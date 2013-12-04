@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/descarwin/!svn/ver/289/trunk/dae/src/variation
+END
+addatom.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/descarwin/!svn/ver/289/trunk/dae/src/variation/addatom.h
+END
+addgoal.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/descarwin/!svn/ver/124/trunk/dae/src/variation/addgoal.h
+END
+delatom.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/descarwin/!svn/ver/124/trunk/dae/src/variation/delatom.cpp
+END
+delgoal.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/descarwin/!svn/ver/124/trunk/dae/src/variation/delgoal.cpp
+END
+crossover.h
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/descarwin/!svn/ver/124/trunk/dae/src/variation/crossover.h
+END
+delatom.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/descarwin/!svn/ver/124/trunk/dae/src/variation/delatom.h
+END
+addgoal.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/descarwin/!svn/ver/200/trunk/dae/src/variation/addgoal.cpp
+END
+delgoal.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/descarwin/!svn/ver/124/trunk/dae/src/variation/delgoal.h
+END

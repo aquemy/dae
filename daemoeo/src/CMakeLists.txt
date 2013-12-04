@@ -1,0 +1,67 @@
+ 
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+#SET(DAEXMOEO_LIB_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+#SET(LIBRARY_OUTPUT_PATH ${DAEXMOEO_LIB_OUTPUT_PATH})
+
+INCLUDE(../install.cmake)
+
+ ADD_DEFINITIONS(-W -Wall -DDAE )#-DCOST_ADD) 
+
+SET (DAEXMOEO_SOURCES
+     core/planningObjectiveVectorTraits.h
+     core/planningObjectiveVectorTraits.cpp
+     core/planningObjectiveVector.h
+     core/moeoDaex.h
+     core/planning.h
+     #core/planning.cpp
+     #core/planningEval.h
+     core/planningEval.cpp  
+) 	 
+
+INCLUDE_DIRECTORIES(${DAEXMOEO_SRC_DIR}
+		    ${DAEXMOEO_SRC_DIR}/src
+		    ${DAEXMOEO_SRC_DIR}/src/core
+		    ${DAEXMOEO_SRC_DIR}/src/do
+		    ${DAEXMOEO_SRC_DIR}/src/utils
+		    ${PARADISEO_EO_SRC_DIR}/src 
+                    ${PARADISEO_MO_SRC_DIR}/src
+                    ${PARADISEO_MOEO_SRC_DIR}/src
+                    ${PARADISEO_PEO_SRC_DIR}/src
+		    ${DAEX_SRC_DIR}
+		    ${DAEX_SRC_DIR}/core
+ 		    ${DAEX_SRC_DIR}/utils
+		    ${DAEX_SRC_DIR}/pack
+	  	    ${DAEX_SRC_DIR}/initialization
+    		    ${DAEX_SRC_DIR}/evaluation
+ 		    ${DAEX_SRC_DIR}/variation)
+	    
+######################################################################################
+
+
+######################################################################################
+###  Specify where CMake can find the libraries
+######################################################################################
+
+# Link with the EO library directory, only if you need it
+LINK_DIRECTORIES(${PARADISEO_EO_BIN_DIR}/lib)
+
+# Link with the MOEO library directory, only if you need it
+LINK_DIRECTORIES(${PARADISEO_MOEO_BIN_DIR}/lib)
+
+# Link with the PEO library directory, only if you need it
+LINK_DIRECTORIES(${PARADISEO_PEO_BIN_DIR}/lib)
+
+LINK_DIRECTORIES(${PARADISEO_DIR}/libxml2/lib)
+
+LINK_DIRECTORIES(${DAEX_BIN_DIR}
+
+		 ${DAEXMOEO_BIN_DIR}/lib)
+
+
+ADD_LIBRARY(daexmoeo STATIC ${DAEXMOEO_SOURCES})
+
+TARGET_LINK_LIBRARIES( daexmoeo daex moeo eo eoutils )
+ 
+SET_TARGET_PROPERTIES(daexmoeo PROPERTIES LINKER_LANGUAGE CXX)
+
