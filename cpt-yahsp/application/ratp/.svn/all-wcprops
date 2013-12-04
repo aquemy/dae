@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/descarwin/!svn/ver/649/trunk/cpt-yahsp/application/ratp
+END
+ratp_structs.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/descarwin/!svn/ver/584/trunk/cpt-yahsp/application/ratp/ratp_structs.h
+END
+ratp.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/descarwin/!svn/ver/584/trunk/cpt-yahsp/application/ratp/ratp.c
+END
+ratp.h
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/descarwin/!svn/ver/584/trunk/cpt-yahsp/application/ratp/ratp.h
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/descarwin/!svn/ver/649/trunk/cpt-yahsp/application/ratp/CMakeLists.txt
+END
