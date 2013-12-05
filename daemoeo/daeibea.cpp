@@ -2,7 +2,7 @@
 #include <moeo>
 #include <daex.h>
  
-#include <utils/eoParserLogger.h>
+#include <utils/eoParser.h>
 #include <utils/eoLogger.h>
 
 #include "src/core/planningObjectiveVectorTraits.h"
@@ -39,7 +39,7 @@ using namespace std;
 int main (int argc, char *argv[])
 {
         
-  	eoParserLogger parser(argc, argv); // for user-parameter reading
+  	eoParser parser(argc, argv); // for user-parameter reading
  	eoState state;                // to keep all things allocated
   	make_verbose(parser); // to keep all things allocated
    

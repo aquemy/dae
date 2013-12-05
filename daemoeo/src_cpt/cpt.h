@@ -77,7 +77,7 @@ struct TimeStruct {
 #define STRING_MAX 10000
 
 
-#include "options.h"
+//#include "options.h"
 
 
 #define NEST(body...) do { body } while (0)

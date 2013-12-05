@@ -4,6 +4,7 @@
 
 #include <eo>
 
+/* Redefined in ParadisEO. I suppose it has been added after. - Aquemy
 template< class EOT >
 class eoBestIndividualStat : public eoSortedStat<EOT, std::string> 
 {
@@ -21,7 +22,7 @@ public:
         value() = os.str();
     }
 };
-
+*/
 
 template< class EOT >
 class eoBestPlanStat : public eoBestIndividualStat<EOT> 
