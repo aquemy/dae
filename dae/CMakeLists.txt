@@ -45,9 +45,9 @@ ENDIF()
  
 # target + link libraries
 
-#OK ADD_EXECUTABLE(dae dae.cpp)
-#OKADD_DEPENDENCIES(dae daex)
-#OKtarget_link_libraries(dae ${PARADISEO_LIBRARIES} daex cpt_yahsp_library-common cpt_yahsp_library)
+#ADD_EXECUTABLE(dae test3.cpp)
+#ADD_DEPENDENCIES(dae daex  daexmo moeo)
+#target_link_libraries(dae ${PARADISEO_LIBRARIES} daex cpt_yahsp_library-common cpt_yahsp_library  daex daexmo )
 
 #LINK_LIBRARIES(daex  daexmoeo eoutils gmp rt ncurses eo gcov gdsl)
 

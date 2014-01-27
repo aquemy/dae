@@ -1,0 +1,4 @@
+1.Copy your program into  the corresponding folder
+3. Change the name of the exec if necessary in the scenario file 
+2.Launch the  paramils_run.sh with the name of programme and the objective criterion (Exp. ./paramils_run.sh daensgaII Add)
+

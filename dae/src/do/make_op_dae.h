@@ -20,7 +20,7 @@ eoGenOp< EOT>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLoa
     
     // the crossovers 
    
-    eoQuadOp<EOT> *ptQuad =  new daex::CrossOverTimeFilterHalf ;
+    eoQuadOp<EOT> *ptQuad =  new daex::CrossOverTimeFilterHalf<EOT> ;
     
      // store in the state
   _state.storeFunctor (ptQuad);
@@ -78,7 +78,7 @@ eoGenOp< EOT>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLoa
     
     // Create the CombinedMonOp
 
-    eoMonOp< EOT> *ptMon =   new  daex::MutationDelGoal();
+    eoMonOp< EOT> *ptMon =   new  daex::MutationDelGoal<EOT>();
     
     _state.storeFunctor (ptMon);
       
@@ -87,7 +87,7 @@ eoGenOp< EOT>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLoa
      eoPropCombinedMonOp< EOT>  (*ptMon, w_delgoal); /// à voir
     
 //    daex::MutationDelOneAtom delatom;
-     ptMon = new  daex::MutationDelAtom(proba_del_atom) ;     
+     ptMon = new  daex::MutationDelAtom<EOT>(proba_del_atom) ;     
     
     
     _state.storeFunctor(ptMon); 
@@ -96,7 +96,7 @@ eoGenOp< EOT>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLoa
         
        
     // partition, radius, l_max
-     ptMon = new daex::MutationAddGoal ( _pddl.chronoPartitionAtom(), radius /*,
+     ptMon = new daex::MutationAddGoal<EOT>( _pddl.chronoPartitionAtom(), radius /*,
      init.l_max()*/ );
      
      _state.storeFunctor(ptMon); 
@@ -105,7 +105,7 @@ eoGenOp< EOT>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLoa
      ptCombinedMonOp  -> add(*ptMon, w_addgoal);
      
      
-      ptMon = new daex::MutationChangeAddAtom ( _pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
+      ptMon = new daex::MutationChangeAddAtom<EOT>( _pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
       
       _state.storeFunctor(ptMon); 
       

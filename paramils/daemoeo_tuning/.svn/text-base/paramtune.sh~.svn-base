@@ -1,0 +1,24 @@
+#!/bin/bash
+
+tab=()
+
+for i in `seq 1 10`
+do
+tab[i]=$1
+shift
+done
+#echo ${tab[*]}
+Gen=10
+./${tab[1]}  ${tab[2]} -I=${tab[4]} -S=${tab[8]}  ${tab[9]}${tab[10]}  -G=$Gen
+
+sed -i -e "s/\t/ /g" ./Res/arch.$Gen 
+./normalize  ${tab[3]}'_bound' ./Res/arch.$Gen    norm_$Gen 
+./hyp_ind  norm_$Gen  ${tab[3]}_'ref' hyp_$Gen  
+
+ 
+best_sol=`awk 'NR==1 {print $1}' hyp_$Gen `
+#runtime=`awk 'NR=='$Gen' {print $8}' ./Res/stats`
+##runlength=`awk 'NR=='$Gen' {print $2}' ./Res/stats`
+#let "runlength =-1*$runlength"
+#echo "Result for ParamILS: SAT, $runtime, $runlength, $best_sol, ${tab[8]}"
+echo "Result for ParamILS: -1, -1, -1, $best_sol, ${tab[8]}"

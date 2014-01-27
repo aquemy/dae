@@ -171,7 +171,6 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
     } // for i atom
 }
 
-
 void pddlLoad::compute_chrono_partition()
 {
     assert( _atoms.size() != 0 );
@@ -211,6 +210,12 @@ pddlLoad::pddlLoad(
     load_pddl( solver, heuristic_start_times, nthreads, solver_args);
     compute_chrono_partition();
 }
+
+pddlLoad::pddlLoad(eoParser& parser) : pddLoad(
+    parser.valueOf<std::string>("domain"),
+    parser.valueOf<std::string>("instance")
+)
+{}
 
 pddlLoad::~pddlLoad()
 {

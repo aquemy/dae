@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <string>
 #include <eo>
+#include <moeo>
 
 #include "utils/pddl_load.h"
 #include "core/decomposition.h"
@@ -66,7 +67,7 @@ bool operator!=( const PDDLTerm & term, const daex::pddlObject & object );
  * il doivent etre implémentés.
  */
 template<class EOT = daex::Decomposition>
-class daeCptYahspEval : public moeoEvalFunc< EOT>
+class daeCptYahspEval : public moeoEvalFunc<EOT>
 {
 public:
   daeCptYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e60, bool sequential = false ) : _l_max( l_max_ ), _b_max_in(b_max_in),_b_max_last( b_max_last),_unknown_parameter(fitness_weight),_fitness_penalty( fitness_penalty ),_sequential( sequential ) { }

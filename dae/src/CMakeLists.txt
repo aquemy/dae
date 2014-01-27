@@ -32,6 +32,28 @@ INCLUDE_DIRECTORIES(${DAEXMOEO_SRC_DIR}
     		${DAEX_SRC_DIR}/evaluation
  		    ${DAEX_SRC_DIR}/variation
  		    ${PARADISEO_DIR})
+ 		    
+SET (DAEXMO_SRC
+     core/moDaex.h
+     core/moplanning.h
+     #core/planning.cpp
+     #core/planningEval.h
+     core/moplanningEval.cpp 
+) 	 
+
+INCLUDE_DIRECTORIES(${DAEXMO_SRC_DIR}
+		    ${DAEXMOEO_SRC_DIR}/src
+		    ${DAEXMOEO_SRC_DIR}/src/core
+		    ${DAEXMOEO_SRC_DIR}/src/do
+		    ${DAEXMOEO_SRC_DIR}/src/utils
+		    ${DAEX_SRC_DIR}
+		    ${DAEX_SRC_DIR}/core
+ 		    ${DAEX_SRC_DIR}/utils
+		    ${DAEX_SRC_DIR}/pack
+	  	    ${DAEX_SRC_DIR}/initialization
+    		${DAEX_SRC_DIR}/evaluation
+ 		    ${DAEX_SRC_DIR}/variation
+ 		    ${PARADISEO_DIR})
 	    
 ######################################################################################
 
@@ -46,8 +68,10 @@ INCLUDE_DIRECTORIES(${DAEXMOEO_SRC_DIR}
 
 
 ADD_LIBRARY(daexmoeo STATIC ${DAEXMOEO_SRC})
+ADD_LIBRARY(daexmo STATIC ${DAEXMO_SRC})
 
-TARGET_LINK_LIBRARIES( daexmoeo daex moeo eo eoutils )
+TARGET_LINK_LIBRARIES(daexmoeo daex moeo eo eoutils )
+TARGET_LINK_LIBRARIES(daexmo daex eo eoutils )
  
 SET_TARGET_PROPERTIES(daexmoeo PROPERTIES LINKER_LANGUAGE CXX)
-
+SET_TARGET_PROPERTIES(daexmo PROPERTIES LINKER_LANGUAGE CXX)

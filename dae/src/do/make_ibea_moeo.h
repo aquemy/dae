@@ -13,9 +13,22 @@
 #include <algo/moeoEA.h>
 #include <algo/moeoEasyEA.h>
 #include <algo/moeoIBEA.h>
- 
- 
 
+namespace daex {
+
+void do_make_ibea_param(eoParser &_parser)
+{
+
+    _parser.createParam(std::string("Epsilon"), "indicator",
+                                 "Binary indicator for IndicatorBased: Epsilon, Hypervolume", 'i',
+                                 "Evolution Engine");
+  
+    _parser.createParam(1.1, "rho", "reference point for the hypervolume indicator", '\0',
+                                   "Evolution Engine");
+                                   
+    _parser.createParam(0.05, "kappa", "Scaling factor kappa for IndicatorBased", 'k',
+                                     "Evolution Engine");
+}
 
 /**
  * This functions allows to build a moeoEA from the parser
@@ -30,41 +43,37 @@ template < class MOEOT >
 moeoIBEA < MOEOT > & do_make_ibea_moeo(eoParser & _parser, eoState & _state, eoEvalFunc < MOEOT > & _eval, eoContinue < MOEOT > & _continue, eoGenOp < MOEOT > & _op)
 {
 
-  /* the objective vector type */
-  typedef typename MOEOT::ObjectiveVector ObjectiveVector;
+    /* the objective vector type */
+    typedef typename MOEOT::ObjectiveVector ObjectiveVector;
 
 
-  /* the fitness assignment strategy */
-  std::string & indicatorParam = _parser.createParam(std::string("Epsilon"), "indicator",
-                                 "Binary indicator for IndicatorBased: Epsilon, Hypervolume", 'i',
-                                 "Evolution Engine").value();
+    /* the fitness assignment strategy */
+    std::string indicatorParam = _parser.valueOf<std::string>("indicator");
+    double rho = _parser.valueOf<double>("rho");
+    double kappa = _parser.valueOf<double>("kappa");
   
-  double rho = _parser.createParam(1.1, "rho", "reference point for the hypervolume indicator", '\0',
-                                   "Evolution Engine").value();
-  double kappa = _parser.createParam(0.05, "kappa", "Scaling factor kappa for IndicatorBased", 'k',
-                                     "Evolution Engine").value();
-  // metric
-  moeoNormalizedSolutionVsSolutionBinaryMetric < ObjectiveVector, double > *metric;
-  if (indicatorParam == std::string("Epsilon"))
-        {
-          metric = new moeoAdditiveEpsilonBinaryMetric < ObjectiveVector >;
-        }
-      else if (indicatorParam == std::string("Hypervolume"))
-        {
-          metric = new moeoHypervolumeBinaryMetric < ObjectiveVector > (rho);
-        }
-      else
-        {
-          std::string stmp = std::string("Invalid binary quality indicator: ") + indicatorParam;
-          throw std::runtime_error(stmp.c_str());
-        }
+    // metric
+    moeoNormalizedSolutionVsSolutionBinaryMetric < ObjectiveVector, double > *metric;
+    if (indicatorParam == std::string("Epsilon"))
+    {
+        metric = new moeoAdditiveEpsilonBinaryMetric < ObjectiveVector >;
+    }
+    else if (indicatorParam == std::string("Hypervolume"))
+    {
+        metric = new moeoHypervolumeBinaryMetric < ObjectiveVector > (rho);
+    }
+    else
+    {
+        std::string stmp = std::string("Invalid binary quality indicator: ") + indicatorParam;
+        throw std::runtime_error(stmp.c_str());
+    }
        
     
      // _state.storeFunctor(metric);
  
     /// the moeoIBEA
  
-   moeoIBEA < MOEOT > * algo = new moeoIBEA < MOEOT > (_continue, _eval, _op,  *metric, kappa);
+    moeoIBEA < MOEOT > * algo = new moeoIBEA < MOEOT > (_continue, _eval, _op,  *metric, kappa);
   
   
    //_state.storeFunctor(algo);
@@ -72,5 +81,7 @@ moeoIBEA < MOEOT > & do_make_ibea_moeo(eoParser & _parser, eoState & _state, eoE
    return *algo;
 
 }
+
+} // namespace daex
 
 #endif /*MAKE_EA_MOEO_H_*/

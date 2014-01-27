@@ -215,6 +215,13 @@ pddlLoad::pddlLoad(
     compute_chrono_partition();
 }
 
+pddlLoad::pddlLoad(eoParser &parser) : pddlLoad::pddlLoad(
+    parser.valueOf<std::string>("domain"),
+    parser.valueOf<std::string>("instance"))
+{
+    
+}
+
 pddlLoad::~pddlLoad()
 {
     for( unsigned int i=0; i<_atoms.size(); ++i) {

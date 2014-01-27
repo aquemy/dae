@@ -1,0 +1,18 @@
+
+#############################################INPUT
+
+Trial 1 for calling: ruby saps_wrapper.rb /home/mostepha/framework/paramils2.3.5-source/example_data/SWGCP-satisfiable-instances/SWlin2006.19724.cnf "" 5.0 2147483647 323759947 -wp 0.03 -rho 0.5 -ps 0.066 -alpha 1.4 
+
+ruby saps_wrapper.rb <instance_relname> <instance_specifics> <cutoff_time> <cutoff_length> <seed> <params to be passed on>
+
+
+###############################################"""OUTPUT
+
+
+
+
+Calling: ./ubcsat -alg saps -wp 0.03 -rho 0.5 -ps 0.066 -alpha 1.4 -inst /home/mostepha/framework/paramils2.3.5-source/example_data/SWGCP-satisfiable-instances/SWlin2006.19724.cnf -cutoff 2147483647 -timeout 5.0 -target 0 -seed 323759947 -r stats stdout default,best > ubcsat_output0.910478602394718.txt
+
+
+Result for ParamILS: SAT, 0.2, 109599, 0, 323759947
+		<solved>, <runtime>, <runlength>, <bestsoluion>

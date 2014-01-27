@@ -40,7 +40,7 @@ public:
 
     //! Construct a valid plan from a YAHSP's pointer: get the makespan and the string representation
     
-     Plan() : _makespan( INT_MAX ), _search_steps(0), _is_valid(false),_plan_rep("No plan") ,_cost_add(INT_MAX ), _cost_max(INT_MAX ) {}
+     Plan() : _makespan( INT_MAX ), _cost_add(INT_MAX ), _cost_max(INT_MAX ), _search_steps(0), _is_valid(false), _plan_rep("No plan")  {}
 	
       ~Plan(){}
      

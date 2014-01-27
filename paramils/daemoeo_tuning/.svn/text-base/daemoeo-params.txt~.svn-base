@@ -1,0 +1,35 @@
+-fitness-weight={1,2,5,10,15,20}[10] 		# -W Unknown weight in the feasible and unfeasible fitness computation
+-fitness-penalty={10,50,100,150,200,300,500,1000,10000}[200] # -w : Penalty in the unfeasible fitnesses computation
+-bmax-fixed={10,100,1000,10000,100000,1000000}[10] 		# -b Fixed number of allowed expanded nodes. 
+-bmax-last-weight={1,2,3,4,5,6,7,8,9,10}[3]          	 # -T : Weighting for the b_max used during the last search towards the end goal
+-radius={0,2,3,5,8,10}[2]                      # -R : Number of neighbour goals to consider for the addGoal mutation (just when -bmax-fixed=0)
+-proba-change={0,0.1,0.2,0.5,0.8,1.0}[0.8]    	# -k : Probability to change an atom for the changeAtom mutation
+-proba-del-atom={0,0.1,0.2,0.5,0.8,1.0}[0.5]  	# -p : Average probability to delete an atom for the delAtom mutation
+-w-delgoal={0,1,2,3,4,5,6,7,8,9,10}[1]                     	 # -a : Relative weight defining the probability to call the delGoal mutation
+-w-addgoal={0,1,2,3,4,5,6,7,8,9,10}[1]                     	 # -A : Relative weight defining the probability to call the addGoal mutation
+-w-delatom={0,1,2,3,4,5,6,7,8,9,10}[3]                     	 # -u : Relative weight defining the probability to call the delAtom mutation
+-w-addatom={0,1,2,3,4,5,6,7,8,9,10}[1]                     	 # -d : Relative weight defining the probability to call the addAtom mutation
+-maxtry-candidate={0}[0]               	   # -y : Maximum number of atoms to try when searching for a candidate in the changeAtom mutation
+-maxtry-mutex={0}[0]                   	 # -z : Maximum number of atoms to try when searching for mutexes in the changeAtom mutation
+-proba-cross={0,0.1,0.2,0.5,0.8,1.0}[0.2]     # -c : Probability to apply a cross-over
+-proba-mut={0,0.1,0.2,0.5,0.8,1.0}[0.8]       # -m : Probability to apply one of the mutation
+-maxGen={1000,10000}[1000]                    # -G : Maximum number of generations
+-steadyGen={100000}[100000]                   # -s : Number of generations with no improvement
+-popSize={100}[100]                           # -P : Population Size
+-updateArch={1}[1]                           # Update the archive at each gen.
+-lmax-initcoef={2}[2]                        # -N : l_max will be set to the size of the chrono partition * this coefficient
+-lmin={1}[1]                                 # -M : Minimum number of goals in a decomposition
+-eraseDir={1}[1]                             # erase files in dirName if any
+-printPop={0}[0]                            # Print sorted pop. every gen.
+-storeArch={1}[1]                             # Store the archive's objective vectors at each gen.
+-printArch={1}[1]                             # Print the archive at each gen.
+-contribution={0}[0]                         # Store the contribution of the archive at each gen.
+-entropy={0}[0]                              # Store the entropy of the archive at each gen.
+-printStats={1}[1]                           # Print Best/avg/feasible every gen.
+-saveFrequency={0}[0]                        # Save every F generation (0 = only final state, absent = never)
+-sequential={0}[0]                           # -q : Is the problem a sequential one? REQUIRED 
+-objective={Add}[Add]                        # -Z : 2nd objective to take into account (Add(additive cost )/Max(max cost)
+-domain={../benchmarks/domain/domain.pddl}[../benchmarks/domain/domain.pddl} # -D : PDDL domain file REQUIRED 
+
+
+ 

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+
+tab=()
+
+for i in `seq 1 2`
+do
+tab[i]=$1
+shift
+done
+echo ${tab[*]}
+
+
+sed -i -e "s/\t/ /g" ./Res/arch.${tab[1]}
+./normalize  ./${tab[2]}'_bound' ./Res/arch.${tab[1]}  norm.${tab[1]} 
+./hyp_ind norm.${tab[1]} ./${tab[2]}_'ref' hyp.${tab[1]}
+
+best_sol=`awk 'NR==1 {print $1}' hyp.${tab[1]} `
+
+ echo $best_sol
+
+runtime=`awk 'NR==10 {print $8}' ./Res/stats`
+
+ echo $runtime
+
+#echo "Result for ParamILS: SAT, #{runtime}, #{runlength}, #{best_sol}, ${tab[8]}"
+ echo "Result for ParamILS: SAT, #{runtime}, #{runlength}, $best_sol, #{seed}"

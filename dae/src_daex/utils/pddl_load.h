@@ -3,6 +3,7 @@
 #define __PDDL_LOAD_H_
 
 /***** C++ headers *****/
+#include <eo>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -32,6 +33,7 @@
 //} // extern "C"
 
 #include "core/atom.h"
+
 
 #define SOLVER_YAHSP "yahsp"
 #define SOLVER_CPT   "cpt"
@@ -78,6 +80,7 @@ public:
     //! Parse the PDDL file, instanciate corresponding atoms in a vector and compute the corresponding chronological partition
     pddlLoad( std::string domain, std::string problem, std::string solver = SOLVER_YAHSP, unsigned int heuristic_start_times = HEURISTIC_H1, unsigned int nthreads= 1, std::vector<std::string> solver_args = std::vector<std::string>());
 
+    pddlLoad(eoParser &parser);
 
     ~pddlLoad();
 
