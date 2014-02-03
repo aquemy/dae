@@ -2,7 +2,7 @@
 *.html
 
 # ignore all textual files
-*.txt
+#*.txt
 
 # ignore object and archive files
 *.[oa]
