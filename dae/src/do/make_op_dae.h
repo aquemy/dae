@@ -44,7 +44,7 @@ eoGenOp< EOT>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLoa
             "Number of neighbour goals to consider for the addGoal mutation", 'R', "Variation" ).value();
      
     double proba_change = _parser.createParam( (double)0.8, "proba-change", 
-            "Probability to change an atom for the changeAtom mutation", 'k', "Variation" ).value();
+            "Probability to change an atom for the changeAtom mutation", 't', "Variation" ).value();
             
      if ( (proba_change  < 0) || (proba_change  > 1) )
      	throw std::runtime_error("Invalid pChange");

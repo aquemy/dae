@@ -45,7 +45,7 @@ int main (int argc, char *argv[])
          
   	eoParser parser(argc, argv);                    // for user-parameter reading
  	eoState state;                                  // to keep all things allocated
-  	make_verbose(parser);                           // to keep all things allocated
+  	//make_verbose(parser);                           // to keep all things allocated
   	
   	// General parameters
   	daex::do_make_general_param(parser);            // Common part
@@ -93,9 +93,10 @@ int main (int argc, char *argv[])
     algo(pop);
 
     /// printing of the best of the final population
-    cout << "Final Population\n";
-    pop.sortedPrintOn(cout);
-    cout << endl;
+    //cout << "Final Population\n";
+    //pop.sortedPrintOn(cout);
+    for (unsigned int i = 0; i < pop.size (); i++)
+        cerr << pop[i].objectiveVector() << endl;
 
     return EXIT_SUCCESS;
 }
