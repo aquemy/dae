@@ -10,6 +10,7 @@
 #include "utils/eoFeasibleStat.h"
 #include "utils/moeoPopObjectiveVectorSavingUpdater.h"
 #include "utils/moeoArchiveObjectiveVectorTimeSavingUpdater.h"
+#include "utils/moeoPopObjectiveVectorTimeSavingUpdater.h"
 #include "utils/eoPlanStat.h"
 #include <metric/moeoHyperVolumeDifferenceMetric.h>
 template < class MOEOT >
@@ -133,12 +134,9 @@ eoCheckPoint < MOEOT > & do_make_checkpoint_daemoeo (eoParser & _parser, eoState
     }
     
       
-  eoValueParam<unsigned int>&  saveIntervalArch = _parser.getORcreateParam((unsigned int)(0), "saveIntervalArch", "Save the archive's objective vectors every T seconds (0 or absent = never)", '\0', "Output");
+    unsigned int  saveIntervalArch = _parser.getORcreateParam((unsigned int)(0), "saveIntervalArch", "Save the archive's objective vectors every T seconds (0 or absent = never)", '\0', "Output").value();
   
-  bool printIntervalArch = _parser.getORcreateParam(false, "printIntervalArch", "Print the archive at each time interval", '\0', "Output").value(); 
-     
-  
-  if (_parser.isItThere(saveIntervalArch) && saveIntervalArch.value()>0)
+  if (saveIntervalArch>0)
     {
 
 #ifdef _MSVC
@@ -147,7 +145,7 @@ eoCheckPoint < MOEOT > & do_make_checkpoint_daemoeo (eoParser & _parser, eoState
       std::string stmp = dirName + "/archTime";
 #endif
         
-      moeoArchiveObjectiveVectorTimeSavingUpdater < MOEOT > * saveTimeUpdater = new moeoArchiveObjectiveVectorTimeSavingUpdater < MOEOT > (_archive, stmp, true, saveIntervalArch.value(),printIntervalArch);
+      moeoArchiveObjectiveVectorTimeSavingUpdater < MOEOT > * saveTimeUpdater = new moeoArchiveObjectiveVectorTimeSavingUpdater < MOEOT > (_archive, stmp, saveIntervalArch, true);
       _state.storeFunctor(saveTimeUpdater);
       checkpoint.add(*saveTimeUpdater);
     }
@@ -157,9 +155,25 @@ eoCheckPoint < MOEOT > & do_make_checkpoint_daemoeo (eoParser & _parser, eoState
   //////////////////
   // update the pop vectors every generation    
   
-  bool storePopVectors = _parser.getORcreateParam(false, "storePopVectors", "Store the pop's objective vectors at each gen.", '\0', "Output").value();
+    unsigned int saveIntervalPopVectors = _parser.valueOf<unsigned int>("saveIntervalPopVectors");
+  
+   bool storePopVectors = _parser.getORcreateParam(false, "storePopVectors", "Store the pop's objective vectors at each gen.", '\0', "Output").value();
   
   bool printPopVectors = _parser.getORcreateParam(false, "printPopVectors", "Print the pop vectors at each gen.", '\0', "Output").value(); 
+
+    if (saveIntervalPopVectors > 0)
+    {
+
+#ifdef _MSVC
+      std::string stmp = dirName + "\popTime";
+#else
+      std::string stmp = dirName + "/popTime";
+#endif 
+
+    moeoPopObjectiveVectorTimeSavingUpdater< MOEOT > * save_popvec_updater = new moeoPopObjectiveVectorTimeSavingUpdater < MOEOT > (_pop, stmp, saveIntervalPopVectors, true);
+      _state.storeFunctor(save_popvec_updater);
+      checkpoint.add(*save_popvec_updater);
+    }
   
     if (storePopVectors)
     {
@@ -174,6 +188,9 @@ eoCheckPoint < MOEOT > & do_make_checkpoint_daemoeo (eoParser & _parser, eoState
       _state.storeFunctor(save_popvec_updater);
       checkpoint.add(*save_popvec_updater);
     }
+   
+    
+    
     ///////////////////
   // Metrics
   ////////////////// 

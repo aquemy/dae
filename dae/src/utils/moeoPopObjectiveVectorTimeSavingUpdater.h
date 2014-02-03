@@ -1,5 +1,5 @@
 /*
-* <moeoArchiveObjectiveVectorSavingUpdater.h>
+* <moeoPopObjectiveVectorSavingUpdater.h>
 * Copyright (C)  TAO Project-Team, INRIA Saclay, 2011-2012
  
 * Mostepha-Redouane Khouadjia
@@ -8,8 +8,8 @@
 
 
 */
-#ifndef MOEOARCHIVEOBJECTIVEVECTORTIMESAVINGUPDATER_H_
-#define MOEOARCHIVEOBJECTIVEVECTORTIMESAVINGUPDATER_H_
+#ifndef MOEOPOPOBJECTIVEVECTORTIMESAVINGUPDATER_H_
+#define MOEOPOPOBJECTIVEVECTORTIMESAVINGUPDATER_H_
 
 #include <fstream>
 #include <string>
@@ -23,7 +23,7 @@
  * This class allows to save the objective vectors of the solutions contained in an archive into a file at each generation.
  */
 template < class MOEOT >
-class moeoArchiveObjectiveVectorTimeSavingUpdater : public eoUpdater
+class moeoPopObjectiveVectorTimeSavingUpdater : public eoUpdater
   {
   public:
 
@@ -34,8 +34,8 @@ class moeoArchiveObjectiveVectorTimeSavingUpdater : public eoUpdater
      * @param _count put this variable to true if you want a new file to be created each time () is called and to false if you only want the file to be updated
      * @param _id own ID
      */
-    moeoArchiveObjectiveVectorTimeSavingUpdater (moeoArchive<MOEOT> & _arch, const std::string & _filename, time_t _interval, bool _count = false,int _id = -1) :
-        arch(_arch), filename(_filename), interval(_interval), last_time(time(0)), first_time(time(0)), count(_count), id(_id), first(true)
+    moeoPopObjectiveVectorTimeSavingUpdater (eoPop<MOEOT> & _pop, const std::string & _filename, time_t _interval, bool _count = false,int _id = -1) :
+        pop(_pop), filename(_filename), interval(_interval), last_time(time(0)), first_time(time(0)), count(_count), id(_id), first(true)
     {}
 
 
@@ -46,7 +46,7 @@ class moeoArchiveObjectiveVectorTimeSavingUpdater : public eoUpdater
     {
       time_t now = time(0);
       char buff[MAX_BUFFER_SIZE];
-
+      
       if (now >= last_time + interval or first)
       {
 	    last_time = now;
@@ -75,8 +75,8 @@ class moeoArchiveObjectiveVectorTimeSavingUpdater : public eoUpdater
                 }
             }
           std::ofstream f(buff);
-          for (unsigned int i = 0; i < arch.size (); i++)
-            f << arch[i].objectiveVector() << std::endl;
+          for (unsigned int i = 0; i < pop.size (); i++)
+            f << pop[i].objectiveVector() << std::endl;
           f.close ();
         }
     
@@ -86,7 +86,7 @@ class moeoArchiveObjectiveVectorTimeSavingUpdater : public eoUpdater
   private:
 
     /** local archive */
-    moeoArchive<MOEOT> & arch;
+    eoPop<MOEOT> & pop;
     /** target filename */
     std::string filename;
     /** this variable is set to true if a new file have to be created each time () is called and to false if the file only HAVE to be updated */

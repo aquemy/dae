@@ -26,11 +26,13 @@ void do_make_checkpoint_param(eoParser &parser)
   
     bool printArch = parser.getORcreateParam(false, "printArch", "Print the archive at each gen.", '\0', "Output").value(); 
       
-    eoValueParam<unsigned int>&  saveIntervalArch = parser.getORcreateParam((unsigned int)(0), "saveIntervalArch", "Save the archive's objective vectors every T seconds (0 or absent = never)", '\0', "Output");
+    unsigned int saveIntervalArch = parser.getORcreateParam((unsigned int)(0), "saveIntervalArch", "Save the archive's objective vectors every T seconds (0 or absent = never)", '\0', "Output").value();
   
     bool printIntervalArch = parser.getORcreateParam(false, "printIntervalArch", "Print the archive at each time interval", '\0', "Output").value();  
   
     bool storePopVectors = parser.getORcreateParam(false, "storePopVectors", "Store the pop's objective vectors at each gen.", '\0', "Output").value();
+    
+    unsigned int saveIntervalPopVectors = parser.getORcreateParam((unsigned int)(0), "saveIntervalPopVectors", "Store the pop's objective vectors  every T seconds (0 or absent = never).", '\0', "Output").value();
   
     bool printPopVectors = parser.getORcreateParam(false, "printPopVectors", "Print the pop vectors at each gen.", '\0', "Output").value(); 
   
