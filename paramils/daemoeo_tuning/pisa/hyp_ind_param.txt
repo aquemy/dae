@@ -1,0 +1,4 @@
+dim 2
+obj - -
+method 1
+nadir 500.1 500.1
