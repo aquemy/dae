@@ -35,7 +35,7 @@ class moeoArchiveObjectiveVectorTimeSavingUpdater : public eoUpdater
      * @param _id own ID
      */
     moeoArchiveObjectiveVectorTimeSavingUpdater (moeoArchive<MOEOT> & _arch, const std::string & _filename, time_t _interval, bool _count = false,int _id = -1) :
-        arch(_arch), filename(_filename), interval(_interval), last_time(time(0)), first_time(time(0)), count(_count), id(_id), first(true)
+        arch(_arch), filename(_filename), interval(_interval), last_time(time(0)), first_time(time(0)), count(_count), id(_id)
     {}
 
 
@@ -50,7 +50,6 @@ class moeoArchiveObjectiveVectorTimeSavingUpdater : public eoUpdater
       if (now >= last_time + interval or first)
       {
 	    last_time = now;
-	    first = false;
 	
 	    if (count)
             {
@@ -96,7 +95,6 @@ class moeoArchiveObjectiveVectorTimeSavingUpdater : public eoUpdater
     const time_t interval;
     time_t last_time;
     const time_t first_time;
-    bool first;
   };
 
 #endif //MOEOARCHIVEOBJECTIVEVECTORTIMESAVINGUPDATER_H_
