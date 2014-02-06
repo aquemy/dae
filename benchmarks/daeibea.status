@@ -7,7 +7,7 @@
 --fitness-weight=15                      # -W : Unknown weight in the feasible and unfeasible fitness computation
 --fitness-penalty=1000                  # -w : Penalty in the unfeasible fitnesses computation
 --bmax-fixed=1000000                               # -b : Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0
-# --bmax-last-weight=3                     # -T : Weighting for the b_max used during the last search towards the end goal (must be strictly positive)
+--bmax-last-weight=1                     # -T : Weighting for the b_max used during the last search towards the end goal (must be strictly positive)
 --bmax-quantile=0.5                      # -Q : Quantile to use for estimating b_max (in [0,1], 0.5=median)
 --lenght_weigth=1                        # -H : Weighting for the optimizing lenght during the search
 --cost_weigth=1                            # -U : Weighting for the optimizing cost during the search

@@ -47,7 +47,7 @@ class moeoArchiveObjectiveVectorTimeSavingUpdater : public eoUpdater
       time_t now = time(0);
       char buff[MAX_BUFFER_SIZE];
 
-      if (now >= last_time + interval or first)
+      if (now >= last_time + interval)
       {
 	    last_time = now;
 	
