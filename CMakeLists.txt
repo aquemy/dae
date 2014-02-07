@@ -35,6 +35,7 @@ include_directories(${PARADISEO_INCLUDE_DIR})
 
 # the source directory of yahsp is not /src/ because we include src/cpt.h instead of cpt.h
 # because of name collisions
+set(DAE true) # YAHSP CONFIGURATION
 set(CPT_YAHSP_SRC_DIR ${CMAKE_SOURCE_DIR}/cpt-yahsp)
 
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)

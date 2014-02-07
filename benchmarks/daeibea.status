@@ -27,8 +27,8 @@
 
 ### INITIALIZATION #################################################################
 # --insemination=0                         # Use the insemination heuristic to estimate b_max at init
-# --lmax-initcoef=20                        # -N : l_max will be set to the size of the chrono partition * this coefficient
-# --lmin=1                                 # -M : Minimum number of goals in a decomposition
+--lmax-initcoef=20                        # -N : l_max will be set to the size of the chrono partition * this coefficient
+--lmin=1                                 # -M : Minimum number of goals in a decomposition
 
 ### LOGGER #########################################################################
 # --verbose=quiet                          # -v : Set the verbose level
@@ -43,7 +43,7 @@
 --printPlan=0                            # Print sorted plan. every gen.
 --storeArch=0                            # Store the archive's objective vectors at each gen.
 --printArch=0                            # Print the archive at each gen.
---saveIntervalArch=10                    # Save the archive's objective vectors every T seconds (0 or absent = never)
+--saveIntervalArch=1                    # Save the archive's objective vectors every T seconds (0 or absent = never)
 --printIntervalArch=0                   # Print the archive at each time interval
 --storePopVectors=0                      # Store the pop's objective vectors at each gen.
 --printPopVectors=0                      # Print the pop vectors at each gen.
@@ -61,10 +61,10 @@
 # --status=./dae/daeibea.status            # Status file
 
 ### PROBLEM ########################################################################
---domain=./BENCH/domain.pddl             # -D : PDDL domain file REQUIRED 
---instance=./BENCH/Shape/3n9t2p/ariari_Zeno3n9t2pMulti.pddl # -I : PDDL instance file REQUIRED 
+--domain=./domain.pddl             # -D : PDDL domain file REQUIRED 
+#--instance=./BENCH/Shape/3n9t2p/ariari_Zeno3n9t2pMulti.pddl # -I : PDDL instance file REQUIRED 
 --sequential=0                           # -q : Is the problem a sequential one? REQUIRED 
-# --objective=Add                          # -Z : 2nd objective to take into account (Add(additive cost )/Max(max cost)
+ --objective=Add                          # -Z : 2nd objective to take into account (Add(additive cost )/Max(max cost)
 
 ### STOPPING CRITERION #############################################################
 --maxGen=0                               # -G : Maximum number of generations

@@ -5,28 +5,28 @@
             city0 city1 city2 city3 city4 - city)
   (:init (= (total-cost) 0)
          (= (citythreat city0) 0)
-         (= (citythreat city1) 1)
-         (= (citythreat city2) 2.38629)
-         (= (citythreat city3) 3.19722)
+         (= (citythreat city1) 69)
+         (= (citythreat city2) 109)
+         (= (citythreat city3) 138)
          (= (citythreat city4) 0)
          
 ; city1
-         (= (timeTerre city0 city1) 3.19722)
-         (= (timeTerre city1 city0) 3.19722)
-         (= (timeTerre city4 city1) 3.19722)
-         (= (timeTerre city1 city4) 3.19722)
+         (= (timeTerre city0 city1) 138)
+         (= (timeTerre city1 city0) 138)
+         (= (timeTerre city4 city1) 138)
+         (= (timeTerre city1 city4) 138)
          
 ; city2
-         (= (timeTerre city0 city2) 2.38629)
-         (= (timeTerre city2 city0) 2.38629)
-         (= (timeTerre city4 city2) 2.38629)
-         (= (timeTerre city2 city4) 2.38629)
+         (= (timeTerre city0 city2) 109)
+         (= (timeTerre city2 city0) 109)
+         (= (timeTerre city4 city2) 109)
+         (= (timeTerre city2 city4) 109)
          
 ; city3
-         (= (timeTerre city0 city3) 1)
-         (= (timeTerre city3 city0) 1)
-         (= (timeTerre city4 city3) 1)
-         (= (timeTerre city3 city4) 1)
+         (= (timeTerre city0 city3) 69)
+         (= (timeTerre city3 city0) 69)
+         (= (timeTerre city4 city3) 69)
+         (= (timeTerre city3 city4) 69)
          
 ; plane init
          (at plane1 city0)
@@ -60,21 +60,20 @@
   (:metric (and (minimize (total-time)) (minimize (total-cost)))))
 
 ; Pareto points : Makespan - Cost
-; 51.1556 16
-; 49.5337 18.7726
-; 46.7611 20.3944
-; 45.1393 23.167
-; 42.3667 24.7889
-; 40.7448 27.5615
-; 37.9722 29.1833
-; 36.3504 31.9559
-; 33.5778 33.5778
-; 31.9559 36.3504
-; 31.9559 36.3504
-; 29.1833 37.9722
-; 27.5615 40.7448
-; 24.7889 42.3667
-; 23.167 45.1393
-; 20.3944 46.7611
-; 18.7726 49.5337
-; 16 51.1556
+; 2208 1104
+; 2150 1184
+; 2070 1242
+; 2012 1322
+; 1932 1380
+; 1874 1460
+; 1794 1518
+; 1736 1598
+; 1656 1656
+; 1598 1736
+; 1518 1794
+; 1460 1874
+; 1380 1932
+; 1322 2012
+; 1242 2070
+; 1184 2150
+; 1104 2208
