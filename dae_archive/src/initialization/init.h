@@ -18,13 +18,14 @@ class Init : public eoInit<EOT>//Decomposition>
     typedef typename EOT::AtomType G;
 #ifdef DAE_MO
     // TODO autoriser les décomposition vides ? (_min_nb = 0 )
- Init( const ChronoPartition & times, std::string strategy, double proba_strategy, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1):
+ Init( const ChronoPartition & times, std::string strategy, double proba_strategy, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1, unsigned int l_max = 20):
             _times(times),
 	    _strategy(strategy),
 	    _proba_strategy(proba_strategy),
 	    _min_nb(min_nb),
 	    _l_max_init_coef(l_max_init_coef),
-	    _l_max( 20 ) {
+	    _l_max(l_max) 
+	{
 
         assert( ! _times.empty() );
         // TODO valider le choix arbitraire du times * 2 pour le l_max

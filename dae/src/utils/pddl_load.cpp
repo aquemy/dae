@@ -1,6 +1,6 @@
 
 
-#include "utils/pddl_load.h"
+#include "utils/pddl_load.h" 
 #include <utils/eoLogger.h>
 #include <utils/eoParallel.h>
 
@@ -8,7 +8,7 @@
 namespace daex
 {
 
-std::vector< daex::Atom*> globalAtoms;
+//std::vector< daex::Atom*> globalAtoms;
 
 void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/, 
                           unsigned int heuristic_start_times /*= HEURISTIC_H1*/,
@@ -160,16 +160,20 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
     for( unsigned int i=0; i < (unsigned int) fluents_nb; ++i) {
 
         // prédicat, objet, date au plus tot, pointeur vers le fluent CPT
-        daex::Atom * atom = new daex::Atom( fluents[i]->init,  i );
+        ///daex::Atom * atom = new daex::Atom( fluents[i]->init,  i ); selement dans Daepeo
+	
+	daex::Atom * atom = new daex::Atom( fluents[i]->init, fluents[i] );
+	
 
         //std::cout << *atom << std::endl;
 
         _atoms.push_back( atom );
         
-         globalAtoms.push_back( atom );
+        // globalAtoms.push_back( atom );
 
     } // for i atom
 }
+
 
 void pddlLoad::compute_chrono_partition()
 {
@@ -211,11 +215,12 @@ pddlLoad::pddlLoad(
     compute_chrono_partition();
 }
 
-pddlLoad::pddlLoad(eoParser& parser) : pddLoad(
+pddlLoad::pddlLoad(eoParser &parser) : pddlLoad::pddlLoad(
     parser.valueOf<std::string>("domain"),
-    parser.valueOf<std::string>("instance")
-)
-{}
+    parser.valueOf<std::string>("instance"))
+{
+    
+}
 
 pddlLoad::~pddlLoad()
 {

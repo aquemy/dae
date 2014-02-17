@@ -12,7 +12,7 @@
 -bmax-increase-coef={1}[1]                   # -K : Multiplier increment for the computation of b_max
 -popSize={10,20,30,50,100,200,300}[100]                            # -P : Population Size
 -lmax-initcoef={20}[20]     # -N : l_max will be set to the size of the chrono partition * this coefficient
--lmin={1}[1]		   # -M : Minimum number of goals in a decomposition
+-lmin={1}[1]		    # -M : Minimum number of goals in a decomposition
 -maxGen={0}[0]                    # -G : Maximum number of generations
 -steadyGen={-1}[-1]                   # -s : Number of generations with no improvement
 -radius={1,3,5,7,10}[3]      # -R : Number of neighbour goals to consider for the addGoal mutation 
@@ -26,6 +26,6 @@
 -maxtry-mutex={100}[100]               # -z : Maximum number of atoms to try when searching for mutexes in the changeAtom 
 -proba-cross={0.0,0.1,0.2,0.5,0.8,1.0}[0.2]     # -c : Probability to apply a cross-over
 -proba-mut={0.0,0.1,0.2,0.5,0.8,1.0}[0.8]       # -m : Probability to apply one of the mutation
--domain={../benchmarks/domain/domain.pddl}[../benchmarks/domain/domain.pddl]
+-domain={../benchmarks/domain/MultiZeno.pddl}[../benchmarks/domain/MultiZeno.pddl]
 
  

@@ -20,9 +20,12 @@ template<class EOT>
 class FeasibleRatioStat : public eoStat< EOT, double >
 {
 public:
+
     using eoStat<EOT, double>::value;
 
-    FeasibleRatioStat( std::string description = "FeasibleRatio(%)" ) : eoStat<EOT,double>( 0.0, description ) {}
+    FeasibleRatioStat( std::string description = "FeasibleRatio(%)" ) : 
+        eoStat<EOT,double>(0.0, description) 
+    {}
 
     virtual void operator()( const eoPop<EOT> & pop )
     {
@@ -37,7 +40,7 @@ public:
         value() = static_cast<double>( std::count_if( pop.begin(), pop.end(), isFeasible<EOT> ) ) / static_cast<double>( pop.size() );
 	
 #endif
-	 value() *=100;
+	 value() *= 100;
 		
     }
 

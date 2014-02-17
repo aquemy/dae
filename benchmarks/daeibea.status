@@ -71,7 +71,7 @@
 --steadyGen=0                          # -s : Number of generations with no improvement
 # --minGen=0                               # -g : Minimum number of generations
 # --maxEval=0                              # -E : Maximum number of evaluations (0 = none)
---maxTime=310                            # -T : Maximum running time in seconds (0 = none)
+#--maxTime=310                            # -T : Maximum running time in seconds (0 = none)
 # --CtrlC=0                                # -C : Terminate current generation upon Ctrl C
 
 ### STOPPING CRITERIONS ############################################################

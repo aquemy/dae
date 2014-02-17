@@ -47,7 +47,7 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/lib)
 ######################################################################################
 ### 0) DAEX Config
 ######################################################################################
-set(DAEX_SRC_DIR "${CMAKE_SOURCE_DIR}/dae/src_daex")
+set(DAEX_SRC_DIR "${CMAKE_SOURCE_DIR}/dae/src")
 set(DAEXMOEO_SRC_DIR "${CMAKE_SOURCE_DIR}/dae/src")
 
 ######################################################################################

@@ -19,7 +19,7 @@ INCLUDE_DIRECTORIES(
 ### 0) Include subdirectories
 ######################################################################################
 #add_subdirectory(doc)
-add_subdirectory(src_daex)
+#add_subdirectory(src_daex)
 add_subdirectory(src)
 
 if(ENABLE_CMAKE_TESTING)
@@ -33,7 +33,7 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/lib)
 
 # flags to use with compiler
 # VV : -DDAE pour les headers de YAHSP
-ADD_DEFINITIONS(-W -Wall -DDAE )#-DCOST_ADD) 
+ADD_DEFINITIONS(-W -Wall -DDAE)#-DCOST_ADD) 
 
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
   #ADD_DEFINITIONS(-DPAPERVERSION)
@@ -41,7 +41,6 @@ IF (CMAKE_BUILD_TYPE MATCHES Debug)
 ELSE()
   ADD_DEFINITIONS(-O3 -DNDEBUG)
 ENDIF()
-
  
 # target + link libraries
 
