@@ -28,6 +28,9 @@ void do_make_general_param(eoParser &parser)
 
     bool insemination = parser.createParam(false, "insemination", "Use the insemination heuristic to estimate b_max at init", '\0', "Initialization").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "insemination" << insemination << std::endl;
+    
+    unsigned int param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "seed" << param_seed << std::endl;
 
 }
 

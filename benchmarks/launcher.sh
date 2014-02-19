@@ -2,8 +2,9 @@
 
 nbRuns=30
 build=../build/dae
-folder=Shape/3n6t2p
-instances=( "ariari_3n6t2p" "expexp_3n6t2p" "loglog_3n6t2p" )
+folder=Concavity/other
+instances=( "1_3n6t2p" "2_3n6t2p" )
+seedFactor=12345
 
 for instance in "${instances[@]}"   
 do 
@@ -16,10 +17,8 @@ do
     for ((i=0 ; $i < $nbRuns; i++)) 
     do 
         echo "- Run : $i"
-        $build/daeibea @./"$folder"/daeibea.status -I="./"$folder"/"$instance".pddl" --maxTime=610
+        $build/daeibea @./"$folder"/daeibea.status -I="./"$folder"/"$instance".pddl" --maxTime=610 --seed=$((i*$seedFactor))
         mv ./Res ./runs/"$folder"/runs/"$instance"_runs/run"$i"
     done
-    
-    cp ./scripts/* ./runs/
 done
 

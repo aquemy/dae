@@ -41,7 +41,7 @@ using namespace std;
 /// main
 int main (int argc, char *argv[])
 {
-        
+    
   	eoParser parser(argc, argv); // for user-parameter reading
  	eoState state;                // to keep all things allocated
   	make_verbose(parser); // to keep all things allocated
@@ -59,16 +59,23 @@ int main (int argc, char *argv[])
     daex::do_make_continue_param(parser);
     
     make_help(parser);
-    
+
     daex::pddlLoad pddl(parser);
     
  	///*** the representation-dependent things ***///
+ 	unsigned seed = parser.valueOf<unsigned int>("seed");
+ 	if (seed == 0) {
+        // change the parameter itself, that will be dumped in the status file
+        //        param_seed.value( time(0) );
+        seed = time(0); // EO compatibility fixed by CC on 2010.12.24
+    }
+    eo::rng.reseed(seed);
     
     /// Initialization
     unsigned int l_max_init_coef = parser.valueOf<unsigned int>("lmax-initcoef");
     unsigned int l_min = parser.valueOf<unsigned int>("lmin");
     daex::Init<Planning> init(pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
-     	  	
+    	  	
   	eoGenOp<Planning>& variator = do_make_op (parser, state, pddl);
   	 
   	/// definition of the archive
@@ -76,15 +83,15 @@ int main (int argc, char *argv[])
   	  	
   	/// initialization of the population
     eoPop<Planning>& pop = do_make_pop(parser, state, init);
-              
+     
     // The fitness evaluation
-    eoEvalFuncCounter<Planning>& eval_yahsp_moeo = do_make_eval(parser,state,pop, init);
+    eoEvalFuncCounter<Planning>& eval_yahsp_moeo = do_make_eval(parser, state, pop, init);
         
     /// stopping criteria
     eoContinue<Planning>& continuator= do_make_continue_daemoeo(parser, state, eval_yahsp_moeo,arch);
        	 
     eoCheckPoint<Planning>& checkpoint = do_make_checkpoint_daemoeo (parser, state,   eval_yahsp_moeo, continuator, pop, arch);
-   
+   //eoCheckPoint<Planning>& checkpoint = do_make_checkpoint_op(continuator, parser, state, pop,  eval_yahsp_moeo, arch);
     /// algorithm
     moeoIBEA<Planning> &  ibea = do_make_ibea_moeo(parser, state, eval_yahsp_moeo, checkpoint, variator);
 

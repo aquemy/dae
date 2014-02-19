@@ -2,7 +2,7 @@
 ######                 General    ######
 # --help=0                                 # -h : Prints this message
 # --stopOnUnknownParam=1                   # Stop if unkown param entered
-# --seed=1359411032                        # -S : Random number seed
+--seed=42                        # -S : Random number seed
 
 ######    Evaluation              ######
 # --bmax-init=10000                        # -B : Number of allowed expanded nodes for the initial computation of b_max
