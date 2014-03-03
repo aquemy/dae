@@ -1,0 +1,15 @@
+awk: fatal : impossible d'ouvrir le fichier « ./zeno_AddRes/stats » en lecture (Aucun fichier ou dossier de ce type)
+sed: impossible de lire ./zeno_AddRes/arch.-1: Aucun fichier ou dossier de ce type
+sort: impossible de lire: ./zeno_AddRes/arch.-1: Aucun fichier ou dossier de ce type
+data file not found
+data file not found
+awk: fatal : impossible d'ouvrir le fichier « ./zeno_AddRes/zeno_hyp_-1 » en lecture (Aucun fichier ou dossier de ce type)
+awk: fatal : impossible d'ouvrir le fichier « ./zeno_AddRes/stats » en lecture (Aucun fichier ou dossier de ce type)
+/usr/lib/ruby/2.1.0/rubygems/core_ext/kernel_require.rb:55:in `require': cannot load such file -- stats_ils.rb (LoadError)
+	from /usr/lib/ruby/2.1.0/rubygems/core_ext/kernel_require.rb:55:in `require'
+	from /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/algo_specifics.rb:767:in `combinationOfObjectiveFunctions'
+	from param_ils_2_3_run.rb:539:in `doRunsBounded'
+	from param_ils_2_3_run.rb:601:in `boundedIncTimeSpentInState'
+	from param_ils_2_3_run.rb:825:in `iterated_local_search'
+	from param_ils_2_3_run.rb:806:in `iterative_deepening_ils'
+	from param_ils_2_3_run.rb:1731:in `<main>'

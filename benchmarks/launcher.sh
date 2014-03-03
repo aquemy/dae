@@ -3,7 +3,7 @@
 nbRuns=30
 build=../build/dae
 folder=Concavity/other
-instances=( "1_3n6t2p" "2_3n6t2p" )
+instances=( "2_3n6t2p" )
 seedFactor=12345
 
 for instance in "${instances[@]}"   

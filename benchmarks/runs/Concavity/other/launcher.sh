@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # 
-nbRuns=10
+nbRuns=30
 minTime=0
-maxTime=30
+maxTime=300
 timeInterval=10
 runsDir="./runs"
 resDir="./result"
 refDir="./front"
-modes=( "1_3n6t2p" )
+modes=( "1_3n6t2p" "2_3n6t2p" )
 
 #
 pisaDir="./exe"

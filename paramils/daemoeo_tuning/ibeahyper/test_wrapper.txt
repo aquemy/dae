@@ -1,0 +1,72 @@
+divide-and-evolve approach with 1 threads
+domain file : ../benchmarks/domain/MultiZeno.pddl
+problem file : /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl
+suboptimal yahsp search, threads : 64, teams : 1, strategy : 0
+temporal precision : 0.01,0.01
+enables h2 based fluent mutexes in yahsp
+maximum backtracks/all : 0
+initial heuristic : h1
+
+Parsing domain.................... done : 0.001          
+Parsing problem................... done : 0.001          
+domain : zeno-travel
+problem : ztravel-3-8
+Instantiating operators........... done : 0.003          
+Creating initial structures....... done : 0.002          
+Computing bound................... done : 0.000          
+Computing e-deleters.............. done : 0.001          
+Finalizing e-deleters............. done : 0.001          
+Refreshing structures............. done : 0.003          
+Finalizing structures............. done : 0.000          
+Apply the standard strategy to fix bmax_last:
+Final Archive
+4
+24 4   (Decomposition[1]: (Goal[2]: (Atom[600]: (at person2 city3)) (Atom[600]: (at plane1 city3))) ); Time 0.000
+; Length 0
+; TotalCost 24
+0.00: (fly plane1 city0 city3 person3) [6] [1]
+0.01: (fly plane2 city0 city3 person2) [6] [1]
+6.02: (fly plane2 city3 city4 person2) [6] [0]
+6.03: (flyvide plane1 city3 city0) [6] [0]
+12.04: (fly plane1 city0 city3 person1) [6] [1]
+12.05: (flyvide plane2 city4 city3) [6] [1]
+18.06: (fly plane1 city3 city4 person1) [6] [0]
+18.07: (fly plane2 city3 city4 person3) [6] [0]
+; END OF PLAN
+16 40   (Decomposition[1]: (Goal[2]: (Atom[400]: (at plane1 city2)) (Atom[400]: (at person1 city2))) ); Time 0.000
+; Length 0
+; TotalCost 16
+0.00: (fly plane1 city0 city2 person2) [4] [10]
+0.01: (fly plane2 city0 city2 person1) [4] [10]
+4.02: (fly plane1 city2 city4 person1) [4] [0]
+4.03: (flyvide plane2 city2 city0) [4] [0]
+8.04: (fly plane2 city0 city2 person3) [4] [10]
+8.05: (flyvide plane1 city4 city2) [4] [10]
+12.06: (fly plane1 city2 city4 person2) [4] [0]
+12.07: (fly plane2 city2 city4 person3) [4] [0]
+; END OF PLAN
+12 301   (Decomposition[1]: (Goal[2]: (Atom[600]: (at plane2 city3)) (Atom[600]: (at person2 city3))) ); Time 0.000
+; Length 0
+; TotalCost 12
+0.00: (fly plane1 city0 city1 person1) [2] [100]
+0.01: (fly plane2 city0 city3 person2) [6] [1]
+2.02: (fly plane1 city1 city4 person1) [2] [0]
+4.03: (flyvide plane1 city4 city1) [2] [100]
+6.04: (flyvide plane1 city1 city0) [2] [0]
+6.05: (fly plane2 city3 city4 person2) [6] [0]
+8.06: (fly plane1 city0 city1 person3) [2] [100]
+10.07: (fly plane1 city1 city4 person3) [2] [0]
+; END OF PLAN
+8 400   (Decomposition[1]: (Goal[2]: (Atom[200]: (at person3 city1)) (Atom[200]: (at person1 city1))) ); Time 0.000
+; Length 0
+; TotalCost 8
+0.00: (fly plane1 city0 city1 person1) [2] [100]
+0.01: (fly plane2 city0 city1 person3) [2] [100]
+2.02: (fly plane1 city1 city4 person1) [2] [0]
+2.03: (flyvide plane2 city1 city0) [2] [0]
+4.04: (fly plane2 city0 city1 person2) [2] [100]
+4.05: (flyvide plane1 city4 city1) [2] [100]
+6.06: (fly plane1 city1 city4 person3) [2] [0]
+6.07: (fly plane2 city1 city4 person2) [2] [0]
+; END OF PLAN
+

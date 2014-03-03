@@ -708,7 +708,7 @@ def getObjectivesForComputedInstances(algo, within_obj, instances, instances_sor
 end
 
 def getGlobalObjective(algo, within_obj, obj_function, instances, state_as_string, cutoff_time=100, cutoff_length=2147483647)
-	require "stats_ils.rb"
+	require_relative "stats_ils.rb"
 	results = []
 	for entry in instances
 		if entry["resultForState"].key?(state_as_string)
@@ -743,7 +743,7 @@ def getAllObjectives(algo, within_obj, instances, instances_sorted, stripped_sta
 			for res in result
 				results << singleRunObjective(algo, within_obj, res, qual, rest, cutoff_time, cutoff_length)
 			end
-			require "stats_ils.rb"
+			require_relative "stats_ils.rb"
 			objectives << [results.median, results.length]
 #			objectives << [singleInstanceObjective(algo, within_obj, result, qual, reference), result.length]
 		else
@@ -764,7 +764,7 @@ def combinationOfObjectiveFunctions(algo, obj_function, instanceObjectives, with
 		maxOK = cutoff_length
 	end
 
-	require "stats_ils.rb"
+	require_relative "stats_ils.rb"
 	return instanceObjectives.quantile(0.9) if obj_function == "q90"
 #	return instanceObjectives.median if obj_function == "median"
 	return instanceObjectives.quantile(0.5) if obj_function == "median"

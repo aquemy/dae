@@ -1,8 +1,8 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__))
 
-require "param_reader.rb"
-require "global_helper.rb" # for instance hash
+require_relative "param_reader.rb"
+require_relative "global_helper.rb" # for instance hash
 
 $state_to_int = {}
 $stripped_state_to_int = {}

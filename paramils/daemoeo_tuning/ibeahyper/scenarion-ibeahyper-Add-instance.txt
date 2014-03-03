@@ -1,0 +1,12 @@
+algo = ../daemoeo_wrapper.sh daeibea 1
+execdir = daemoeo_tuning/ibeahyper
+deterministic = 0
+run_obj = qual
+overall_obj = mean
+cutoff_time = max
+cutoff_length = max
+tunerTimeout = 10
+paramfile = daemoeo_tuning/daemoeo-params.txt
+outdir = daemoeo_tuning/results/ibeahyper
+instance_file = daemoeo_tuning/daemoeo-inst.txt
+test_instance_file = daemoeo_tuning/daemoeo-inst.txt

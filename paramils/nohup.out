@@ -1,0 +1,81 @@
+/home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/daemoeo-params.txt
+num_params = 14, num_combos=76187381760
+seed: 1234
+Run 1
+Level 
+========================================================
+Starting ILS for level 1, i.e. a limit of N=2000, and cutoff time=1000000000.0.
+Current CPU time = 0, this run goes until 120.0 
+========================================================
+New Incumbent: 0, 100000000 [0, 0]. With state -astar_weigth==10, -bmax-fixed==1000000, -bmax-increase-coef==1, -bmax-init==1000000, -bmax-last-weight==1, -cost_weigth==1, -domain==../benchmarks/domain/MultiZeno.pddl, -fitness-penalty==1000, -fitness-weight==15, -lenght_weigth==1, -lmax-initcoef==20, -lmin==1, -makespan_add_weigth==1, -makespan_max_weigth==1, -maxGen==0, -maxtry-candidate==100, -maxtry-mutex==100, -popSize==100, -proba-change==0.8, -proba-cross==0.2, -proba-del-atom==0.5, -proba-mut==0.8, -radius==3, -rand_yahsp_seed==1, -steadyGen==0, -w-addatom==1, -w-addgoal==1, -w-delatom==3, -w-delgoal==1
+getAlgoResultsForInstsAndParams.
+  Trial 1 for calling: ../daemoeo_wrapper.sh daeibea /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl "[]" 1000000000.0000001 2147483647 822569775 --astar_weigth= 10 --bmax-fixed= 1000000 --bmax-increase-coef= 1 --bmax-init= 1000000 --bmax-last-weight= 1 --cost_weigth= 1 --domain= ../benchmarks/domain/MultiZeno.pddl --fitness-penalty= 1000 --fitness-weight= 15 --lenght_weigth= 1 --lmax-initcoef= 20 --lmin= 1 --makespan_add_weigth= 1 --makespan_max_weigth= 1 --maxGen= 0 --maxtry-candidate= 100 --maxtry-mutex= 100 --popSize= 100 --proba-change= 0.8 --proba-cross= 0.2 --proba-del-atom= 0.5 --proba-mut= 0.8 --radius= 3 --rand_yahsp_seed= 1 --steadyGen= 0 --w-addatom= 1 --w-addgoal= 1 --w-delatom= 3 --w-delgoal= 1 > /tmp/tmp-2014-02-2417:23:10-0.08030891418457031
+Executing cmd: ../daemoeo_wrapper.sh daeibea /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl "[]" 1000000000.0000001 2147483647 822569775 --astar_weigth= 10 --bmax-fixed= 1000000 --bmax-increase-coef= 1 --bmax-init= 1000000 --bmax-last-weight= 1 --cost_weigth= 1 --domain= ../benchmarks/domain/MultiZeno.pddl --fitness-penalty= 1000 --fitness-weight= 15 --lenght_weigth= 1 --lmax-initcoef= 20 --lmin= 1 --makespan_add_weigth= 1 --makespan_max_weigth= 1 --maxGen= 0 --maxtry-candidate= 100 --maxtry-mutex= 100 --popSize= 100 --proba-change= 0.8 --proba-cross= 0.2 --proba-del-atom= 0.5 --proba-mut= 0.8 --radius= 3 --rand_yahsp_seed= 1 --steadyGen= 0 --w-addatom= 1 --w-addgoal= 1 --w-delatom= 3 --w-delgoal= 1 > /tmp/tmp-2014-02-2417:23:10-0.08030891418457031
+Result: -1, , -1, , --bmax-fixed=
+ERROR - empty result.
+{0=>{"rest"=>[], "params"=>0, "seeds"=>[822569775], "results"=>{0=>["-1", 0.0, -1, 0.0, 0]}}}
+{"rest"=>[], "params"=>0, "seeds"=>[822569775], "results"=>{0=>["-1", 0.0, -1, 0.0, 0]}}
+{0=>["-1", 0.0, -1, 0.0, 0]}
+/home/aquemy/dev/Inria/descarwin/clean/dae/paramils/global_helper.rb:668:in `block in getAlgoResultsForEntryParamsPairs': Empty result for instance /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl, seed 822569775, and stripped_state_int 0 (RuntimeError)
+	from /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/global_helper.rb:656:in `each'
+	from /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/global_helper.rb:656:in `getAlgoResultsForEntryParamsPairs'
+	from param_ils_2_3_run.rb:246:in `getRunsOnEntriesWithParams'
+	from param_ils_2_3_run.rb:538:in `doRunsBounded'
+	from param_ils_2_3_run.rb:601:in `boundedIncTimeSpentInState'
+	from param_ils_2_3_run.rb:825:in `iterated_local_search'
+	from param_ils_2_3_run.rb:806:in `iterative_deepening_ils'
+	from param_ils_2_3_run.rb:1731:in `<main>'
+/home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/daemoeo-params.txt
+num_params = 14, num_combos=76187381760
+seed: 1234
+Run 1
+Level 
+========================================================
+Starting ILS for level 1, i.e. a limit of N=2000, and cutoff time=1000000000.0.
+Current CPU time = 0, this run goes until 120.0 
+========================================================
+New Incumbent: 0, 100000000 [0, 0]. With state -astar_weigth==10, -bmax-fixed==1000000, -bmax-increase-coef==1, -bmax-init==1000000, -bmax-last-weight==1, -cost_weigth==1, -domain==../benchmarks/domain/MultiZeno.pddl, -fitness-penalty==1000, -fitness-weight==15, -lenght_weigth==1, -lmax-initcoef==20, -lmin==1, -makespan_add_weigth==1, -makespan_max_weigth==1, -maxGen==0, -maxtry-candidate==100, -maxtry-mutex==100, -popSize==100, -proba-change==0.8, -proba-cross==0.2, -proba-del-atom==0.5, -proba-mut==0.8, -radius==3, -rand_yahsp_seed==1, -steadyGen==0, -w-addatom==1, -w-addgoal==1, -w-delatom==3, -w-delgoal==1
+getAlgoResultsForInstsAndParams.
+  Trial 1 for calling: ../daemoeo_wrapper.sh daeibea /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl "[]" 1000000000.0000001 2147483647 822569775 --astar_weigth= 10 --bmax-fixed= 1000000 --bmax-increase-coef= 1 --bmax-init= 1000000 --bmax-last-weight= 1 --cost_weigth= 1 --domain= ../benchmarks/domain/MultiZeno.pddl --fitness-penalty= 1000 --fitness-weight= 15 --lenght_weigth= 1 --lmax-initcoef= 20 --lmin= 1 --makespan_add_weigth= 1 --makespan_max_weigth= 1 --maxGen= 0 --maxtry-candidate= 100 --maxtry-mutex= 100 --popSize= 100 --proba-change= 0.8 --proba-cross= 0.2 --proba-del-atom= 0.5 --proba-mut= 0.8 --radius= 3 --rand_yahsp_seed= 1 --steadyGen= 0 --w-addatom= 1 --w-addgoal= 1 --w-delatom= 3 --w-delgoal= 1 > /tmp/tmp-2014-02-2417:30:41-0.005055427551269531
+Executing cmd: ../daemoeo_wrapper.sh daeibea /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl "[]" 1000000000.0000001 2147483647 822569775 --astar_weigth= 10 --bmax-fixed= 1000000 --bmax-increase-coef= 1 --bmax-init= 1000000 --bmax-last-weight= 1 --cost_weigth= 1 --domain= ../benchmarks/domain/MultiZeno.pddl --fitness-penalty= 1000 --fitness-weight= 15 --lenght_weigth= 1 --lmax-initcoef= 20 --lmin= 1 --makespan_add_weigth= 1 --makespan_max_weigth= 1 --maxGen= 0 --maxtry-candidate= 100 --maxtry-mutex= 100 --popSize= 100 --proba-change= 0.8 --proba-cross= 0.2 --proba-del-atom= 0.5 --proba-mut= 0.8 --radius= 3 --rand_yahsp_seed= 1 --steadyGen= 0 --w-addatom= 1 --w-addgoal= 1 --w-delatom= 3 --w-delgoal= 1 > /tmp/tmp-2014-02-2417:30:41-0.005055427551269531
+Result: -1, , -1, , --bmax-fixed=
+ERROR - empty result.
+{0=>{"rest"=>[], "params"=>0, "seeds"=>[822569775], "results"=>{0=>["-1", 0.0, -1, 0.0, 0]}}}
+{"rest"=>[], "params"=>0, "seeds"=>[822569775], "results"=>{0=>["-1", 0.0, -1, 0.0, 0]}}
+{0=>["-1", 0.0, -1, 0.0, 0]}
+/home/aquemy/dev/Inria/descarwin/clean/dae/paramils/global_helper.rb:668:in `block in getAlgoResultsForEntryParamsPairs': Empty result for instance /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl, seed 822569775, and stripped_state_int 0 (RuntimeError)
+	from /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/global_helper.rb:656:in `each'
+	from /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/global_helper.rb:656:in `getAlgoResultsForEntryParamsPairs'
+	from param_ils_2_3_run.rb:246:in `getRunsOnEntriesWithParams'
+	from param_ils_2_3_run.rb:538:in `doRunsBounded'
+	from param_ils_2_3_run.rb:601:in `boundedIncTimeSpentInState'
+	from param_ils_2_3_run.rb:825:in `iterated_local_search'
+	from param_ils_2_3_run.rb:806:in `iterative_deepening_ils'
+	from param_ils_2_3_run.rb:1731:in `<main>'
+/home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/daemoeo-params.txt
+num_params = 14, num_combos=76187381760
+seed: 1234
+Run 1
+Level 
+========================================================
+Starting ILS for level 1, i.e. a limit of N=2000, and cutoff time=1000000000.0.
+Current CPU time = 0, this run goes until 120.0 
+========================================================
+New Incumbent: 0, 100000000 [0, 0]. With state -astar_weigth==10, -bmax-fixed==1000000, -bmax-increase-coef==1, -bmax-init==1000000, -bmax-last-weight==1, -cost_weigth==1, -domain==../benchmarks/domain/MultiZeno.pddl, -fitness-penalty==1000, -fitness-weight==15, -lenght_weigth==1, -lmax-initcoef==20, -lmin==1, -makespan_add_weigth==1, -makespan_max_weigth==1, -maxGen==0, -maxtry-candidate==100, -maxtry-mutex==100, -popSize==100, -proba-change==0.8, -proba-cross==0.2, -proba-del-atom==0.5, -proba-mut==0.8, -radius==3, -rand_yahsp_seed==1, -steadyGen==0, -w-addatom==1, -w-addgoal==1, -w-delatom==3, -w-delgoal==1
+getAlgoResultsForInstsAndParams.
+  Trial 1 for calling: ../daemoeo_wrapper.sh daeibea /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl "[]" 1000000000.0000001 2147483647 822569775 --astar_weigth= 10 --bmax-fixed= 1000000 --bmax-increase-coef= 1 --bmax-init= 1000000 --bmax-last-weight= 1 --cost_weigth= 1 --domain= ../benchmarks/domain/MultiZeno.pddl --fitness-penalty= 1000 --fitness-weight= 15 --lenght_weigth= 1 --lmax-initcoef= 20 --lmin= 1 --makespan_add_weigth= 1 --makespan_max_weigth= 1 --maxGen= 0 --maxtry-candidate= 100 --maxtry-mutex= 100 --popSize= 100 --proba-change= 0.8 --proba-cross= 0.2 --proba-del-atom= 0.5 --proba-mut= 0.8 --radius= 3 --rand_yahsp_seed= 1 --steadyGen= 0 --w-addatom= 1 --w-addgoal= 1 --w-delatom= 3 --w-delgoal= 1 > /tmp/tmp-2014-02-2417:32:06-0.8697566986083984
+Executing cmd: ../daemoeo_wrapper.sh daeibea /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl "[]" 1000000000.0000001 2147483647 822569775 --astar_weigth= 10 --bmax-fixed= 1000000 --bmax-increase-coef= 1 --bmax-init= 1000000 --bmax-last-weight= 1 --cost_weigth= 1 --domain= ../benchmarks/domain/MultiZeno.pddl --fitness-penalty= 1000 --fitness-weight= 15 --lenght_weigth= 1 --lmax-initcoef= 20 --lmin= 1 --makespan_add_weigth= 1 --makespan_max_weigth= 1 --maxGen= 0 --maxtry-candidate= 100 --maxtry-mutex= 100 --popSize= 100 --proba-change= 0.8 --proba-cross= 0.2 --proba-del-atom= 0.5 --proba-mut= 0.8 --radius= 3 --rand_yahsp_seed= 1 --steadyGen= 0 --w-addatom= 1 --w-addgoal= 1 --w-delatom= 3 --w-delgoal= 1 > /tmp/tmp-2014-02-2417:32:06-0.8697566986083984
+Result: -1, , -1, ,
+ERROR - empty result.
+{0=>{"rest"=>[], "params"=>0, "seeds"=>[822569775], "results"=>{0=>["-1", 0.0, -1, 0.0, 0]}}}
+{"rest"=>[], "params"=>0, "seeds"=>[822569775], "results"=>{0=>["-1", 0.0, -1, 0.0, 0]}}
+{0=>["-1", 0.0, -1, 0.0, 0]}
+/home/aquemy/dev/Inria/descarwin/clean/dae/paramils/global_helper.rb:668:in `block in getAlgoResultsForEntryParamsPairs': Empty result for instance /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl, seed 822569775, and stripped_state_int 0 (RuntimeError)
+	from /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/global_helper.rb:656:in `each'
+	from /home/aquemy/dev/Inria/descarwin/clean/dae/paramils/global_helper.rb:656:in `getAlgoResultsForEntryParamsPairs'
+	from param_ils_2_3_run.rb:246:in `getRunsOnEntriesWithParams'
+	from param_ils_2_3_run.rb:538:in `doRunsBounded'
+	from param_ils_2_3_run.rb:601:in `boundedIncTimeSpentInState'
+	from param_ils_2_3_run.rb:825:in `iterated_local_search'
+	from param_ils_2_3_run.rb:806:in `iterative_deepening_ils'
+	from param_ils_2_3_run.rb:1731:in `<main>'
