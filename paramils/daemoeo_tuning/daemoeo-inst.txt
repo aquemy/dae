@@ -1,1 +1,1 @@
-daemoeo_tuning/benchmarks/problems/zenoMiniMulti.pddl 
+daemoeo_tuning/benchmarks/problems/zenoMulti/linear/ariari_3n3t2p.pddl 
