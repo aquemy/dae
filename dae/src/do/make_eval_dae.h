@@ -194,7 +194,7 @@ eoEvalFuncCounter<Planning> &   do_make_eval(eoParser& _parser, eoState& _state,
 eoEvalFuncCounter<Planning> &do_make_eval_aggregation(eoParser& _parser, eoState& _state,eoPop<Planning> & _pop,   daex::Init<Planning> & _init)
 {
 
-  	std::string objective =  _parser.valueOf<std::string>("Add");
+  	std::string objective =  _parser.valueOf<std::string>("objective");
 	unsigned int b_max_init = _parser.valueOf<unsigned int>("bmax-init");
     unsigned int fitness_weight = _parser.valueOf<unsigned int>("fitness-weight");
     unsigned int fitness_penalty = _parser.valueOf<unsigned int>("fitness-penalty");
@@ -226,10 +226,10 @@ eoEvalFuncCounter<Planning> &do_make_eval_aggregation(eoParser& _parser, eoState
     }
   
     double lenght_weigth = _parser.valueOf<double>("lenght_weigth");
-    double cost_weigth = _parser.valueOf<double>("cost_weight"); 	
+    double cost_weigth = _parser.valueOf<double>("cost_weigth"); 	
     double makespan_max_weigth = _parser.valueOf<double>("makespan_max_weigth");
  	double makespan_add_weigth = _parser.valueOf<double>("makespan_add_weigth");
-    unsigned astar_weight = _parser.valueOf<unsigned int>("astar_weigth");
+    double astar_weight = _parser.valueOf<double>("astar_weigth");
 	bool rand_seed = _parser.valueOf<bool>("rand_yahsp_seed");
     double alpha = _parser.valueOf<double>("alpha");
  	double minObj1 = _parser.valueOf<double>("minObj1");
@@ -342,9 +342,7 @@ eoEvalFuncCounter<Planning> &do_make_eval_aggregation(eoParser& _parser, eoState
             proba_strateg_indiv,
             proba_strateg_goal
         ); 
-    	
 		apply(*eval_yahsp, _pop);
-		
     }
     eoEvalFuncCounter<Planning> *eval_counter = new eoEvalFuncCounter<Planning>( *eval_yahsp, "Eval.\t" );
     	

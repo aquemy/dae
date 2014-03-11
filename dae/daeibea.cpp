@@ -32,7 +32,7 @@
 #include <do/make_checkpoint_moeo.h>
 
 /// evolution engine (selection and replacement)
-#include "src/do/make_ibea_moeo.h"
+#include "src/do/make_ibea.h"
 
 
 using namespace std;
@@ -43,12 +43,11 @@ int main (int argc, char *argv[])
 {
     
   	eoParser parser(argc, argv); // for user-parameter reading
- 	eoState state;                // to keep all things allocated
-  	make_verbose(parser); // to keep all things allocated
+ 	eoState state;               // to keep all things allocated
+  	make_verbose(parser);        // to keep all things allocated
    
   	// General parameters
   	daex::do_make_general_param(parser);            // Common part
-  	daex::do_make_general_param_moeo(parser);       // Multiobjectives part
   	daex::do_make_ibea_param(parser);               // IBEA part
   	
   	// Parameters makers
@@ -90,8 +89,8 @@ int main (int argc, char *argv[])
     /// stopping criteria
     eoContinue<Planning>& continuator= do_make_continue_daemoeo(parser, state, eval_yahsp_moeo,arch);
        	 
-    eoCheckPoint<Planning>& checkpoint = do_make_checkpoint_daemoeo (parser, state,   eval_yahsp_moeo, continuator, pop, arch);
-   //eoCheckPoint<Planning>& checkpoint = do_make_checkpoint_op(continuator, parser, state, pop,  eval_yahsp_moeo, arch);
+    eoCheckPoint<Planning>& checkpoint = do_make_checkpoint_daemoeo(parser, state, eval_yahsp_moeo, continuator, pop, arch);
+
     /// algorithm
     moeoIBEA<Planning> &  ibea = do_make_ibea_moeo(parser, state, eval_yahsp_moeo, checkpoint, variator);
 

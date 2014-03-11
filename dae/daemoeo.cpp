@@ -49,7 +49,6 @@ int main (int argc, char *argv[])
   	
   	// General parameters
   	daex::do_make_general_param(parser);            // Common part
-  	daex::do_make_general_param_moeo(parser);       // Multiobjectives part
   	daex::do_make_ea_moeo_param(parser);            // Evolution engine part
   	//daex::make_general_param_mpi(parser, state);  // Parallel part
   	

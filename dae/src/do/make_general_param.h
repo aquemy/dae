@@ -10,7 +10,7 @@ void do_make_general_param(eoParser &parser)
     std::string domain = parser.createParam( (std::string)"domain-zeno-time.pddl", "domain", "PDDL domain file", 'D', "Problem", true ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "domain" << domain << std::endl;
 
-    std::string instance = parser.createParam( (std::string)"zeno10.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
+    std::string instance = parser.createParam( (std::string)"zeno.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "instance" << instance << std::endl;
 
     std::string plan_file = parser.createParam( (std::string)"plan.soln", "plan-file", "Plan file backup", 'f', "Output" ).value();
@@ -32,15 +32,6 @@ void do_make_general_param(eoParser &parser)
     unsigned int param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "seed" << param_seed << std::endl;
 
-}
-
-void do_make_general_param_moeo(eoParser &parser)
-{
-    double kappa = parser.createParam(0.05, "kappa", "Scaling factor kappa for indicator based search", 'k', "Evolution Engine").value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "kappa" << kappa << std::endl;
-
-    double rho = parser.createParam(1.1, "rho", "reference point for the hypervolume indicator", 'R', "Evolution Engine").value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "rho" << rho << std::endl;
 }
 
 } // namespace daex

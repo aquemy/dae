@@ -36,7 +36,7 @@
 template<class EOT> 
 void  do_make_stats(eoParser& _parser, eoState& _state, eoCheckPoint<EOT>& _checkpoint, eoPop<EOT> & _pop)
 {
-  std::string plan_file = _parser.getORcreateParam( (std::string)"plan.ipc", "plan-file", "Plan file backup", 'F', "Misc" ).value();
+  std::string plan_file = _parser.valueOf<std::string>("plan-file");
   
  //eoValueParam<unsigned>& popSize = _parser.getORcreateParam(unsigned(20), "popSize", "Population Size", 'P', "Evolution Engine");
 

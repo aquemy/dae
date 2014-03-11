@@ -48,7 +48,6 @@ int main (int argc, char *argv[])
    
   	// General parameters
   	daex::do_make_general_param(parser);            // Common part
-  	daex::do_make_general_param_moeo(parser);       // Multiobjectives part
   	
   	// Parameters makers
     daex::do_make_eval_param(parser);             
