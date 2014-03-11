@@ -50,6 +50,10 @@ ENDIF()
 
 #LINK_LIBRARIES(daex  daexmoeo eoutils gmp rt ncurses eo gcov gdsl)
 
+ADD_EXECUTABLE(daeaggreg aggregation.cpp) 
+ADD_DEPENDENCIES(daeaggreg daex daexmoeo moeo)
+TARGET_LINK_LIBRARIES(daeaggreg ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common cpt_yahsp_library  daex daexmoeo)
+
 ADD_EXECUTABLE(daemoeo daemoeo.cpp) 
 ADD_DEPENDENCIES(daemoeo daex daexmoeo moeo)
 TARGET_LINK_LIBRARIES(daemoeo ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common cpt_yahsp_library  daex daexmoeo )

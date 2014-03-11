@@ -13,6 +13,7 @@ refDir=$8
 for ((run=0 ; $run < nbRuns; run++)) 
 do
     more "$runsDir"/"$mode"_runs/run"$run"/archTime."$maxTime" >> "$resDir"/"$mode"/cumulative_pop.txt
+    echo " " >> "$resDir"/"$mode"/cumulative_pop.txt
 done
 
 # GnuPlot

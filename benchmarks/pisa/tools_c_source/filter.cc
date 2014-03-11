@@ -82,6 +82,7 @@ My email address is j.knowles@manchester.ac.uk
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 using namespace std;
 

@@ -8,6 +8,7 @@ set(DAEX_SRC
     ${DAEX_SRC_DIR}/core/decomposition.h
     ${DAEX_SRC_DIR}/core/goal.h
     ${DAEX_SRC_DIR}/core/strategies.h
+    ${DAEX_SRC_DIR}/core/AggregaEval.h
     ${DAEX_SRC_DIR}/initialization/init.h
     ${DAEX_SRC_DIR}/evaluation/cpt-yahsp.h
     ${DAEX_SRC_DIR}/evaluation/yahsp.h
@@ -61,7 +62,8 @@ SET (DAEXMOEO_SRC
      core/planning.h
      #core/planning.cpp
      #core/planningEval.h
-     core/planningEval.cpp  
+     core/planningEval.cpp
+     core/AggregaEval.cpp  
 ) 	 
 
 INCLUDE_DIRECTORIES(${DAEXMOEO_SRC_DIR}
@@ -83,7 +85,8 @@ SET (DAEXMO_SRC
      core/moplanning.h
      #core/planning.cpp
      #core/planningEval.h
-     core/moplanningEval.cpp 
+     core/moplanningEval.cpp
+     core/AggregaEval.cpp 
 ) 	 
 
 INCLUDE_DIRECTORIES(${DAEXMO_SRC_DIR}

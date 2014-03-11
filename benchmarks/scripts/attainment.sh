@@ -8,6 +8,14 @@ timeInterval=$5
 runsDir=$6
 resDir=$7
 refDir=$8
+pisaDir=$9
+
+# EAF with PISA
+$pisaDir/eaf -o $resDir/$mode/EAF_All.txt $resDir/$mode/cumulative_pop.txt
+
+$pisaDir/eafplot.pl --extra="$refDir"/"$mode"_pareto.txt --extra-label="Pareto front" --obj1=Makespan --obj2=Cost --eps "$resDir"/"$mode"/EAF_All.txt
+
+$pisaDir/eafplot.pl --IQR --extra="$refDir"/"$mode"_pareto.txt --extra-label="Pareto front" --obj1=Makespan --obj2=Cost --eps "$resDir"/"$mode"/EAF_All.txt
 
 # Attainment
 more "./plot/attainmentHeader.gp" > "$resDir"/"$mode"/plotAttainment.gp

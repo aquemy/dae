@@ -38,6 +38,6 @@ do
     bash ./cumulated.sh "$mode" "$nbRuns" "$minTime" "$maxTime" "$timeInterval" "$runsDir" "$resDir" "$refDir"
     
     echo "## 4. Attainment Computation"
-    bash ./attainment.sh "$mode" "$nbRuns" "$minTime" "$maxTime" "$timeInterval" "$runsDir" "$resDir" "$refDir"
+    bash ./attainment.sh "$mode" "$nbRuns" "$minTime" "$maxTime" "$timeInterval" "$runsDir" "$resDir" "$refDir" "$pisaDir"
 done
 

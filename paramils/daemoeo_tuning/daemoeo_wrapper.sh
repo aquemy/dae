@@ -37,7 +37,11 @@ mkdir -p "$resDir" > /dev/null
 echo "./$exe @$paramFile -Z=$objective -I=$instance --maxTime=$maxTime -seed=$seed -q=0 $stringparam" > command_line.txt
 ./$exe @$paramFile -Z=$objective -I=$instance --maxTime=$maxTime -seed=$seed -q=0 --resDir=$resDir $stringparam > test_wrapper.txt
 
-../pisa/normalize ../pisa/zeno_bound ./$resDir/archTime.$maxTime  ./$resDir/zeno_norm_$maxTime 
+lastArch=`ls -got ./$resDir | grep archTime | head -1 | awk '{print $7}'`
+
+echo "LAST ARCHIVE : $lastArch" >> archiveList.txt
+
+../pisa/normalize ../pisa/zeno_bound ./$resDir/$lastArch  ./$resDir/zeno_norm_$maxTime 
 
 ../pisa/hyp_ind ../pisa/hyp_ind_param.txt ./$resDir/zeno_norm_$maxTime  ../pisa/zeno_ref ./$resDir/zeno_hyp_$maxTime
 
