@@ -1,4 +1,4 @@
-algo = ../daemoeo_wrapper.sh daeibea 10
+algo = ../daemoeo_wrapper.sh ibeahyper 1
 execdir = daemoeo_tuning/ibeahyper
 deterministic = 0
 run_obj = qual
@@ -7,6 +7,6 @@ cutoff_time = max
 cutoff_length = max
 tunerTimeout = 60
 paramfile = daemoeo_tuning/daemoeo-params.txt
-outdir = daemoeo_tuning/results/daeibea/paramils
+outdir = daemoeo_tuning/results/ibeahyper/paramils
 instance_file = daemoeo_tuning/daemoeo-inst.txt
 test_instance_file = daemoeo_tuning/daemoeo-inst.txt

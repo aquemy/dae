@@ -12,61 +12,61 @@ Parsing problem................... done : 0.001
 domain : multi-zeno-travel
 problem : multizeno-a
 Instantiating operators........... done : 0.002          
-Creating initial structures....... done : 0.002          
+Creating initial structures....... done : 0.001          
 Computing bound................... done : 0.000          
 Computing e-deleters.............. done : 0.001          
 Finalizing e-deleters............. done : 0.001          
-Refreshing structures............. done : 0.002          
+Refreshing structures............. done : 0.003          
 Finalizing structures............. done : 0.000          
 Apply the standard strategy to fix bmax_last:
 Final Archive
 4
-2400 400   (Decomposition[2]: (Goal[1]: (Atom[60000]: (at person3 city3))) (Goal[1]: (Atom[60000]: (at person2 city3))) ); Time 0.000
+2400 400   (Decomposition[1]: (Goal[3]: (Atom[60000]: (at plane1 city3)) (Atom[60000]: (at person2 city3)) (Atom[60000]: (at person1 city3))) ); Time 0.000
 ; Length 0
 ; TotalCost 2400
 0.00: (fly plane1 city0 city3 person2) [600] [100]
-0.01: (fly plane2 city0 city3 person3) [600] [100]
-600.02: (fly plane1 city3 city4 person2) [600] [0]
+0.01: (fly plane2 city0 city3 person1) [600] [100]
+600.02: (fly plane1 city3 city4 person1) [600] [0]
 600.03: (flyvide plane2 city3 city0) [600] [0]
-1200.04: (fly plane2 city0 city3 person1) [600] [100]
+1200.04: (fly plane2 city0 city3 person3) [600] [100]
 1200.05: (flyvide plane1 city4 city3) [600] [100]
-1800.06: (fly plane1 city3 city4 person3) [600] [0]
-1800.07: (fly plane2 city3 city4 person1) [600] [0]
+1800.06: (fly plane1 city3 city4 person2) [600] [0]
+1800.07: (fly plane2 city3 city4 person3) [600] [0]
 ; END OF PLAN
-2000 600   (Decomposition[3]: (Goal[3]: (Atom[40000]: (at person1 city2)) (Atom[60000]: (at person2 city3)) (Atom[60000]: (at person3 city3))) (Goal[1]: (Atom[60000]: (at person3 city3))) (Goal[1]: (Atom[60000]: (at person2 city3))) ); Time 0.000
-; Length 0
-; TotalCost 2000
-0.00: (fly plane1 city0 city2 person1) [400] [200]
-0.01: (fly plane2 city0 city3 person2) [600] [100]
-400.02: (flyvide plane1 city2 city0) [400] [0]
-600.03: (fly plane2 city3 city4 person2) [600] [0]
-800.04: (fly plane1 city0 city3 person3) [600] [100]
-1200.05: (flyvide plane2 city4 city2) [400] [200]
-1400.06: (fly plane1 city3 city4 person3) [600] [0]
-1600.07: (fly plane2 city2 city4 person1) [400] [0]
-; END OF PLAN
-1600 800   (Decomposition[3]: (Goal[1]: (Atom[60000]: (at person3 city3))) (Goal[2]: (Atom[60000]: (at person3 city3)) (Atom[20000]: (at plane1 city1))) (Goal[1]: (Atom[60000]: (at person2 city3))) ); Time 0.000
+1600 800   (Decomposition[1]: (Goal[3]: (Atom[40000]: (at plane2 city2)) (Atom[40000]: (at person3 city2)) (Atom[40000]: (at person1 city2))) ); Time 0.000
 ; Length 0
 ; TotalCost 1600
-0.00: (fly plane1 city0 city1 person1) [200] [300]
-0.01: (fly plane2 city0 city3 person3) [600] [100]
-200.02: (flyvide plane1 city1 city0) [200] [0]
-400.03: (fly plane1 city0 city3 person2) [600] [100]
-600.04: (fly plane2 city3 city4 person3) [600] [0]
-1000.05: (fly plane1 city3 city4 person2) [600] [0]
-1200.06: (flyvide plane2 city4 city1) [200] [300]
-1400.07: (fly plane2 city1 city4 person1) [200] [0]
+0.00: (fly plane1 city0 city2 person3) [400] [200]
+0.01: (fly plane2 city0 city2 person1) [400] [200]
+400.02: (fly plane2 city2 city4 person1) [400] [0]
+400.03: (flyvide plane1 city2 city0) [400] [0]
+800.04: (fly plane1 city0 city2 person2) [400] [200]
+800.05: (flyvide plane2 city4 city2) [400] [200]
+1200.06: (fly plane1 city2 city4 person2) [400] [0]
+1200.07: (fly plane2 city2 city4 person3) [400] [0]
 ; END OF PLAN
-1200 1000   (Decomposition[1]: (Goal[1]: (Atom[60000]: (at person2 city3))) ); Time 0.000
+1200 1000   (Decomposition[1]: (Goal[1]: (Atom[60000]: (at person3 city3))) ); Time 0.000
 ; Length 0
 ; TotalCost 1200
-0.00: (fly plane2 city0 city1 person3) [200] [300]
-0.01: (fly plane1 city0 city3 person2) [600] [100]
-200.02: (fly plane2 city1 city4 person3) [200] [0]
-400.03: (flyvide plane2 city4 city1) [200] [300]
-600.04: (flyvide plane2 city1 city0) [200] [0]
-600.05: (fly plane1 city3 city4 person2) [600] [0]
-800.06: (fly plane2 city0 city1 person1) [200] [300]
-1000.07: (fly plane2 city1 city4 person1) [200] [0]
+0.00: (fly plane1 city0 city1 person1) [200] [300]
+0.01: (fly plane2 city0 city3 person3) [600] [100]
+200.02: (fly plane1 city1 city4 person1) [200] [0]
+400.03: (flyvide plane1 city4 city1) [200] [300]
+600.04: (flyvide plane1 city1 city0) [200] [0]
+600.05: (fly plane2 city3 city4 person3) [600] [0]
+800.06: (fly plane1 city0 city1 person2) [200] [300]
+1000.07: (fly plane1 city1 city4 person2) [200] [0]
+; END OF PLAN
+800 1200   (Decomposition[1]: (Goal[3]: (Atom[20000]: (at plane1 city1)) (Atom[20000]: (at plane2 city1)) (Atom[20000]: (at person2 city1))) ); Time 0.000
+; Length 0
+; TotalCost 800
+0.00: (fly plane1 city0 city1 person2) [200] [300]
+0.01: (fly plane2 city0 city1 person1) [200] [300]
+200.02: (fly plane1 city1 city4 person1) [200] [0]
+200.03: (flyvide plane2 city1 city0) [200] [0]
+400.04: (fly plane2 city0 city1 person3) [200] [300]
+400.05: (flyvide plane1 city4 city1) [200] [300]
+600.06: (fly plane1 city1 city4 person2) [200] [0]
+600.07: (fly plane2 city1 city4 person3) [200] [0]
 ; END OF PLAN
 

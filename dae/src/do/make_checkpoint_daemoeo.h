@@ -401,9 +401,9 @@ eoCheckPoint < MOEOT > & do_make_checkpoint_daemoeo (eoParser & _parser, eoState
     if (saveTimeIntervalParam > 0)
     {
 #ifdef _MSVC
-        std::string stmp = dirName + "\time_";
+        std::string stmp = dirName + "\time";
 #else
-        std::string stmp = dirName + "/time_";
+        std::string stmp = dirName + "/time";
 #endif
       eoTimedStateSaver *stateSaver2 = new eoTimedStateSaver(saveTimeIntervalParam, _state, stmp);
       _state.storeFunctor(stateSaver2);
@@ -430,9 +430,9 @@ eoCheckPoint < MOEOT > & do_make_checkpoint_daemoeo (eoParser & _parser, eoState
     if (storeArch)
     {
 #ifdef _MSVC
-        std::string stmp = dirName + "\arch_";
+        std::string stmp = dirName + "\arch";
 #else
-        std::string stmp = dirName + "/arch_";
+        std::string stmp = dirName + "/arch";
 #endif
           
       moeoArchiveObjectiveVectorSavingUpdater < MOEOT > * save_updater = new moeoArchiveObjectiveVectorSavingUpdater < MOEOT > (_archive, stmp, printArch);
@@ -486,9 +486,9 @@ eoCheckPoint < MOEOT > & do_make_checkpoint_daemoeo (eoParser & _parser, eoState
     {
 
 #ifdef _MSVC
-      std::string stmp = dirName + "\pop_";
+      std::string stmp = dirName + "\pop";
 #else
-      std::string stmp = dirName + "/pop_";
+      std::string stmp = dirName + "/pop";
 #endif
       
       moeoPopObjectiveVectorSavingUpdater < MOEOT > * save_popvec_updater = new moeoPopObjectiveVectorSavingUpdater < MOEOT > (_pop, stmp, printPopVectors);
