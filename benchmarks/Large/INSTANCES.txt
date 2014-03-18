@@ -1,0 +1,63 @@
+# Instance 1
+
+- Cities:       20
+- Passengers:   6
+- Planes:       2
+- Pareto Set :  409
+
+# Instance 2
+
+- Cities:       150
+- Passengers:   3
+- Planes:       2
+- Pareto Set :  1496
+
+# Instance 3
+
+- Cities:       250
+- Passengers:   3
+- Planes:       2
+- Pareto Set :  2197
+
+# Instance 4
+
+- Cities:       3
+- Passengers:   21
+- Planes:       2
+- Pareto Set :  61
+
+# Instance 5
+
+- Cities:       100
+- Passengers:   3
+- Planes:       2
+- Pareto Set :  268
+
+# Instance 6
+
+- Cities:       200
+- Passengers:   3
+- Planes:       2
+- Pareto Set :  538
+
+# Instance 7
+
+- Cities:       8
+- Passengers:   26
+- Planes:       25
+- Pareto Set :  15
+
+# Instance 8
+
+- Cities:       200
+- Passengers:   3
+- Planes:       2
+- Pareto Set :  399
+
+# Instance 9
+
+- Cities:       10
+- Passengers:   10
+- Planes:       3
+- Pareto Set :  383
+
