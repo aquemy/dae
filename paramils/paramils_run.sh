@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #program="nsgaII speaII ibeaepsilon ibeahyper"
-program="ibeahyper"
+program="aggregation"
 
 #var="Add Max"
 var="Add"
