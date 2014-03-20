@@ -7,6 +7,6 @@ cutoff_time = max
 cutoff_length = max
 tunerTimeout = 172800
 paramfile = daemoeo_tuning/aggregation/daemoeo-params.txt
-outdir = daemoeo_tuning/results/aggregaton/paramils
+outdir = daemoeo_tuning/results/aggregation/paramils
 instance_file = daemoeo_tuning/daemoeo-inst.txt
 test_instance_file = daemoeo_tuning/daemoeo-inst.txt

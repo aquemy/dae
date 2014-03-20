@@ -11,17 +11,17 @@
 --bmax-fixed=1000000                     # -b : Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0
 --bmax-last-weight=1                     # -T : Weighting for the b_max used during the last search towards the end goal (must be strictly positive)
 --bmax-quantile=0.5                      # -Q : Quantile to use for estimating b_max (in [0,1], 0.5=median)
---lenght_weigth=3                        # -H : Weighting for the optimizing lenght during the search
---cost_weigth=4                          # -U : Weighting for the optimizing cost during the search
---makespan_max_weigth=2                  # -Y : Weighting for the optimizing makespan_max during the search
---makespan_add_weigth=3                  # -V : Weighting for the optimizing  makespan_add during the search
+--lenght_weigth=0                        # -H : Weighting for the optimizing lenght during the search
+--cost_weigth=2                          # -U : Weighting for the optimizing cost during the search
+--makespan_max_weigth=1                  # -Y : Weighting for the optimizing makespan_max during the search
+--makespan_add_weigth=4                  # -V : Weighting for the optimizing  makespan_add during the search
 --astar_weigth=10                        # -O : Weighting for the optimizing  A* heuristic during the search
 --rand_yahsp_seed=1                      # -X : flag  for the random initilaization of yahsp at each optimization
 --bmax-increase-coef=1                   # -K : Multiplier increment for the computation of b_max
 --bmax-ratio=0.01                        # -J : Satisfying proportion of feasible individuals for the computation of b_max
 
 ### EVOLUTION ENGINE ###############################################################
---popSize=30                             # -P : Population Size
+--popSize=50                             # -P : Population Size
 --kappa=0.05                             # -k : Scaling factor kappa for indicator based search
 --rho=1.1                                # -R : reference point for the hypervolume indicator
 --indicator=Hypervolume                  # -i : Binary indicator for IndicatorBased: Epsilon, Hypervolume
@@ -41,7 +41,7 @@
 
 ### OUTPUT #########################################################################
 --plan-file=plan.soln                    # -f : Plan file backup
---resDir=../results/ibeahyper/ariari_3n3t2p/run188 # Directory to store DISK outputs
+--resDir=../results/ibeahyper/ariari_3n3t2p/run23 # Directory to store DISK outputs
 --eraseDir=1                             # erase files in dirName if any
 --printPop=0                             # Print sorted pop. every gen.
 --printPlan=0                            # Print sorted plan. every gen.
@@ -82,14 +82,14 @@
 # --runs-max=0                             # -r : Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start
 
 ### VARIATION ######################################################################
---radius=7                               # -R : Number of neighbour goals to consider for the addGoal mutation
---proba-change=1                         # -k : Probability to change an atom for the changeAtom mutation
---proba-del-atom=1                       # -p : Average probability to delete an atom for the delAtom mutation
---w-delgoal=5                            # -a : Relative weight defining the probability to call the delGoal mutation
---w-addgoal=3                            # -A : Relative weight defining the probability to call the addGoal mutation
---w-delatom=1                            # -u : Relative weight defining the probability to call the delAtom mutation
---w-addatom=10                           # -d : Relative weight defining the probability to call the addAtom mutation
+--radius=3                               # -R : Number of neighbour goals to consider for the addGoal mutation
+--proba-change=0.8                       # -k : Probability to change an atom for the changeAtom mutation
+--proba-del-atom=0.1                     # -p : Average probability to delete an atom for the delAtom mutation
+--w-delgoal=1                            # -a : Relative weight defining the probability to call the delGoal mutation
+--w-addgoal=0                            # -A : Relative weight defining the probability to call the addGoal mutation
+--w-delatom=7                            # -u : Relative weight defining the probability to call the delAtom mutation
+--w-addatom=5                            # -d : Relative weight defining the probability to call the addAtom mutation
 --maxtry-candidate=100                   # -y : Maximum number of atoms to try when searching for a candidate in the changeAtom mutation
 --maxtry-mutex=100                       # -z : Maximum number of atoms to try when searching for mutexes in the changeAtom mutation
---proba-cross=0.8                        # -c : Probability to apply a cross-over
+--proba-cross=0.5                        # -c : Probability to apply a cross-over
 --proba-mut=1                            # -m : Probability to apply one of the mutation

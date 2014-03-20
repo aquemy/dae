@@ -19,7 +19,7 @@ echo "$runNb" > ../results/$exe/$instanceName/runNumber
 
 resDir="../results/$exe/$instanceName/run$runNb"
 
-for i in `seq 1 6` 	 #Parameter reading $#`
+for i in `seq 1 7` 	 #Parameter reading $#`
 do
 shift
 done
@@ -28,13 +28,14 @@ stringparam=`echo  $* | sed 's/= /=/g'`
 
 mkdir -p "$resDir" > /dev/null
 
-echo "./$exe @$paramFile -Z=$objective -I=$instance --maxTime=$maxTime -seed=$seed -q=0 $stringparam" > command_line.txt
+echo "./$exe @$paramFile -Z=$objective -I=$instance -T=$maxTime -seed=$seed -q=0 --resDir=$resDir $stringparam" > command_line.txt
 ./$exe @$paramFile -Z=$objective -I=$instance --maxTime=$maxTime -seed=$seed -q=0 --resDir=$resDir $stringparam > test_wrapper.txt
 
 # Get the last archive according to timestamp
-lastArch=`ls -got ./$resDir | grep archTime | head -1 | awk '{print $7}'`
 
-../pisa/normalize ${instance%.*}_bounds.txt ./$resDir/$lastArch ./$resDir/normalized_$maxTime.txt 
+lastArch=`ls ./$resDir | grep archTime | cut -d . -f 2 | sort -n | tail -n1`
+echo $lastArch "|" `ls -got ./$resDir | grep archTime | head -1 | awk '{print $7}'` >> ARCHIVES.txt
+../pisa/normalize ${instance%.*}_bounds.txt ./$resDir/archTime.$lastArch ./$resDir/normalized_$maxTime.txt 
 ../pisa/hyp_ind ../pisa/hyp_ind_param.txt ./$resDir/normalized_$maxTime.txt  ${instance%.*}_ref.txt ./$resDir/hypervolume_$maxTime
 
 best_sol=`awk 'NR==1 {print $1}' ./$resDir/hypervolume_$maxTime`

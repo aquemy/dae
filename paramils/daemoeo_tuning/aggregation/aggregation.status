@@ -2,7 +2,7 @@
 ### GENERAL ########################################################################
 --help=0                                 # -h : Prints this message
 --stopOnUnknownParam=1                   # Stop if unkown param entered
-# --seed=1395319410                        # -S : Random number seed
+# --seed=1395322737                        # -S : Random number seed
 
 ### EVALUATION #####################################################################
 --alpha=0.5                              # -x : Aggregation param for the fitness func. (alp.* makespan + (1-alp.) (cost/risk))
@@ -57,7 +57,7 @@
 --printPlan=0                            # Print sorted plan. every gen.
 --storeArch=0                            # Store the archive's objective vectors at each gen.
 --printArch=0                            # Print the archive at each gen.
---saveIntervalArch=60                    # Save the archive's objective vectors every T seconds (0 or absent = never)
+--saveIntervalArch=10                    # Save the archive's objective vectors every T seconds (0 or absent = never)
 --printIntervalArch=0                    # Print the archive at each time interval
 --storePopVectors=0                      # Store the pop's objective vectors at each gen.
 --saveIntervalPopVectors=10              # Store the pop's objective vectors  every T seconds (0 or absent = never).
@@ -70,8 +70,8 @@
 --printBestStat=0                        # Print Best/avg// every gen.
 
 ### PERSISTENCE ####################################################################
---saveFrequency=0                        # Save every F generation (0 = only final state, absent = never)
---saveTimeInterval=0                     # Save every T seconds (0 or absent = never)
+# --saveFrequency=0                        # Save every F generation (0 = only final state, absent = never)
+# --saveTimeInterval=0                     # Save every T seconds (0 or absent = never)
 # --Load=                                  # -L : A save file to restart from
 # --recomputeFitness=0                     # -r : Recompute the fitness after re-loading the pop.?
 # --status=./aggregation.status            # Status file
@@ -87,7 +87,7 @@
 --steadyGen=0                            # -s : Number of generations with no improvement
 # --minGen=0                               # -g : Minimum number of generations
 # --maxEval=0                              # -E : Maximum number of evaluations (0 = none)
---maxTime=5400                           # -T : Maximum running time in seconds (0 = none)
+--maxTime=120                            # -T : Maximum running time in seconds (0 = none)
 # --CtrlC=0                                # -C : Terminate current generation upon Ctrl C
 --steadyGen=0                            # -s : Number of generations with no improvement
 # --minGen=0                               # -g : Minimum number of generations
