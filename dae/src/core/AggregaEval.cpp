@@ -145,22 +145,21 @@ double PlanningAggregaEval::max_cost(  Planning & _decompo)
 }
 
 
-double PlanningAggregaEval::aggreg_additiveCost_makespan ( Planning & decompo,  PlanningObjectiveVector& objVector)
+double PlanningAggregaEval::aggreg_additiveCost_makespan ( Planning & decompo, PlanningObjectiveVector& objVect)
 {
 	double Q;
-
-	objVector[1]=decompo.plan().cost_add() ;
-
+    double makespan = objVect[0];
+	double cost = decompo.plan().cost_add() ;
+    objVect[1] = decompo.plan().cost_add();
 	// Pour travailler sur les valeurs affichables, on va partout ramener à la bonne valeur
 	//unsigned int Q = solution_plan->makespan;
 
 	if (normalize)
 
-		Q =  alpha *( (double) (decompo.plan().makespan() -  obj1_bounds[0] )/ (obj1_bounds[1]- obj1_bounds[0]))  + (1-alpha) * ( (double) 		(decompo.plan().cost_add() - obj2_add_bounds[0] )/  (obj2_add_bounds[1] - obj2_add_bounds[0] ));
+		Q =  alpha *((makespan -  obj1_bounds[0] )/ (obj1_bounds[1]- obj1_bounds[0]))  + (1-alpha) * ( (cost - obj2_add_bounds[0] )/  (obj2_add_bounds[1] - obj2_add_bounds[0] ));
 
 	else
-
-		Q = (alpha *((double) decompo.plan().makespan())+ (1-alpha) * (double) decompo.plan().cost_add() );
+		Q = alpha *makespan + (1-alpha) * cost;
 
 	//assert( Q > 0 );
 
@@ -168,222 +167,189 @@ double PlanningAggregaEval::aggreg_additiveCost_makespan ( Planning & decompo,  
 }
 
 
-
-double PlanningAggregaEval::aggreg_maxCost_makespan ( Planning & decompo,  PlanningObjectiveVector &objVector)
+double PlanningAggregaEval::aggreg_maxCost_makespan ( Planning & decompo,  PlanningObjectiveVector &objVect)
 {
 	double Q;
-
-	objVector[1]=decompo.plan().cost_max() ;
-
+    double makespan = objVect[0];
+	double cost = decompo.plan().cost_max() ;
+    objVect[1] = cost;
 	// Pour travailler sur les valeurs affichables, on va partout ramener à la bonne valeur
 	//unsigned int Q = solution_plan->makespan;
 
 
 	if (normalize)
-
-		Q =  alpha *( (double) (decompo.plan().makespan() -  obj1_bounds[0] )/ (obj1_bounds[1]- obj1_bounds[0]) )+ (1-alpha) * ( (double) (decompo.plan().cost_max() - obj2_max_bounds[0] )/  (obj2_max_bounds[1] - obj2_max_bounds[0] ));
-
+		Q =  alpha *((makespan -  obj1_bounds[0] )/ (obj1_bounds[1]- obj1_bounds[0]) )+ (1-alpha) * ((cost - obj2_max_bounds[0] )/  (obj2_max_bounds[1] - obj2_max_bounds[0] ));
 	else
-
-		Q = (alpha *((double) decompo.plan().makespan()) + (1-alpha) * (double) decompo.plan().cost_max() );
+		Q = (alpha * makespan + (1-alpha) * cost );
 
 	//assert( Q > 0 );
 
-
+    
 	return Q ;//+ ( (double)decompo.size() - (double)decompo.get_number_useful_goals() + 1.0 ) / Q + (double)decompo.get_number_evaluated_nodes() / ( (double)_l_max * (double)decompo.b_max() );
 }
 
 void PlanningAggregaEval::call (Planning & _decompo){
 
-
-	aggregation(_decompo);
-
+    PlanningObjectiveVector objVector;
+	
+	objVector[0] = makespan(_decompo);
+	
+	if (_decompo.is_feasible())
+        _decompo.fitness((this->*fitness_aggregation)(_decompo,objVector));
+    else
+    {
+        objVector[1] = objVector[0];
+        _decompo.fitness(objVector[1]);
+    }
+    _decompo.objectiveVector(objVector);
+	
 }
 
-
-void PlanningAggregaEval::aggregation( Planning &  decompo)
+double PlanningAggregaEval::makespan( Planning &  decompo)
 {
-
-	PlanningObjectiveVector objVector;
-	double unfeasible_fitness;
-
-#ifndef NDEBUG
-	eo::log << eo::xdebug << "decompo.size=" << decompo.size() << std::endl;
-#endif
-#ifndef NDEBUG
-	eo::log << eo::xdebug << "Check goal consistency" << std::endl;
-	for( Planning::iterator igoal  = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
-		assert_noduplicate( igoal->begin(), igoal->end() );
-		assert_nomutex(     igoal->begin(), igoal->end() );
-	}
-#endif
-	if( ! decompo.invalid() ) { // do nothing
-#ifndef NDEBUG
-		eo::log << eo::debug << "-";
-		eo::log.flush();
-#endif
-	} else { // if decompo.invalid
+    double _makespan; 
+    
+    #ifndef NDEBUG
+     eo::log << eo::xdebug << "decompo.size=" << decompo.size() << std::endl;
+    #endif
+    #ifndef NDEBUG
+    eo::log << eo::xdebug << "Check goal consistency" << std::endl;
+    for( daex::Decomposition::iterator igoal  = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
+    assert_noduplicate( igoal->begin(), igoal->end() );
+    assert_nomutex(     igoal->begin(), igoal->end() );
+    }
+    #endif
+    if( ! decompo.invalid() ) { // do nothing
+    #ifndef NDEBUG
+    eo::log << eo::debug << "-";
+    eo::log.flush();
+    #endif
+    } else { // if decompo.invalid
 
 #ifndef PAPERVERSION
-		//   JACK the code does not even try to evaluate decompositions that are too long
-		// FIXME what is the effect on variation operators that relies on last_reached?
-		if( decompo.size() > _l_max ) {
+            //   JACK the code does not even try to evaluate decompositions that are too long 
+              // FIXME what is the effect on variation operators that relies on last_reached?
+        if( decompo.size() > _l_max ) {
+           
+          _makespan = fitness_unfeasible_too_long();
+          
+          decompo.setFeasible(false);
+        } else 
+                                 #endif
+        {
+        BitArray previous_state = bitarray_create( fluents_nb );  
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "malloc plans...";
+                                         eo::log.flush();
+                                 #endif
+        cpt_malloc( plans, decompo.size()+1 ); // +1 for the subplan between the last goal and the final state
+        plans_nb = 0;
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "ok" << std::endl;
+                                         eo::log << eo::xdebug << "yahsp reset...";
+                                         eo::log.flush();
+                                 #endif
+        yahsp_reset();
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "ok" << std::endl;
+                                 #endif
+        decompo.reset_number_evaluated_goals(); // compteur de goals
+        decompo.reset_number_useful_goals(); // compteur de goals utiles
+        decompo.reset_number_evaluated_nodes(); // compteur des tentatives de recherche
 
-			//_makespan = fitness_unfeasible_too_long();
-			unfeasible_fitness= fitness_unfeasible_too_long();
-			decompo.fitness(unfeasible_fitness);
-			decompo.setFeasible(false);
-			objVector[0]=objVector[1]=unfeasible_fitness;
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "for each goal:" << std::endl;
+                                 #endif
+        unsigned int code = 0; // return code of cpt_search
+       // b_max( b_max_in); // set the generic b_max 
+        decompo.b_max(  _b_max_in ); // VV : set b_max for the decomposition
 
-		} else
-#endif
-		{
-			BitArray previous_state = bitarray_create( fluents_nb );
-#ifndef NDEBUG
-			eo::log << eo::xdebug << "malloc plans...";
-			eo::log.flush();
-#endif
-			cpt_malloc( plans, decompo.size()+1 ); // +1 for the subplan between the last goal and the final state
-			plans_nb = 0;
-#ifndef NDEBUG
-			eo::log << eo::xdebug << "ok" << std::endl;
-			eo::log << eo::xdebug << "yahsp reset...";
-			eo::log.flush();
-#endif
-			yahsp_reset();
-#ifndef NDEBUG
-			eo::log << eo::xdebug << "ok" << std::endl;
-#endif
-			decompo.reset_number_evaluated_goals(); // compteur de goals
-			decompo.reset_number_useful_goals(); // compteur de goals utiles
-			decompo.reset_number_evaluated_nodes(); // compteur des tentatives de recherche
+        //parcourt les goals de la décomposition
+        for( daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
+                                 #ifndef NDEBUG
+                                             eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
+                                             eo::log.flush();
+                                 #endif
+         //  copie des goals daex dans leur equivant YAHSP
+//           nouvelle allocation de tableau de goal
+            assert( igoal->size() > 0 );
+            Fluent **intermediate_goal_state = (Fluent **) malloc(igoal->size() * sizeof(Fluent *));
+            unsigned int i = 0;
+            for( daex::Goal::iterator iatom = igoal->begin(); iatom != igoal->end(); ++iatom ) {
+              //  le compilateur demande à expliciter le template pour fluents, 
+                //car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
+                intermediate_goal_state[i] =  (*iatom)->fluent();
+                i++;
+            }
+             assert( i ==  igoal->size());
+          //  search a plan towards the current goal
+            bitarray_copy( previous_state, *get_current_state(), fluents_nb );
+            code = solve_next( decompo, intermediate_goal_state, igoal->size(), _b_max_in );
+            free(intermediate_goal_state);
 
-#ifndef NDEBUG
-			eo::log << eo::xdebug << "for each goal:" << std::endl;
-#endif
-			unsigned int code = 0; // return code of cpt_search
-			// b_max( b_max_in); // set the generic b_max
-			decompo.b_max(  _b_max_in ); // VV : set b_max for the decomposition
-
-			//parcourt les goals de la décomposition
-			for( Planning::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
-#ifndef NDEBUG
-				eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
-				eo::log.flush();
-#endif
-				//  copie des goals daex dans leur equivant YAHSP
-				//           nouvelle allocation de tableau de goal
-				assert( igoal->size() > 0 );
-
-
-				/*if (strategy_level.compare("goal") ==0 ||  (strategy_level.compare("mixte") ==0 && ! decompo.indiv_strategy_level)) {
-
-					//daex::Goal & subGoal = * decompo.iter_at(decompo.last_reached_safe()) ;
-
-					if (rng.flip(proba_strateg_goal))
-
-						igoal->makespan_weight  = ! igoal-> makespan_weight ;
-
-
-					if (igoal-> makespan_weight)
-
-						yahsp_set_optimize_makespan_add();
-					else
-
-						yahsp_set_optimize_cost();
-
-
-				}*/
-
-				Fluent **intermediate_goal_state = (Fluent **) malloc(igoal->size() * sizeof(Fluent *));
-				unsigned int i = 0;
-				for( daex::Goal::iterator iatom = igoal->begin(); iatom != igoal->end(); ++iatom ) {
-					//  le compilateur demande à expliciter le template pour fluents,
-					//car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
-					intermediate_goal_state[i] =  (*iatom)->fluent();
-					i++;
-				}
-				assert( i ==  igoal->size());
-				//  search a plan towards the current goal
-				bitarray_copy( previous_state, *get_current_state(), fluents_nb );
-				code = solve_next( decompo, intermediate_goal_state, igoal->size(), _b_max_in );
-				free(intermediate_goal_state);
-
-				if( code != PLAN_FOUND ) {
-
-					decompo.setFeasible(false);
+            if( code != PLAN_FOUND ) {
+            decompo.setFeasible(false);
 #ifdef PAPERVERSION
-					unfeasible_fitness = fitness_unfeasible(decompo,previous_state);
-
+             
+            _makespan = fitness_unfeasible(decompo,previous_state);
+               
 #else
-
-					unfeasible_fitness = fitness_unfeasible_intermediate(decompo);
-
+            
+            _makespan = fitness_unfeasible_intermediate(decompo);
+               
 #endif 
-					decompo.fitness(unfeasible_fitness);
+           
+             break; 
+            }
+        } // for igoal in decompo
+//        here we have reached the last goal of the decomposition, it remains searching towards the ultimate goal   
+        if((decompo.size() == 0) || (code == PLAN_FOUND)) {
+          //  set the b_max specific to this step
+          //  b_max( _b_max_last );
+            decompo.b_max( _b_max_last ); // VV : set b_max for the decomposition
 
-					objVector[0]=objVector[1]=unfeasible_fitness;
+            bitarray_copy( previous_state, *get_current_state(), fluents_nb );
+            unsigned int code = solve_next( decompo, goal_state, goal_state_nb, _b_max_last );
 
-					break;
-				}
-			} // for igoal in decompo
-			//        here we have reached the last goal of the decomposition, it remains searching towards the ultimate goal
-			if((decompo.size() == 0) || (code == PLAN_FOUND)) {
-				//  set the b_max specific to this step
-				//  b_max( _b_max_last );
-				decompo.b_max( _b_max_last ); // VV : set b_max for the decomposition
-
-				bitarray_copy( previous_state, *get_current_state(), fluents_nb );
-				unsigned int code = solve_next( decompo, goal_state, goal_state_nb, _b_max_last );
-
-				if( code == PLAN_FOUND ) {
-					compress( decompo );
-					/*
+            if( code == PLAN_FOUND ) {
+                
+                compress( decompo );
+                /*
                 if (solution_plan->makespan < 6)
                     std::cout << decompo.size() << " " << plans_nb << std::endl;
-					 */
+                */
 
-					decompo.setFeasible(true);
-                    //std::cout << fitness_feasible( decompo ) << std::endl;
-					objVector[0]=fitness_feasible( decompo );
+               decompo.setFeasible(true);
+ 
+              _makespan = fitness_feasible( decompo );
+     
 
-					decompo.fitness((this->*fitness_aggregation)(decompo,objVector));
-
-
-#ifndef NDEBUG
-					eo::log << eo::debug << "*";
-					eo::log.flush();
-#endif
-				} else {
-
-					decompo.setFeasible(false);
+              #ifndef NDEBUG
+              eo::log << eo::debug << "*";
+              eo::log.flush();
+              #endif
+            } else {
+            
+             decompo.setFeasible(false);
 #ifdef PAPERVERSION
-
-
-
-					unfeasible_fitness =fitness_unfeasible(decompo, previous_state);
-
+                _makespan =  fitness_unfeasible(decompo, previous_state);
+     
 #else
+              
+                _makespan = fitness_unfeasible_final(decompo);             
+//               
+#endif 
+            } // if PLAN_FOUND for last goal
+        } // if PLAN_FOUND
+        cpt_free(previous_state);
+      } // if size > _l_max
+    } // if !decompo.invalid
+   free_yahsp_structures();
 
-					unfeasible_fitness= fitness_unfeasible_final(decompo);
-					//
-#endif   
-					decompo.fitness(unfeasible_fitness);
-					objVector[0]=objVector[1]=unfeasible_fitness;
+   return _makespan;
 
-				} // if PLAN_FOUND for last goal
-			} // if PLAN_FOUND
-			cpt_free(previous_state);
-		} // if size > _l_max
-	} // if !decompo.invalid
-	free_yahsp_structures();
-
-	decompo.objectiveVector(objVector);
-    //std::cout << objVector[0] << " " << objVector[1] << std::endl;
-
+ 
 }
-
-
 
 void PlanningAggregaEval::post_call( Planning & decompo ) {
 	decompo.plan().search_steps( decompo.get_number_evaluated_nodes() );

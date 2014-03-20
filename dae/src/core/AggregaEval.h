@@ -66,7 +66,7 @@ PlanningAggregaEval (unsigned int l_max_ = 20,
    * computation of the makespan
    * @param _decompo the genotype to evaluate
    */
-   void  aggregation(Planning & _decompo);  
+   double makespan( Planning &  decompo);
 
    /**
     * computation of the cost

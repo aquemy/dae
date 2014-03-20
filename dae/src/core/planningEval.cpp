@@ -49,14 +49,13 @@ PlanningEval::~PlanningEval(){};
 
 void PlanningEval::operator()(Planning & _decompo)
 {
-      if (_decompo.invalidObjectiveVector())
-       {
-	 adaptive_search_strategy();
-    	 pre_call(_decompo);
-    	 call(_decompo);
-    	 post_call(_decompo);
-    	
-      }
+    if (_decompo.invalid())
+    {
+	    adaptive_search_strategy();
+    	pre_call(_decompo);
+        call(_decompo);
+        post_call(_decompo);
+    }
 }
 
 void PlanningEval::adaptive_search_strategy()
@@ -74,7 +73,7 @@ void PlanningEval::adaptive_search_strategy()
    yahsp_set_seed(rng.rand());
 
 
-		      
+	      
 }
 
  
@@ -93,7 +92,7 @@ double PlanningEval::max_cost(  Planning & _decompo)
   return _decompo.plan().cost_max();
 }
 
- void PlanningEval::call (Planning & _decompo){
+void PlanningEval::call (Planning & _decompo){
 	
 	PlanningObjectiveVector objVector;
 	
@@ -111,8 +110,7 @@ double PlanningEval::max_cost(  Planning & _decompo)
     	
     	
     	_decompo.objectiveVector(objVector);
-    	
-    	
+	
 }
 
 
