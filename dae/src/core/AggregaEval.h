@@ -1,14 +1,11 @@
-
 #ifndef __AGGREGA_EVAL_YAHSP_H__
 #define __AGGREGA_EVAL_YAHSP_H__
 
- 
 #include <iostream>
 #include <utility>
 #include <moeo>
 #include <evaluation/yahsp.h>
 #include "planning.h"
-
 
 // FIXME gérer les timers yahsp
 

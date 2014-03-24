@@ -5,17 +5,23 @@
 #include <iostream>
 #include <utility>
 #include <moeo>
+#include <typeinfo>
 #include <evaluation/yahsp.h>
 #include "planning.h"
+
+namespace daex {
 
 /**
  * Evaluation of the objective vector a (multi-objective) Planning object
  */
-class PlanningEval : public daeCptYahspEval  <Planning>
-  {
-  public:
+template <class EOT >
+class PlanningEval : public daeYahspEval< EOT >
+{
+public:
 
-  PlanningEval (unsigned int l_max_ = 20,
+    typedef typename EOT::Fitness Fitness;
+
+    PlanningEval (unsigned int l_max_ = 20,
 		unsigned int b_max_in = 10, 
 		unsigned int b_max_last = 30,
 		double fitness_weight = 10, 
@@ -27,78 +33,109 @@ class PlanningEval : public daeCptYahspEval  <Planning>
 		double makespan_add_weigth=1.0,
 		unsigned int astar_weigth=3,
 		bool _rand_seed = false
- 	      );
-  /**
-     * computation of the multi-objective evaluation of a Planning object
-     * @param _decompo the Planning object to evaluate
-     */
-  void operator()(Planning & _decompo);
-  
+    ):
+        daeYahspEval< EOT >(
+            l_max_,
+            b_max_in, 
+            b_max_last, 
+            fitness_weight, 
+            fitness_penalty
+       ), 
+       rand_seed(_rand_seed)
+    {
+        if (_objective.compare("Add")==0)
+       		secondObjective = &PlanningEval::additive_cost;
+      	else
+     		secondObjective = &PlanningEval::max_cost;
+	
+	    rates.push_back(lenght_weigth);
+	    rates.push_back(cost_weigth);
+	    rates.push_back(makespan_max_weigth);
+	    rates.push_back(makespan_add_weigth);
+     	
+	    yahsp_set_weight(astar_weigth);
+    }
+    
+    virtual ~PlanningEval() {};
 
-  virtual ~PlanningEval();
+    virtual void setFitness(EOT & _decompo)
+    {
+	    PlanningObjectiveVector objVector;
+	
+	    objVector[0] = daeYahspEval< EOT >::fitness_feasible(_decompo);
+	
+     	if (_decompo.is_feasible())
+     		objVector[1] = (this->*secondObjective)(_decompo);  		
+      	else 
+    		objVector[1] = objVector[0];
 
-   
-  virtual void call (Planning & _decompo);
-   
-   /**
-   * computation of the makespan
-   * @param _decompo the genotype to evaluate
-   */
-   double makespan(Planning & _decompo);  
+    	_decompo.objectiveVector(objVector);
+	
+    }
 
    /**
     * computation of the cost
     * @param _decompo the genotype to evaluate
     */
-   double additive_cost(Planning & _decompo); 
-   
-   double max_cost(Planning & _decompo); 
-   
-   void adaptive_search_strategy();
-    
-   virtual void step_recorder(){};
-    
-   virtual void step_recorder_fail(){};
-   
-   void pre_call( Planning& decompo ){};   
-    
-    void post_call( Planning & decompo);  
-        
-    
+    double additive_cost(EOT & _decompo)
+    {
+        return _decompo.plan().cost_add();
+    }
 
-  protected:
-
-    unsigned int solve_next( Planning & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes );
-    
-     void compress( Planning & decompo );
-                                
-
-   // ! Free all necessary pointers to global variables
-    //that have been used during call
-      void free_yahsp_structures();
-      
-    // Pointer towards the 2nd objective to optimize (tota cost / max cost)
-     double  (PlanningEval::*secondObjective)(Planning &);  
-     
-     // Weight vectors of the different strategies (lenght, cost,  makespan_max, makespan_add,)
-     
-     std::vector<double> rates;
-     
-     bool rand_seed; // flag for the random initialization of yashp at each call
+    double max_cost(EOT & _decompo)
+    {
+        return _decompo.plan().cost_max();
+    }
+   
+    void adaptive_search_strategy()
+    {
+        unsigned what = rng.roulette_wheel(rates);
   
- };
+        if (what == 0) 
+            yahsp_set_optimize_length(); 
+        else if (what ==1) 
+            yahsp_set_optimize_cost();  
+	    else if (what ==2) 
+	        yahsp_set_optimize_makespan_max();  
+	    else yahsp_set_optimize_makespan_add();  
+	                  
+        if (rand_seed)
+            yahsp_set_seed(rng.rand());
+    }
+    
+    virtual void step_recorder(){};
+    
+    virtual void step_recorder_fail(){};
+   
+    void pre_call(EOT& decompo ){};   
+    
+    void post_call(EOT& decompo)
+    {
+        decompo.plan().search_steps(decompo.get_number_evaluated_nodes()); 
+    } 
+                                
+    // Pointer towards the 2nd objective to optimize (tota cost / max cost)
+    double (PlanningEval::*secondObjective)(EOT &);  
+     
+    // Weight vectors of the different strategies (lenght, cost,  makespan_max, makespan_add,)
+    std::vector<double> rates;
+     
+    bool rand_seed; // flag for the random initialization of yashp at each call
+  
+};
+
 //! Classe à utiliser lors de la première itération, pour estimer b_max
- 
-class PlanningEvalInit : public PlanningEval
+template <class EOT >
+class PlanningEvalInit : public PlanningEval< EOT >
 {
 public:
 
     PlanningEvalInit( 
-            unsigned int pop_size, 
-            unsigned int l_max, 
-            unsigned int b_max_in = 10000, 
-            unsigned int b_max_last = 30000, 
-            double fitness_weight = 10,
+        unsigned int pop_size, 
+        unsigned int l_max, 
+        unsigned int b_max_in = 10000, 
+        unsigned int b_max_last = 30000, 
+        double fitness_weight = 10,
 	    double fitness_penalty = 1e6,
 	    std::string _objective="Add",
 	    double lenght_weigth=1.0, 
@@ -107,20 +144,32 @@ public:
 	    double makespan_add_weigth=1.0,
 	    unsigned int astar_weigth=3,
 	    bool _rand_seed = false):
-	    PlanningEval( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty,_objective,lenght_weigth,
-	    cost_weigth, makespan_max_weigth, makespan_add_weigth, astar_weigth,_rand_seed) 
+	    PlanningEval<EOT >( 
+	        l_max, 
+	        b_max_in, 
+	        b_max_last, 
+	        fitness_weight, 
+	        fitness_penalty,
+	        _objective,
+	        lenght_weigth,
+	        cost_weigth, 
+	        makespan_max_weigth, 
+	        makespan_add_weigth, 
+	        astar_weigth,
+	        _rand_seed
+	        ) 
     {
        node_numbers.reserve( pop_size * l_max );
     }
 
-    void call(Planning & decompo ){
+    void call(EOT& decompo ){
 #ifndef NDEBUG
     eo::log << eo::logging << std::endl << "init decompo nodes nb: ";
     eo::log.flush();
     int prev = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
 #endif
 
-    PlanningEval::call( decompo );
+    PlanningEval< EOT >::call( decompo );
 
 #ifndef NDEBUG
     int next = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
@@ -194,5 +243,6 @@ protected:
     std::vector<unsigned int> node_numbers;
 };
 
+} // namespace daex
 
 #endif /*PLANNINGEVAL_H_*/

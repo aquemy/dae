@@ -51,17 +51,18 @@ void do_make_variation_param(eoParser &parser)
             "Probability to apply one of the mutation", 'm', "Variation" );
 }
 
-eoGenOp< Planning>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLoad & _pddl)
+template <class EOT >
+eoGenOp< EOT >  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLoad & _pddl)
 {
     // Crossovers 
-    eoQuadOp<Planning> *ptQuad =  new daex::CrossOverTimeFilterHalf<Planning> ;
+    eoQuadOp< EOT > *ptQuad =  new daex::CrossOverTimeFilterHalf< EOT >;
     
     // Store in the state
     _state.storeFunctor (ptQuad);
      
 
     // Create the CombinedQuadOp
-    eoPropCombinedQuadOp<Planning> *ptCombinedQuadOp = new eoPropCombinedQuadOp<Planning>(*ptQuad, 1.0);
+    eoPropCombinedQuadOp< EOT > *ptCombinedQuadOp = new eoPropCombinedQuadOp< EOT >(*ptQuad, 1.0);
      
         
     // don't forget to store the CombinedQuadOp
@@ -89,14 +90,14 @@ eoGenOp< Planning>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pd
     
     // Create the CombinedMonOp
 
-    eoMonOp< Planning> *ptMon = new daex::MutationDelGoal<Planning>();
+    eoMonOp< EOT > *ptMon = new daex::MutationDelGoal< EOT >();
     
     _state.storeFunctor (ptMon);
       
-     eoPropCombinedMonOp< Planning> *ptCombinedMonOp = new eoPropCombinedMonOp< Planning>  (*ptMon, w_delgoal); /// à voir
+     eoPropCombinedMonOp< EOT > *ptCombinedMonOp = new eoPropCombinedMonOp< EOT >  (*ptMon, w_delgoal); /// à voir
     
 //    daex::MutationDelOneAtom delatom;
-     ptMon = new  daex::MutationDelAtom<Planning>(proba_del_atom) ;     
+     ptMon = new  daex::MutationDelAtom< EOT >(proba_del_atom) ;     
     
     
     _state.storeFunctor(ptMon); 
@@ -105,7 +106,7 @@ eoGenOp< Planning>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pd
         
        
     // partition, radius, l_max
-     ptMon = new daex::MutationAddGoal<Planning> ( _pddl.chronoPartitionAtom(), radius /*,
+     ptMon = new daex::MutationAddGoal< EOT >( _pddl.chronoPartitionAtom(), radius /*,
      init.l_max()*/ );
      
      _state.storeFunctor(ptMon); 
@@ -114,7 +115,7 @@ eoGenOp< Planning>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pd
      ptCombinedMonOp  -> add(*ptMon, w_addgoal);
      
      
-      ptMon = new daex::MutationChangeAddAtom <Planning>( _pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
+      ptMon = new daex::MutationChangeAddAtom< EOT >( _pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
       
       _state.storeFunctor(ptMon); 
       
@@ -144,13 +145,13 @@ eoGenOp< Planning>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pd
         throw std::runtime_error("Invalid pMut");
       
       
-    eoProportionalOp<Planning> * cross = new
+    eoProportionalOp< EOT > * cross = new
   
-    eoProportionalOp<Planning> ;
+    eoProportionalOp< EOT > ;
   
     _state.storeFunctor(cross);
   
-    ptQuad = new eoQuadCloneOp<Planning>;
+    ptQuad = new eoQuadCloneOp< EOT >;
   
     _state.storeFunctor(ptQuad);
   
@@ -160,7 +161,7 @@ eoGenOp< Planning>  &do_make_op (eoParser& _parser, eoState & _state,   daex::pd
 
   // now the sequential
   
-    eoSequentialOp<Planning> *op = new eoSequentialOp<Planning>;
+    eoSequentialOp< EOT > *op = new eoSequentialOp< EOT >;
   
     _state.storeFunctor(op);
   

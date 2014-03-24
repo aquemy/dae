@@ -22,7 +22,7 @@
 #include <evaluation/yahsp.h>
 #include <apply.h>
 #include "../core/planningEval.h"
-#include "../core/AggregaEval.h"
+//#include "../core/AggregaEval.h"
 
 namespace daex {
 
@@ -73,8 +73,8 @@ void do_make_eval_param(eoParser &parser)
  * @param eoParser& _parser  to get user parameters
  * @param eoState& _state  to store the memory
  */
- 
-eoEvalFuncCounter<Planning> &   do_make_eval(eoParser& _parser, eoState& _state,eoPop<Planning> & _pop,   daex::Init<Planning> & _init)
+template <class EOT >
+eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop,   daex::Init< EOT > & _init)
 {
 
   	std::string objective = _parser.valueOf<std::string>("objective");
@@ -83,7 +83,7 @@ eoEvalFuncCounter<Planning> &   do_make_eval(eoParser& _parser, eoState& _state,
     unsigned int fitness_weight = _parser.valueOf<unsigned int>("fitness-weight");
     unsigned int fitness_penalty = _parser.valueOf<unsigned int>("fitness-penalty");
         
-    PlanningEvalInit *eval_yahsp_init = new PlanningEvalInit(
+    PlanningEvalInit< EOT > *eval_yahsp_init = new PlanningEvalInit< EOT >(
         _pop.size(), 
         _init.l_max(), 
         b_max_init, 
@@ -109,7 +109,7 @@ eoEvalFuncCounter<Planning> &   do_make_eval(eoParser& _parser, eoState& _state,
     double b_max_ratio = _parser.valueOf<double>("bmax-ratio");
     unsigned int b_max_in, b_max_last, goodguys=0, popsize = _pop.size(); 
   
-    PlanningEval  *eval_yahsp = NULL ;
+    PlanningEval< EOT >  *eval_yahsp = NULL ;
     _state.storeFunctor(eval_yahsp);
   
     if( b_max_fixed == 0 ) 
@@ -123,7 +123,7 @@ eoEvalFuncCounter<Planning> &   do_make_eval(eoParser& _parser, eoState& _state,
 	   
 	        goodguys=0;
 	        b_max_last = static_cast<unsigned int>(std::floor(b_max_in * b_max_last_weight));
-	        eval_yahsp = new PlanningEval(
+	        eval_yahsp = new PlanningEval< EOT >(
 	            _init.l_max(), 
 	            b_max_in, 
 	            b_max_last, 
@@ -167,7 +167,7 @@ eoEvalFuncCounter<Planning> &   do_make_eval(eoParser& _parser, eoState& _state,
 		b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 		assert( b_max_last > 0 );
 		// eval that uses the correct b_max
-		eval_yahsp = new PlanningEval( 
+		eval_yahsp = new PlanningEval< EOT >( 
 		    _init.l_max(), 
 		    b_max_in, 
 		    b_max_last, 
@@ -185,13 +185,15 @@ eoEvalFuncCounter<Planning> &   do_make_eval(eoParser& _parser, eoState& _state,
 		apply(*eval_yahsp, _pop);
 	 }
 
-    eoEvalFuncCounter<Planning> *eval_counter = new eoEvalFuncCounter<Planning>( *eval_yahsp, "Eval.\t" );
+    eoEvalFuncCounter< EOT > *eval_counter = new eoEvalFuncCounter< EOT >( *eval_yahsp, "Eval.\t" );
     _state.storeFunctor(eval_counter);
     	
     return *eval_counter;	
 }
 
-eoEvalFuncCounter<Planning> &do_make_eval_aggregation(eoParser& _parser, eoState& _state,eoPop<Planning> & _pop,   daex::Init<Planning> & _init)
+/*
+template <class EOT >
+eoEvalFuncCounter< EOT >& do_make_eval_aggregation(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop,   daex::Init< EOT > & _init)
 {
 
   	std::string objective =  _parser.valueOf<std::string>("objective");
@@ -350,6 +352,7 @@ eoEvalFuncCounter<Planning> &do_make_eval_aggregation(eoParser& _parser, eoState
     	
     return *eval_counter;  	
 }
+*/
  
 } // namespace daex
 
