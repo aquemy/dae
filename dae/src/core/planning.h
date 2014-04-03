@@ -15,13 +15,14 @@ namespace daex {
 /**
  *  Structure of the genotype for the planning problem: a vector of decomposition and an objective vector.
  */
-template < class MOEOObjectiveVector = PlanningObjectiveVector, class MOEOFitness = double, class MOEODiversity = double > 
-class Planning: public MOEO < MOEOObjectiveVector, MOEOFitness, MOEODiversity >, 
+//MOEO<MOEOObjectiveVector,MOEOFitness, MOEODiversity>
+template < class BaseT > 
+class Planning: public BaseT, 
                 public daex::Decomposition
 {
 public:
 
-    typedef MOEOFitness Fitness;
+    typedef typename BaseT::Fitness Fitness;
 
     using daex::Decomposition :: begin;
     using daex::Decomposition :: end;
@@ -29,7 +30,7 @@ public:
     using daex::Decomposition :: size;
      
     Planning(): 
-        MOEO < MOEOObjectiveVector, MOEOFitness, MOEODiversity >(), 
+        BaseT(), 
         daex::Decomposition(),
         _is_feasible(false)
     {}
@@ -45,7 +46,7 @@ public:
      Planning & operator=(const Planning & other)
      {
         if (this != &other) {
-             MOEO< MOEOObjectiveVector, MOEOFitness, MOEODiversity >::operator=(other);
+             BaseT::operator=(other);
              Decomposition::operator=(other); 
              _is_feasible = other._is_feasible ;
         }
@@ -54,32 +55,13 @@ public:
     
     virtual void invalidate()
     {
-        MOEO < MOEOObjectiveVector, MOEOFitness, MOEODiversity > ::invalidate();
+        BaseT::invalidate();
         daex::Decomposition::invalidate();
-    }
-    
-    void value(const MOEO<MOEOObjectiveVector,MOEOFitness, MOEODiversity>  & _moeo)
-    {
-        if (_moeo.size() != size())	   // safety check
-        {
-            if (size())		   // NOT an initial empty std::vector
-            {
-                std::cout << "Warning: Changing size in moeoVector assignation"<<std::endl;
-                resize(_moeo.size());
-            }
-            else
-            {
-                throw std::runtime_error("Size not initialized in moeoVector");
-            }
-        }
-     
-        std::copy( _moeo.begin(), _moeo.end(),  this->begin() ); 
-        invalidate();
     }
 
     virtual void printOn(std::ostream & _os) const
     {
-		MOEO < MOEOObjectiveVector, MOEOFitness, MOEODiversity >::printOn(_os);
+		BaseT::printOn(_os);
         _os << ' ';
         Decomposition::printOn(_os);  
     }
@@ -90,7 +72,7 @@ public:
      */
     virtual void readFrom(std::istream & _is)
     {
-       MOEO < MOEOObjectiveVector, MOEOFitness, MOEODiversity >::readFrom(_is);
+       BaseT::readFrom(_is);
        Decomposition::readFrom(_is);
     }
 
@@ -105,9 +87,9 @@ public:
         return _is_feasible;
     }
      
-    bool operator< (const MOEO<MOEOObjectiveVector,MOEOFitness, MOEODiversity>  & _moeo) const
+    bool operator< (const BaseT  & _moeo) const
     {
-        return MOEO < MOEOObjectiveVector, MOEOFitness, MOEODiversity >::operator<(_moeo);
+        return BaseT::operator<(_moeo);
     }
    
 protected:
@@ -121,9 +103,9 @@ protected:
  * @param _moeo1 the first object to compare
  * @param _moeo2 the second object to compare
  */
-template < class MOEOObjectiveVector, class MOEOFitness, class MOEODiversity>
-bool operator<(const Planning< MOEOObjectiveVector, MOEOFitness, MOEODiversity> & _moeo1, const 
-Planning< MOEOObjectiveVector, MOEOFitness, MOEODiversity > & _moeo2)
+template <class BaseT >
+bool operator<(const Planning< BaseT > & _moeo1, const 
+Planning< BaseT > & _moeo2)
 {
     return _moeo1.operator<(_moeo2);
 }
@@ -134,15 +116,15 @@ Planning< MOEOObjectiveVector, MOEOFitness, MOEODiversity > & _moeo2)
  * @param _moeo1 the first object to compare
  * @param _moeo2 the second object to compare
  */
-template < class MOEOObjectiveVector, class MOEOFitness, class MOEODiversity >
-bool operator>(const Planning< MOEOObjectiveVector, MOEOFitness, MOEODiversity> & _moeo1, const moeoVector< MOEOObjectiveVector, MOEOFitness, MOEODiversity > & _moeo2)
+/*template <class BaseT >
+bool operator>(const Planning< BaseT > & _moeo1, const moeoVector< BaseT > & _moeo2)
 {
     return _moeo1.operator>(_moeo2);
-}
+}*/
 
 
-template < class MOEOObjectiveVector, class MOEOFitness, class MOEODiversity > 
-std::ostream & operator << ( std::ostream& _os, const Planning< MOEOObjectiveVector, MOEOFitness, MOEODiversity> & _o ) 
+template < class BaseT > 
+std::ostream & operator << ( std::ostream& _os, const Planning< BaseT > & _o ) 
 {
     _o.printOn(_os);
     return _os;

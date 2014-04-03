@@ -37,7 +37,7 @@
 using namespace std;
 using namespace daex;
 
-typedef Planning<PlanningObjectiveVector, double, double> PlanningMOEO;
+typedef Planning<MOEO<PlanningObjectiveVector, double, double> > PlanningMOEO;
 /// main
 int main (int argc, char *argv[])
 {

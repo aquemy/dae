@@ -82,7 +82,7 @@ are considered together.
 *******************************************************************/
 
 
-
+#include <cstring>
 #include <ctime>
 #include <iostream>       
 #include <iomanip>

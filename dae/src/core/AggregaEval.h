@@ -18,7 +18,7 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray );
 
 
 //! Évaluateur principal, à utiliser pour les itérations normales
-class PlanningAggregaEval : public daeCptYahspEval <Planning>
+class PlanningAggregaEval : public daeYahspEval <Planning>
 {
  public: 
 

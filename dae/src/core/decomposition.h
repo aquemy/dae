@@ -11,7 +11,6 @@
 
 #include <eo>
 
- 
 #include "goal.h"
 #include "plan.h"
 #include <src/globs.h>

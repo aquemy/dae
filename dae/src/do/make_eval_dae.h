@@ -155,6 +155,8 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
             b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
         } // while
        //delete temp_yahsp; 
+       std::cout << "b_max_fixed : " <<  b_max_fixed << std::endl;
+       std::cout << "b_max_in : " <<  b_max_in << std::endl;
     }
     //if we want a fixed b_max for the whole search
     else  
@@ -187,7 +189,7 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 
     eoEvalFuncCounter< EOT > *eval_counter = new eoEvalFuncCounter< EOT >( *eval_yahsp, "Eval.\t" );
     _state.storeFunctor(eval_counter);
-    	
+    std::cout << "End of first evaluation" << std::endl;
     return *eval_counter;	
 }
 
