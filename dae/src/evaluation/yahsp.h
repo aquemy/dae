@@ -14,6 +14,7 @@
 #include "core/decomposition.h"
 #include "core/plan.h"
 #include "cpt-yahsp.h"
+#include "../core/planningState.h"
 
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -126,7 +127,7 @@ public:
             // FIXME what is the effect on variation operators that relies on last_reached?
             if( decompo.size() >  daeCptYahspEval<EOT>::_l_max ) 
             {
-                decompo.setFeasible(false);
+                decompo.state(UnfeasibleTooLong);
             } 
             else 
             #endif
@@ -187,7 +188,7 @@ public:
 
                     if(code != PLAN_FOUND) 
                     {
-                        decompo.setFeasible(false);
+                        decompo.state(UnfeasibleIntermediate);
                         break;
                     }
                 } // for igoal in decompo
@@ -209,7 +210,7 @@ public:
                             std::cout << decompo.size() << " " << plans_nb << std::endl;
                         */
 
-                        decompo.setFeasible(true); 
+                        decompo.state(Feasible);
                         #ifndef NDEBUG
                         eo::log << eo::debug << "*";
                         eo::log.flush();
@@ -217,7 +218,7 @@ public:
                     } 
                     else 
                     {
-                        decompo.setFeasible(false); 
+                        decompo.state(UnfeasibleFinal);
                     } // if PLAN_FOUND for last goal
                 } // if PLAN_FOUND
                 cpt_free(previous_state);
@@ -240,8 +241,8 @@ public:
         {
             pre_call(decompo);
             call(decompo);
-            post_call(decompo);
             setFitness(decompo);
+            post_call(decompo);
         }
     }
      

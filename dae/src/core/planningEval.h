@@ -47,12 +47,11 @@ public:
        		secondObjective = &PlanningEval::additive_cost;
       	else
      		secondObjective = &PlanningEval::max_cost;
-	
-	    rates.push_back(lenght_weigth);
-	    rates.push_back(cost_weigth);
+	    
 	    rates.push_back(makespan_max_weigth);
+	    rates.push_back(cost_weigth);
 	    rates.push_back(makespan_add_weigth);
-     	
+	    rates.push_back(lenght_weigth);
 	    yahsp_set_weight(astar_weigth);
     }
     
@@ -61,16 +60,28 @@ public:
     virtual void setFitness(EOT & _decompo)
     {
 	    PlanningObjectiveVector objVector;
-	
-	    objVector[0] = daeYahspEval< EOT >::fitness_feasible(_decompo);
-	
-     	if (_decompo.is_feasible())
-     		objVector[1] = (this->*secondObjective)(_decompo);  		
-      	else 
-    		objVector[1] = objVector[0];
 
+     	if (_decompo.state() == Feasible)
+     	{
+     	    objVector[0] = daeYahspEval< EOT >::fitness_feasible(_decompo);
+     		objVector[1] = (this->*secondObjective)(_decompo);	
+      	}
+      	else
+      	{
+      	    if(_decompo.state() == UnfeasibleIntermediate)
+      	        objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_intermediate(_decompo);
+      	    else if(_decompo.state() == UnfeasibleFinal)
+      	        objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_final(_decompo);
+      	    else if(_decompo.state() == UnfeasibleTooLong)
+      	        objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
+      	    //else
+      	    //    objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible(decompo);
+      	        
+    		objVector[1] = objVector[0];
+        }
+        
     	_decompo.objectiveVector(objVector);
-	
+    	
     }
 
    /**
@@ -87,31 +98,138 @@ public:
         return _decompo.plan().cost_max();
     }
    
-    void adaptive_search_strategy()
+    void pre_call(EOT & decompo)
     {
-        unsigned what = rng.roulette_wheel(rates);
-  
-        if (what == 0) 
-            yahsp_set_optimize_length(); 
-        else if (what ==1) 
-            yahsp_set_optimize_cost();  
-	    else if (what ==2) 
-	        yahsp_set_optimize_makespan_max();  
-	    else yahsp_set_optimize_makespan_add();  
-	                  
-        if (rand_seed)
-            yahsp_set_seed(rng.rand());
+    //unsigned strategy = rng.roulette_wheel(decompo.strategyDistribution);
+    unsigned strategy = rng.roulette_wheel(rates);
+    
+    if (strategy == 0) 
+        yahsp_set_optimize_makespan_max();  
+    else if (strategy == 1) 
+        yahsp_set_optimize_cost();  
+	else if (strategy == 2) 
+	    yahsp_set_optimize_makespan_add();  
+	else 
+	    yahsp_set_optimize_length();
+	
+	/*std::cerr << "Previous Strat : Makespan Max" << std::endl;
+	for(unsigned i = 0; i < decompo.strategyDistribution.size(); i++)
+        std::cerr << "S" << i << " : " << decompo.strategyDistribution[i] << std::endl;
+	
+	if (strategy == 0) std::cerr << "Strat : Makespan Max" << std::endl;  
+    else if (strategy == 1) std::cerr << "Strat : Cost" << std::endl;
+	else if (strategy == 2) std::cerr << "Strat : Makespan Add" << std::endl;
+	else std::cerr << "Strat : Length" << std::endl;*/
+	
+	decompo.currentStrategy = strategy;
+	      
+    if(rand_seed)
+        yahsp_set_seed(rng.rand());
     }
     
     virtual void step_recorder(){};
     
     virtual void step_recorder_fail(){};
-   
-    void pre_call(EOT& decompo ){};   
+  
     
     void post_call(EOT& decompo)
     {
         decompo.plan().search_steps(decompo.get_number_evaluated_nodes()); 
+        
+        // Update Strategies distribution
+        //
+        /*std::cerr << "Decomp stat : ";
+        if (decompo.state() == Feasible)
+     	    std::cerr << "feasible" << std::endl;
+      	else if(decompo.state() == UnfeasibleIntermediate)
+      	    std::cerr << "unfeasible intermediate" << std::endl;
+        else if(decompo.state() == UnfeasibleFinal)
+      	    std::cerr << "unfeasible final" << std::endl;
+        else if(decompo.state() == UnfeasibleTooLong)
+      	    std::cerr << "unfeasible too long" << std::endl;
+      	else
+      	    std::cerr << "unknow" << std::endl;
+
+        std::cerr << "Fitness : ";
+         if(decompo.invalid())
+            std::cerr << "invalid" << std::endl;
+         else 
+            std::cerr << "valid" << std::endl;
+        std::cerr << "PreviousFitness : ";
+        if(decompo.isPrevFitnessInvalid)
+            std::cerr << "invalid" << std::endl;
+         else 
+            std::cerr << "valid" << std::endl; 
+        std::cerr << "Obj Vector : ";
+        if(decompo.invalidObjectiveVector())
+            std::cerr << "invalid" << std::endl;
+         else 
+            std::cerr << "valid" << std::endl; */
+        
+        /*
+        if(!decompo.invalidObjectiveVector() && !decompo.isPrevFitnessInvalid)
+        {
+            //std::cerr << "Objective vector size : " << decompo.objectiveVector().nObjectives() << std::endl;
+            //std::cerr << "Current objective vector : " << decompo.objectiveVector()[0] << " " << decompo.objectiveVector()[1] << std::endl;
+            // 1. Compute the evolution objectives vector
+            PlanningObjectiveVector deltaF;
+            unsigned size = decompo.objectiveVector().nObjectives();
+            double deltaFNorm = 0;
+            for(unsigned i = 0; i < size; i++)
+            {
+                deltaF[i] = (decompo.previousGen[i] - decompo.objectiveVector()[i]) / decompo.previousGen[i];
+                //std::cerr << "dF" << i << " : " << deltaF[i] << std::endl;
+                deltaFNorm += fabs(deltaF[i]);
+            }
+            // 2. Compute the relative variation of evolutions
+            //std::cerr << "||dF|| : " << deltaFNorm << std::endl;
+            if(deltaFNorm > 0) // We don't update the distribution if there is no change
+            {
+                std::vector<double> variations(size);
+                double evolution = 0;
+                for(unsigned i = 0; i < size; i++)
+                {
+                    variations[i] = (deltaF[i] / deltaFNorm);
+                    evolution += variations[i] * deltaF[i];
+                    //std::cerr << "a" << i << " : " << variations[i] << std::endl;
+                }
+            
+                // 3. Update strategies distribution
+                unsigned nbStrategies = decompo.strategyDistribution.size();
+                for(unsigned i = 0; i < nbStrategies; i++)
+                {
+                     if(i == decompo.currentStrategy)
+                        decompo.strategyDistribution[i] += evolution;
+                     else
+                        decompo.strategyDistribution[i] -= evolution / (nbStrategies - 1);
+                }
+                
+                // 4.
+                double min = *std::min_element(decompo.strategyDistribution.begin(),
+                                         decompo.strategyDistribution.end());
+                //std::cerr << "Min : " << min << std::endl;
+                
+                /*for(unsigned i = 0; i < decompo.strategyDistribution.size(); i++)
+                    std::cerr << "S" << i << " : " << decompo.strategyDistribution[i] << std::endl;*/
+                                         
+                /*if(min < 0)
+                    for(unsigned i = 0; i < nbStrategies; i++)
+                        decompo.strategyDistribution[i] += 1 - min;
+             }   
+                /*std::cerr << "Après décalage : " << std::endl;
+                for(unsigned i = 0; i < decompo.strategyDistribution.size(); i++)
+                    std::cerr << "S" << i << " : " << decompo.strategyDistribution[i] << std::endl;*/
+        /*}
+        
+        // Save current objective vector for next generation
+        decompo.isPrevFitnessInvalid = true;
+        if(!decompo.invalidObjectiveVector())
+        {
+            decompo.isPrevFitnessInvalid = false;
+            decompo.previousGen = decompo.objectiveVector();
+        }
+        
+        //std::cerr << "===================" << std::endl;*/
     } 
                                 
     // Pointer towards the 2nd objective to optimize (tota cost / max cost)

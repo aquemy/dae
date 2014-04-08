@@ -22,6 +22,7 @@
 #include <evaluation/yahsp.h>
 #include <apply.h>
 #include "../core/planningEval.h"
+#include "../core/planningState.h"
 //#include "../core/AggregaEval.h"
 
 namespace daex {
@@ -145,7 +146,7 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
             {
                 // unfeasible individuals are invalidated in order to be re-evaluated 
                 // with a larger bmax at the next iteration but we keep the good guys.
-                if (_pop[i].is_feasible()) 
+                if (_pop[i].state() == Feasible) 
                     goodguys++;
                 else 
                     _pop[i].invalidate();

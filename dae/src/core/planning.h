@@ -5,6 +5,7 @@
  
 //#include <moeo>
 #include "planningObjectiveVector.h"
+#include "planningState.h"
 #include <iterator>
 #include <list>
 #include <core/MOEO.h>
@@ -32,8 +33,14 @@ public:
     Planning(): 
         BaseT(), 
         daex::Decomposition(),
-        _is_feasible(false)
-    {}
+        st(Unfeasible)
+    {
+        strategyDistribution.push_back(1); // makespan_add_weigth
+	    strategyDistribution.push_back(1); // cost_weight
+	    strategyDistribution.push_back(1); // makespan_max_weigth
+        strategyDistribution.push_back(1); // lenght_weigth	    
+	    isPrevFitnessInvalid = true;
+    }
      
     virtual ~Planning() {}   
       
@@ -48,7 +55,7 @@ public:
         if (this != &other) {
              BaseT::operator=(other);
              Decomposition::operator=(other); 
-             _is_feasible = other._is_feasible ;
+             st = other.st ;
         }
         return *this;
     }
@@ -77,14 +84,14 @@ public:
     }
 
   
-    void setFeasible(bool  b)
+    void state(PlanningState _state)
     {
-	    _is_feasible = b;
+	    st = _state;
 	}
  
-    bool is_feasible() const 
+    PlanningState state() const 
     {
-        return _is_feasible;
+        return st;
     }
      
     bool operator< (const BaseT  & _moeo) const
@@ -94,8 +101,14 @@ public:
    
 protected:
    
-    bool _is_feasible;
- 
+    PlanningState st;
+    
+public : 
+   
+  unsigned currentStrategy;
+  std::vector<double> strategyDistribution; /// 
+  PlanningObjectiveVector previousGen;      ///
+  bool isPrevFitnessInvalid;    
 };
 
 /**
