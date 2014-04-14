@@ -8,6 +8,7 @@
 #include <eo>
 
 #include "atom.h"
+#include "strategies.h"
 
 namespace daex {
 
@@ -15,9 +16,11 @@ class Goal : public std::list<Atom*>
 {
 public:
 
-    Goal(TimeVal t) :
-        _earliest_start_time(t) 
+    Goal(TimeVal t, std::vector<double> rates = std::vector<double>(NB_YAHSP_STRAT, 1)) :
+        _earliest_start_time(t),
+        strat(Strategy<Goal>(rates))
     {}
+    
 
     TimeVal earliest_start_time(  ) const
     {
@@ -63,9 +66,21 @@ public:
 
         return it;
     }
+    
+    Objective objective()
+    {
+        return strat(*this);
+    }
+    
+    void setStratRates(std::vector<double> rates)
+    {
+        strat = rates;
+    }
 
 protected:
 
+    Strategy<Goal> strat;
+    
     //! Earliest start time among all atoms
     TimeVal _earliest_start_time;
 };

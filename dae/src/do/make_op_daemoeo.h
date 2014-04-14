@@ -52,7 +52,7 @@ void do_make_variation_param(eoParser &parser)
 }
 
 template <class EOT >
-eoGenOp< EOT >  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLoad & _pddl)
+eoGenOp< EOT >  &do_make_op (eoParser& _parser, eoState & _state, daex::pddlLoad & _pddl)
 {
     // Crossovers 
     eoQuadOp< EOT > *ptQuad =  new daex::CrossOverTimeFilterHalf< EOT >;
@@ -83,6 +83,16 @@ eoGenOp< EOT >  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLo
     unsigned int maxtry_candidate = _parser.valueOf<unsigned int>("maxtry-candidate");
     unsigned int maxtry_mutex = _parser.valueOf<unsigned int>("maxtry-mutex");
     
+    double lenght_weigth = _parser.valueOf<double>("lenght_weigth");
+    double cost_weigth = _parser.valueOf<double>("cost_weigth"); 	 
+    double makespan_max_weigth = _parser.valueOf<double>("makespan_max_weigth");
+ 	double makespan_add_weigth = _parser.valueOf<double>("makespan_add_weigth");
+    std::vector<double> rates;
+	rates.push_back(lenght_weigth);
+	rates.push_back(cost_weigth);
+	rates.push_back(makespan_max_weigth);
+	rates.push_back(makespan_add_weigth);
+    
     if ( (proba_change  < 0) || (proba_change  > 1) )
         throw std::runtime_error("Invalid pChange");
     // mutations
@@ -107,7 +117,7 @@ eoGenOp< EOT >  &do_make_op (eoParser& _parser, eoState & _state,   daex::pddlLo
        
     // partition, radius, l_max
      ptMon = new daex::MutationAddGoal< EOT >( _pddl.chronoPartitionAtom(), radius /*,
-     init.l_max()*/ );
+     init.l_max()*/, rates );
      
      _state.storeFunctor(ptMon); 
      

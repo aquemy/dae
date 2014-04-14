@@ -29,6 +29,8 @@ namespace daex {
 
 void do_make_eval_param(eoParser &parser)
 {
+    parser.createParam( (std::string)"Pop", "strat-level", "Level for strategy (Pop,Indi,Goal)", 'L', "Evaluation");
+
     parser.createParam( (std::string)"Add", "objective", "2nd objective to take into account (Add(additive cost )/Max(max cost)", 'Z', "Problem");
   	
 	parser.createParam( (unsigned int)1e4, "bmax-init", "Number of allowed expanded nodes for the initial computation of b_max", 'B', "Evaluation" );
@@ -77,12 +79,31 @@ void do_make_eval_param(eoParser &parser)
 template <class EOT >
 eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop,   daex::Init< EOT > & _init)
 {
+    unsigned int b_max_fixed = _parser.valueOf<unsigned int>("bmax-fixed");
+    double b_max_last_weight = _parser.valueOf<double>("bmax-last-weight");
+    double b_max_quantile = _parser.valueOf<double>("bmax-quantile");
+   
+	double astar_weight = _parser.valueOf<double>("astar_weigth");
+	bool rand_seed = _parser.valueOf<bool>("rand_yahsp_seed");
 
   	std::string objective = _parser.valueOf<std::string>("objective");
   	
 	unsigned int b_max_init = _parser.valueOf<unsigned int>("bmax-init"); 
     unsigned int fitness_weight = _parser.valueOf<unsigned int>("fitness-weight");
     unsigned int fitness_penalty = _parser.valueOf<unsigned int>("fitness-penalty");
+    
+    
+    double lenght_weigth = _parser.valueOf<double>("lenght_weigth");
+    double cost_weigth = _parser.valueOf<double>("cost_weigth"); 	 
+    double makespan_max_weigth = _parser.valueOf<double>("makespan_max_weigth");
+ 	double makespan_add_weigth = _parser.valueOf<double>("makespan_add_weigth");
+    std::vector<double> rates;
+	rates.push_back(lenght_weigth);
+	rates.push_back(cost_weigth);
+	rates.push_back(makespan_max_weigth);
+	rates.push_back(makespan_add_weigth);
+	
+	std::string strat_level = _parser.valueOf<std::string>("strat-level");
         
     PlanningEvalInit< EOT > *eval_yahsp_init = new PlanningEvalInit< EOT >(
         _pop.size(), 
@@ -90,20 +111,11 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
         b_max_init, 
         b_max_init, 
         fitness_weight, 
-        fitness_penalty,objective
+        fitness_penalty,
+        objective
     );
 
 	_state.storeFunctor(eval_yahsp_init);
- 
-	unsigned int b_max_fixed = _parser.valueOf<unsigned int>("bmax-fixed");
-    double b_max_last_weight = _parser.valueOf<double>("bmax-last-weight");
-    double b_max_quantile = _parser.valueOf<double>("bmax-quantile");
-    double lenght_weigth = _parser.valueOf<double>("lenght_weigth");
-    double cost_weigth = _parser.valueOf<double>("cost_weigth"); 	 
-    double makespan_max_weigth = _parser.valueOf<double>("makespan_max_weigth");
- 	double makespan_add_weigth = _parser.valueOf<double>("makespan_add_weigth");
-	double astar_weight = _parser.valueOf<double>("astar_weigth");
-	bool rand_seed = _parser.valueOf<bool>("rand_yahsp_seed");
  
     ///Strategie incrementale 
     double b_max_increase_coef = _parser.valueOf<double>("bmax-increase-coef");
@@ -131,15 +143,14 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 	            fitness_weight, 
 	            fitness_penalty,
 	            objective,
-	            lenght_weigth,
-	            cost_weigth, 
-	            makespan_max_weigth,
-	            makespan_add_weigth,
-	            astar_weight,rand_seed
+	            rates,
+	            astar_weight,
+	            rand_seed,
+	            strat_level
 	        );
 // in non multi-threaded version, use the plan dumper
 //#ifndef SINGLE_EVAL_ITER_DUMP
-            
+
             apply(*eval_yahsp, _pop);  
 
             for (size_t i = 0; i < popsize; ++i) 
@@ -177,14 +188,11 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 		    fitness_weight, 
 		    fitness_penalty,
 		    objective,
-		    lenght_weigth,
-		    cost_weigth, 
-		    makespan_max_weigth,
-		    makespan_add_weigth,
+		    rates,
 		    astar_weight, 
-		    rand_seed
+		    rand_seed,
+		    strat_level
         );
-    	
 		apply(*eval_yahsp, _pop);
 	 }
 

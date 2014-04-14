@@ -73,7 +73,16 @@ int main (int argc, char *argv[])
     /// Initialization
     unsigned int l_max_init_coef = parser.valueOf<unsigned int>("lmax-initcoef");
     unsigned int l_min = parser.valueOf<unsigned int>("lmin");
-    daex::Init<PlanningMOEO > init(pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
+    double lenght_weigth = parser.valueOf<double>("lenght_weigth");
+    double cost_weigth = parser.valueOf<double>("cost_weigth"); 	 
+    double makespan_max_weigth = parser.valueOf<double>("makespan_max_weigth");
+ 	double makespan_add_weigth = parser.valueOf<double>("makespan_add_weigth");
+    std::vector<double> rates;
+	rates.push_back(lenght_weigth);
+	rates.push_back(cost_weigth);
+	rates.push_back(makespan_max_weigth);
+	rates.push_back(makespan_add_weigth);
+    daex::Init<PlanningMOEO > init(pddl.chronoPartitionAtom(), l_max_init_coef, l_min, rates );
     	  	
   	eoGenOp<PlanningMOEO>& variator = do_make_op<PlanningMOEO> (parser, state, pddl);
   	 

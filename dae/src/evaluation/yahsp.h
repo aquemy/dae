@@ -15,6 +15,7 @@
 #include "core/plan.h"
 #include "cpt-yahsp.h"
 #include "../core/planningState.h"
+#include "../core/strategies.h"
 
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -40,7 +41,7 @@
 // FIXME gérer les timers yahsp
 
 //! Affectation de pointeurs depuis les atomes DAEx vers leur équivalent YAHSP
-void bindDaeYahsp( daex::pddlLoad & pddl );
+void bindDaeYahsp(daex::pddlLoad & pddl);
 
 
 //! Affiche un BitArray
@@ -65,8 +66,10 @@ public:
             unsigned int b_max_in = 10, 
             unsigned int b_max_last = 30, 
             double fitness_weight = 10, 
-            double fitness_penalty = 1e6):
-        daeCptYahspEval<EOT>(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty )//,
+            double fitness_penalty = 1e6,
+            std::string _level = "Pop"):
+        daeCptYahspEval<EOT>(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty ),
+        level(_level)//,
         //_previous_state( NULL ) //, _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
     {
         // some init steps are not done here, but in pddl_load.cpp
@@ -168,6 +171,26 @@ public:
                     eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
                     eo::log.flush();
                     #endif
+                    
+                    // Choix de l'objectif à optimiser si l'on a une strategie au niveau des Goals
+                    if(level == "Goal")
+                    {
+                        using namespace daex;
+                        Objective strategy = igoal->objective();
+                        
+                        if (strategy == makespan_max) 
+                            yahsp_set_optimize_makespan_max();  
+                        else if (strategy == cost) 
+                            yahsp_set_optimize_cost();  
+	                    else if (strategy == makespan_add) 
+	                        yahsp_set_optimize_makespan_add();  
+	                    else
+	                        yahsp_set_optimize_length();
+                        
+                        // TODO : Réinitialiser yashp ?
+                        yahsp_set_seed(rng.rand());
+                    }
+                    
                     // copie des goals daex dans leur equivant YAHSP
                     // nouvelle allocation de tableau de goal
                     assert( igoal->size() > 0 );
@@ -175,7 +198,7 @@ public:
                     unsigned int i = 0;
                     for(daex::Goal::iterator iatom = igoal->begin(); iatom != igoal->end(); ++iatom ) 
                     {
-                      //  le compilateur demande à expliciter le template pour fluents, 
+                        //  le compilateur demande à expliciter le template pour fluents, 
                         //car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
                         intermediate_goal_state[i] = (*iatom)->fluent();
                         i++;
@@ -374,6 +397,8 @@ protected:
     // pointeur sur un tableau de Fluent CPT
     /* Fluent * * _intermediate_goal_state; */
     /* unsigned int _intermediate_goal_state_nb; */
+    
+    std::string level;
 };
 
 
@@ -389,8 +414,9 @@ public:
             unsigned int b_max_in = 10000, 
             unsigned int b_max_last = 30000, 
             double fitness_weight = 10,
-	    double fitness_penalty = 1e6
-	    ) : daeYahspEval<EOT>( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty ) 
+	    double fitness_penalty = 1e6,
+	    std::string _level = "Pop"
+	    ) : daeYahspEval<EOT>( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty, _level ) 
     {
         node_numbers.reserve( pop_size * l_max );
     }
@@ -478,6 +504,7 @@ public:
     }
 
 protected:
+    
     //! Distribution des nombres de noeuds utilisés dans les résolutions
     std::vector<unsigned int> node_numbers;
 };

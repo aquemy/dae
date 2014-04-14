@@ -6,6 +6,7 @@
 //#include <moeo>
 #include "planningObjectiveVector.h"
 #include "planningState.h"
+#include "strategies.h"
 #include <iterator>
 #include <list>
 #include <core/MOEO.h>
@@ -30,16 +31,13 @@ public:
     using daex::Decomposition :: resize;
     using daex::Decomposition :: size;
      
-    Planning(): 
+     Planning(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT, 1)): 
         BaseT(), 
         daex::Decomposition(),
-        st(Unfeasible)
+        st(Unfeasible),
+        strat(Strategy<Planning<BaseT > >(_rates))
     {
-        strategyDistribution.push_back(1); // makespan_add_weigth
-	    strategyDistribution.push_back(1); // cost_weight
-	    strategyDistribution.push_back(1); // makespan_max_weigth
-        strategyDistribution.push_back(1); // lenght_weigth	    
-	    isPrevFitnessInvalid = true;
+
     }
      
     virtual ~Planning() {}   
@@ -98,17 +96,17 @@ public:
     {
         return BaseT::operator<(_moeo);
     }
+    
+    Objective objective()
+    {
+        return strat(*this);
+    }
    
 protected:
    
     PlanningState st;
-    
-public : 
-   
-  unsigned currentStrategy;
-  std::vector<double> strategyDistribution; /// 
-  PlanningObjectiveVector previousGen;      ///
-  bool isPrevFitnessInvalid;    
+    Strategy<Planning<BaseT> > strat;
+  
 };
 
 /**
