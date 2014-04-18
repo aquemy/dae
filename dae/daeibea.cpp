@@ -59,7 +59,7 @@ int main (int argc, char *argv[])
     
     make_help(parser);
 
-    daex::pddlLoad pddl(parser);
+    daex::pddlLoad pddl(parser.valueOf<std::string>("domain"), parser.valueOf<std::string>("instance"));
     
  	///*** the representation-dependent things ***///
  	unsigned seed = parser.valueOf<unsigned int>("seed");
@@ -73,19 +73,26 @@ int main (int argc, char *argv[])
     /// Initialization
     unsigned int l_max_init_coef = parser.valueOf<unsigned int>("lmax-initcoef");
     unsigned int l_min = parser.valueOf<unsigned int>("lmin");
-    double lenght_weigth = parser.valueOf<double>("lenght_weigth");
-    double cost_weigth = parser.valueOf<double>("cost_weigth"); 	 
-    double makespan_max_weigth = parser.valueOf<double>("makespan_max_weigth");
- 	double makespan_add_weigth = parser.valueOf<double>("makespan_add_weigth");
-    std::vector<double> rates(NB_YAHSP_STRAT);
+    double length_weigth_min = parser.valueOf<double>("length_weigth-min");
+    double cost_weigth_min = parser.valueOf<double>("cost_weigth-min"); 	 
+    double makespan_max_weigth_min = parser.valueOf<double>("makespan_max_weigth-min");
+ 	double makespan_add_weigth_min = parser.valueOf<double>("makespan_add_weigth-min");
+ 	double length_weigth_max = parser.valueOf<double>("length_weigth-max");
+    double cost_weigth_max = parser.valueOf<double>("cost_weigth-max"); 	 
+    double makespan_max_weigth_max = parser.valueOf<double>("makespan_max_weigth-max");
+ 	double makespan_add_weigth_max = parser.valueOf<double>("makespan_add_weigth-max");
+    std::vector<std::pair<double, double> > rates(NB_YAHSP_STRAT);
 
-	rates[makespan_max] = makespan_max_weigth;
-	rates[makespan_add] = makespan_add_weigth;
-	rates[cost] = cost_weigth;
-	rates[length] = lenght_weigth;
+	rates[makespan_max] = std::pair<double,double>(makespan_max_weigth_min,makespan_max_weigth_max);
+	rates[makespan_add] = std::pair<double,double>(makespan_add_weigth_min,makespan_add_weigth_max);
+	rates[cost] = std::pair<double,double>(cost_weigth_min,cost_weigth_max);
+	rates[length] = std::pair<double,double>(length_weigth_min,length_weigth_max);
+	
+	for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+	    std::cerr << rates[i].first << " " << rates[i].second << std::endl;
      
 	//StrategyInitStatic stratInit(rates);
-	StrategyRngOne stratInit(rates);
+	StrategyInit stratInit(rates);
 	
     daex::Init<PlanningMOEO > init(pddl.chronoPartitionAtom(), stratInit, l_max_init_coef, l_min);
     	  	

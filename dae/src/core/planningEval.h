@@ -126,7 +126,7 @@ public:
     
     void post_call(EOT& decompo)
     {
-        decompo.plan().search_steps(decompo.get_number_evaluated_nodes()); 
+        decompo.plan().search_steps(decompo.get_number_evaluated_nodes());   
     } 
                                 
     // Pointer towards the 2nd objective to optimize (tota cost / max cost)

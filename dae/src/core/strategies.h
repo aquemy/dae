@@ -22,21 +22,20 @@ class Strategy
 {
 public:
 
-    Strategy()
+    Strategy(double _mutRate = 0.5) : mutRate(_mutRate), nbAppel(0)
     {}
 
-    Strategy(std::vector<double> initRates) : distribution(initRates)
+    Strategy(std::vector<double> initRates, double _mutRate = 0.5) : 
+        distribution(initRates),
+        mutRate(_mutRate),
+        nbAppel(0)
     {}
     
     Strategy<EOT> operator=(const Strategy<EOT>& _o)
     {
         distribution = _o.distribution;
-        return *this;
-    }
-    
-    Strategy<EOT> operator=(std::vector<double> rates)
-    {
-        distribution = rates;
+        mutRate = _o.mutRate;
+        nbAppel = _o.nbAppel;
         return *this;
     }
     
@@ -48,15 +47,20 @@ public:
     Objective operator()(const EOT& o)
     {
         // Préconditions & invariants (serialisation, assertions...)
+        nbAppel++;
         Objective choice = _choice(o);
         _update(o, choice);
+        _mutation(o, choice);
         // Post condition
+        //std::cerr << nbAppel << std::endl;
         return choice;
     }
     
 protected:
 
     std::vector<double> distribution;
+    double mutRate;
+    unsigned nbAppel;
 
 private:
 
@@ -70,77 +74,70 @@ private:
         (void)o; 
         (void)choice;
     }
+    
+    virtual void _mutation(const EOT& o, Objective choice)
+    {
+        (void)o;
+        (void)choice;
+        /*double p = rng.uniform(0,1);
+        if(p < mutRate)
+        {
+            //
+            std::cerr << "Avant : ";
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                std::cerr << distribution[i] << " ";
+            //
+            double avrg = 0;
+            double stddev = 0;
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            {
+                avrg += distribution[i];
+                stddev += distribution[i]*distribution[i];
+            }
+            stddev = (1 / (NB_YAHSP_STRAT - 1))*(stddev - avrg*avrg);
+            unsigned pos = rng.uniform(0,NB_YAHSP_STRAT);
+                distribution[pos] += rng.normal(avrg, stddev);
+            
+            std::cerr << " | Après : ";
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                std::cerr << distribution[i] << " ";
+            std::cerr << std::endl;    
+                
+           // Update the mutation rate
+        }
+        mutRate = mutRate*0.9;
+        std::cerr << mutRate << std::endl;*/
+    }
 };
 
 class StrategyInit
 {
 public:
 
-    virtual std::vector<double> operator()() = 0;
-
-};
-
-class StrategyInitStatic : public StrategyInit
-{
-public:
-    
-    StrategyInitStatic(std::vector<double> initRates) : rates(initRates)
+    StrategyInit(std::vector<std::pair<double,double> > initRates) : rates(initRates)
     {}
 
     std::vector<double> operator()()
     {
-        return rates;
-    }
-    
-protected:
 
-    std::vector<double> rates;
-    
-};
-
-class StrategyRngStatic : public StrategyInit
-{
-public:
-    
-    StrategyRngStatic(double _a, double _b) : a(_a), b(_b) 
-    {}
-
-    std::vector<double> operator()()
-    {
-        std::vector<double> rates(NB_YAHSP_STRAT);
+        std::vector<double> distrib(NB_YAHSP_STRAT);
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            rates[i] = rng.uniform(a,b);
-        return rates;
-    }
-    
-protected:
+        {
+            if(rates[i].first == rates[i].second)
+                distrib[i] = rates[i].first;
+            else
+                distrib[i] = rng.uniform(rates[i].first,rates[i].second);
+        }
 
-    double a;
-    double b;
-    
-};
-
-class StrategyRngOne : public StrategyInit
-{
-public:
-    
-    StrategyRngOne(std::vector<double> initRates = std::vector<double>(NB_YAHSP_STRAT,1)) : rates(initRates)
-    {}
-    
-
-    std::vector<double> operator()()
-    {
-        std::vector<double> distrib(NB_YAHSP_STRAT,0);
-        unsigned pos = rng.roulette_wheel(rates);
-        distrib[pos] = 1;
         return distrib;
     }
     
 protected:
 
-    std::vector<double> rates;
+    std::vector<std::pair<double,double> > rates;
     
 };
+
 
 } // namespace daex
 
