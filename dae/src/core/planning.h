@@ -31,13 +31,15 @@ public:
     using daex::Decomposition :: resize;
     using daex::Decomposition :: size;
      
-     Planning(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT, 1)): 
+     Planning(): 
         BaseT(), 
         daex::Decomposition(),
-        st(Unfeasible),
-        strat(Strategy<Planning<BaseT > >(_rates))
+        st(Unfeasible)
+    {}
+    
+    void setStrategy(Strategy<Planning<BaseT> > _strat)
     {
-
+        strat = _strat;
     }
      
     virtual ~Planning() {}   

@@ -51,7 +51,6 @@ public:
         Objective choice = _choice(o);
         _update(o, choice);
         // Post condition
-        
         return choice;
     }
     
@@ -73,8 +72,75 @@ private:
     }
 };
 
+class StrategyInit
+{
+public:
 
+    virtual std::vector<double> operator()() = 0;
 
+};
+
+class StrategyInitStatic : public StrategyInit
+{
+public:
+    
+    StrategyInitStatic(std::vector<double> initRates) : rates(initRates)
+    {}
+
+    std::vector<double> operator()()
+    {
+        return rates;
+    }
+    
+protected:
+
+    std::vector<double> rates;
+    
+};
+
+class StrategyRngStatic : public StrategyInit
+{
+public:
+    
+    StrategyRngStatic(double _a, double _b) : a(_a), b(_b) 
+    {}
+
+    std::vector<double> operator()()
+    {
+        std::vector<double> rates(NB_YAHSP_STRAT);
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            rates[i] = rng.uniform(a,b);
+        return rates;
+    }
+    
+protected:
+
+    double a;
+    double b;
+    
+};
+
+class StrategyRngOne : public StrategyInit
+{
+public:
+    
+    StrategyRngOne(std::vector<double> initRates = std::vector<double>(NB_YAHSP_STRAT,1)) : rates(initRates)
+    {}
+    
+
+    std::vector<double> operator()()
+    {
+        std::vector<double> distrib(NB_YAHSP_STRAT,0);
+        unsigned pos = rng.roulette_wheel(rates);
+        distrib[pos] = 1;
+        return distrib;
+    }
+    
+protected:
+
+    std::vector<double> rates;
+    
+};
 
 } // namespace daex
 

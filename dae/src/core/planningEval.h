@@ -21,13 +21,14 @@ public:
 
     typedef typename EOT::Fitness Fitness;
 
-    PlanningEval (unsigned int l_max_ = 20,
+    PlanningEval (
+        Strategy<EOT> _strat,
+        unsigned int l_max_ = 20,
 		unsigned int b_max_in = 10, 
 		unsigned int b_max_last = 30,
 		double fitness_weight = 10, 
 		double fitness_penalty = 1e6,
 		std::string _objective="Add",
-		std::vector<double> rates = std::vector<double>(NB_YAHSP_STRAT, 1),
 		unsigned int astar_weigth=3,
 		bool _rand_seed = false,
 		std::string _level = "Pop"
@@ -42,7 +43,7 @@ public:
        ), 
        rand_seed(_rand_seed),
        level(_level),
-       strat(Strategy<EOT>(rates))
+       strat(_strat)
     {
         if (_objective.compare("Add")==0)
        		secondObjective = &PlanningEval::additive_cost;
@@ -104,15 +105,15 @@ public:
             strategy = strat(decompo);
         else if(level == "Indi")
             strategy = decompo.objective();
-        
-        if (strategy == makespan_max) 
-            yahsp_set_optimize_makespan_max();  
-        else if (strategy == cost) 
-            yahsp_set_optimize_cost();  
-	    else if (strategy == makespan_add) 
-	        yahsp_set_optimize_makespan_add();  
-	    else
-	        yahsp_set_optimize_length();
+       
+        if (strategy == makespan_max) {
+            yahsp_set_optimize_makespan_max(); } 
+        else if (strategy == cost)  {
+            yahsp_set_optimize_cost();  }
+	    else if (strategy == makespan_add)  {
+	        yahsp_set_optimize_makespan_add();  }
+	    else {
+	        yahsp_set_optimize_length();}
          
         if(rand_seed)
             yahsp_set_seed(rng.rand());
@@ -146,7 +147,8 @@ class PlanningEvalInit : public PlanningEval< EOT >
 {
 public:
 
-    PlanningEvalInit( 
+    PlanningEvalInit(
+        Strategy<EOT> _strat,
         unsigned int pop_size, 
         unsigned int l_max, 
         unsigned int b_max_in = 10000, 
@@ -154,18 +156,17 @@ public:
         double fitness_weight = 10,
 	    double fitness_penalty = 1e6,
 	    std::string _objective="Add",
-	    std::vector<double> rates = std::vector<double>(NB_YAHSP_STRAT, 1),
 	    unsigned int astar_weigth=3,
 	    bool _rand_seed = false,
 	    std::string _level = "Pop"):
-	    PlanningEval<EOT >( 
-	        l_max, 
+	    PlanningEval<EOT >(
+	        _strat,
+	        l_max,
 	        b_max_in, 
 	        b_max_last, 
 	        fitness_weight, 
 	        fitness_penalty,
 	        _objective,
-	        rates,
 	        astar_weigth,
 	        _rand_seed,
 	        _level

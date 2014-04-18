@@ -177,15 +177,19 @@ public:
                     {
                         using namespace daex;
                         Objective strategy = igoal->objective();
-                        
-                        if (strategy == makespan_max) 
-                            yahsp_set_optimize_makespan_max();  
-                        else if (strategy == cost) 
-                            yahsp_set_optimize_cost();  
-	                    else if (strategy == makespan_add) 
-	                        yahsp_set_optimize_makespan_add();  
-	                    else
-	                        yahsp_set_optimize_length();
+                        //std::cerr << "LevelGoal Obj : ";
+                        if (strategy == makespan_max) {
+                           //std::cerr << "Makespan Max" << std::endl;
+                            yahsp_set_optimize_makespan_max(); } 
+                        else if (strategy == cost)  {
+                            //std::cerr << "Cost" << std::endl;
+                            yahsp_set_optimize_cost();  }
+	                    else if (strategy == makespan_add)  {
+                            //std::cerr << "Makespan Add" << std::endl;
+	                        yahsp_set_optimize_makespan_add();  }
+	                    else {
+                            //std::cerr << "Makespan Length" << std::endl;
+	                        yahsp_set_optimize_length();}
                         
                         // TODO : Réinitialiser yashp ?
                         yahsp_set_seed(rng.rand());

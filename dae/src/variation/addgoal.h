@@ -20,10 +20,10 @@ public:
 
     MutationAddGoal(
             const ChronoPartition & times,
+            StrategyInit& _stratInit,
             unsigned int radius = 1/*,
-            unsigned int l_max = 20*/,
-            std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT, 1)
-    ) : _times(times), _radius( radius ), rates(_rates)/*, _l_max(l_max)*/ {}
+            unsigned int l_max = 20*/
+    ) : _times(times), stratInit(_stratInit), _radius( radius )/*, _l_max(l_max)*/ {}
 
     bool operator()( EOT & decompo ) {
     #ifndef NDEBUG
@@ -92,7 +92,7 @@ public:
 
 
                 Goal new_goal = random_goal(0, decompo.iter_at( 0 )->earliest_start_time());
-                new_goal.setStratRates(rates);
+                new_goal.setStratRates(stratInit());
 
 #ifndef NDEBUG
                 eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
@@ -137,7 +137,7 @@ public:
 
                     // draw a random goal in ] t1, t2 ]
                     Goal new_goal = random_goal( 0, t1 );
-                    new_goal.setStratRates(rates);
+                    new_goal.setStratRates(stratInit());
 
 #ifndef NDEBUG
                     eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
@@ -172,7 +172,7 @@ public:
 
                     // draw a random goal in ] t1, t2 ]
                     Goal new_goal = random_goal( t1, t2 );
-                    new_goal.setStratRates(rates);
+                    new_goal.setStratRates(stratInit());
 #ifndef NDEBUG
                     eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
                     eo::log << eo::xdebug << "\tinsert before index: " << j << std::endl;
@@ -218,7 +218,7 @@ public:
                     // that is in ] t0, t2 ]
                     //     not in ] t1, t2 ] !
                     Goal new_goal = random_goal( t0, t2 );
-                    new_goal.setStratRates(rates);
+                    new_goal.setStratRates(stratInit());
 #ifndef NDEBUG
                     eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
                     eo::log << eo::xdebug << "\tpush back" << std::endl;
@@ -399,7 +399,7 @@ protected:
 };
 
     const ChronoPartition & _times;
-
+    StrategyInit& stratInit;
     //! Number of neighbour earliest start date to consider when adding atoms
     unsigned int _radius;
 
@@ -407,7 +407,6 @@ protected:
     /** If the decomposition is already at the max size, the mutation don't add any new goal
      */
     //unsigned int _l_max;
-    std::vector<double> rates;
 };
 
 

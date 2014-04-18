@@ -19,12 +19,12 @@ class Init : public eoInit<EOT> //Decomposition>
 public:
 
     // TODO autoriser les décomposition vides ? (_min_nb = 0 )
-    Init(const ChronoPartition & times, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1,          std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT, 1)) :
+    Init(const ChronoPartition & times, StrategyInit& _stratInit, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1) :
         _times(times), 
+        stratInit(_stratInit),
         _min_nb(min_nb), 
         _l_max_init_coef(l_max_init_coef), 
-        _l_max(20),
-        rates(_rates)
+        _l_max(20)
         
     {
         assert( ! _times.empty() );
@@ -99,7 +99,7 @@ public:
 
         // FIXME random_subset semble retourner tous les atomes existants, et pas un sous-ensemble
         Goal goal = random_subset(nomutex(_times.at(*idate)));
-        goal.setStratRates(rates);
+        goal.setStratRates(stratInit());
 /* Already checked at the beginning of an eval
 #ifndef NDEBUG
         eo::log << eo::xdebug << std::endl << "Check if atoms are no mutex...";
@@ -133,6 +133,8 @@ public:
         decompo.push_back(goal);
     } // for idate in t_candidates
     decompo.invalidate();
+    
+    decompo.setStrategy(Strategy<EOT>(stratInit()));
 } // 
 
     void l_max( unsigned int l ) { _l_max = l; }
@@ -150,7 +152,7 @@ protected:
     //! Taille maximale d'une décomposition
     unsigned int _l_max;
     
-    std::vector<double> rates;
+    StrategyInit& stratInit;
 };
 
 } // namespace daex

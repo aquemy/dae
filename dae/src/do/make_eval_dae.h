@@ -77,7 +77,7 @@ void do_make_eval_param(eoParser &parser)
  * @param eoState& _state  to store the memory
  */
 template <class EOT >
-eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop,   daex::Init< EOT > & _init)
+eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop, daex::Init< EOT > & _init, StrategyInit& stratInit)
 {
     unsigned int b_max_fixed = _parser.valueOf<unsigned int>("bmax-fixed");
     double b_max_last_weight = _parser.valueOf<double>("bmax-last-weight");
@@ -97,15 +97,13 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
     double cost_weigth = _parser.valueOf<double>("cost_weigth"); 	 
     double makespan_max_weigth = _parser.valueOf<double>("makespan_max_weigth");
  	double makespan_add_weigth = _parser.valueOf<double>("makespan_add_weigth");
-    std::vector<double> rates;
-	rates.push_back(lenght_weigth);
-	rates.push_back(cost_weigth);
-	rates.push_back(makespan_max_weigth);
-	rates.push_back(makespan_add_weigth);
 	
 	std::string strat_level = _parser.valueOf<std::string>("strat-level");
+	
+	Strategy< EOT > strat(stratInit());
         
     PlanningEvalInit< EOT > *eval_yahsp_init = new PlanningEvalInit< EOT >(
+        strat,
         _pop.size(), 
         _init.l_max(), 
         b_max_init, 
@@ -137,13 +135,13 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 	        goodguys=0;
 	        b_max_last = static_cast<unsigned int>(std::floor(b_max_in * b_max_last_weight));
 	        eval_yahsp = new PlanningEval< EOT >(
+	            strat,
 	            _init.l_max(), 
 	            b_max_in, 
 	            b_max_last, 
 	            fitness_weight, 
 	            fitness_penalty,
 	            objective,
-	            rates,
 	            astar_weight,
 	            rand_seed,
 	            strat_level
@@ -182,13 +180,13 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 		assert( b_max_last > 0 );
 		// eval that uses the correct b_max
 		eval_yahsp = new PlanningEval< EOT >( 
+		    strat,
 		    _init.l_max(), 
 		    b_max_in, 
 		    b_max_last, 
 		    fitness_weight, 
 		    fitness_penalty,
 		    objective,
-		    rates,
 		    astar_weight, 
 		    rand_seed,
 		    strat_level
