@@ -47,12 +47,14 @@ public:
     Objective operator()(const EOT& o)
     {
         // Préconditions & invariants (serialisation, assertions...)
+
         nbAppel++;
         Objective choice = _choice(o);
         _update(o, choice);
         _mutation(o, choice);
         // Post condition
         //std::cerr << nbAppel << std::endl;
+      
         return choice;
     }
     
@@ -78,7 +80,9 @@ private:
     virtual void _mutation(const EOT& o, Objective choice)
     {
         (void)o;
-        (void)choice;
+        //////////////////////////////////////////////////////////
+        // Static mutation
+        //////////////////////////////////////////////////////////
         /*double p = rng.uniform(0,1);
         if(p < mutRate)
         {
@@ -107,6 +111,30 @@ private:
         }
         mutRate = mutRate*0.9;
         std::cerr << mutRate << std::endl;*/
+        //////////////////////////////////////////////////////////
+        // End Static mutation
+        ////////////////////////////////////////////////////////// 
+        
+        //////////////////////////////////////////////////////////
+        // Self-adaptive mutation
+        //////////////////////////////////////////////////////////
+        mutRate += rng.normal(0.1, 0.1);
+        if(mutRate < 0.01)
+            mutRate = 0.01;
+        else if(mutRate > 1)
+            mutRate = 1;
+        double p = rng.uniform(0,1);
+
+        if(p < mutRate)   
+        {
+            unsigned pos = rng.uniform(0,NB_YAHSP_STRAT);
+            do
+                pos = rng.uniform(0,NB_YAHSP_STRAT);
+            while(pos == choice);
+            distribution[pos] += 1;
+
+        }
+        
     }
 };
 
