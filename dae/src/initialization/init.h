@@ -99,7 +99,7 @@ public:
 
         // FIXME random_subset semble retourner tous les atomes existants, et pas un sous-ensemble
         Goal goal = random_subset(nomutex(_times.at(*idate)));
-        goal.setStratRates(stratInit());
+        goal.setStrategy(stratInit.operator()<Goal>());
 /* Already checked at the beginning of an eval
 #ifndef NDEBUG
         eo::log << eo::xdebug << std::endl << "Check if atoms are no mutex...";
@@ -134,7 +134,7 @@ public:
     } // for idate in t_candidates
     decompo.invalidate();
     
-    decompo.setStrategy(Strategy<EOT>(stratInit()));
+    decompo.setStrategy(stratInit.operator()<EOT >());
 } // 
 
     void l_max( unsigned int l ) { _l_max = l; }

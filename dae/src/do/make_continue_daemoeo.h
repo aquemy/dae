@@ -151,4 +151,4 @@ eoContinue<Indi> & do_make_continue_daemoeo(eoParser& _parser, eoState& _state, 
     return *continuator;
 }
 
-#endif MAKE_CONTINUE_DAEMOEO_H_
+#endif // MAKE_CONTINUE_DAEMOEO_H_

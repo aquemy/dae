@@ -16,10 +16,15 @@ class Goal : public std::list<Atom*>
 {
 public:
 
-    Goal(TimeVal t, std::vector<double> rates = std::vector<double>(NB_YAHSP_STRAT, 1)) :
-        _earliest_start_time(t),
-        strat(Strategy<Goal>(rates))
+    Goal(TimeVal t) :
+        _earliest_start_time(t)
     {}
+    
+    Goal operator=(const Goal& _o)
+    {
+        strat = _o.strat;
+        return *this;
+    }
     
 
     TimeVal earliest_start_time(  ) const
@@ -72,17 +77,21 @@ public:
         return strat(*this);
     }
     
-    void setStratRates(std::vector<double> rates)
+    void setStrategy(Strategy<Goal> _strat)
     {
-        strat = rates;
+        strat = _strat;
+    }
+    
+    void update(double indicator)
+    {
+        strat.update(indicator);
     }
 
 protected:
 
-    Strategy<Goal> strat;
-    
     //! Earliest start time among all atoms
     TimeVal _earliest_start_time;
+    Strategy<Goal> strat;
 };
 
 } // namespace daex

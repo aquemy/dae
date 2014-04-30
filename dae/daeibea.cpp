@@ -15,6 +15,7 @@
 #include "src/do/make_continue_param.h"
 #include "src/do/make_general_param.h"
 #include "src/do/make_init_param.h"
+#include "src/do/make_strategy.h"
 
 /// how to initialize the population
 #include <do/make_pop.h>
@@ -56,6 +57,7 @@ int main (int argc, char *argv[])
     daex::do_make_variation_param(parser);        
     daex::do_make_checkpoint_param(parser);
     daex::do_make_continue_param(parser);
+    daex::do_make_strategy_param(parser);
     
     make_help(parser);
 
@@ -92,22 +94,35 @@ int main (int argc, char *argv[])
 	    std::cerr << rates[i].first << " " << rates[i].second << std::endl;
      
 	//StrategyInitStatic stratInit(rates);
-	StrategyInit stratInit(rates);
 	
+	std::string indicator = parser.valueOf<std::string>("strat-indicator");
+    bool effect = parser.valueOf<bool>("effect-estimation");
+    std::string quality = parser.valueOf<std::string>("quality-assessment");
+    std::string update = parser.valueOf<std::string>("strat-update");
+    bool jump = parser.valueOf<bool>("strat-jump");
+    
+    std::cerr << "INIT : StratInit" << std::endl;
+	StrategyInit stratInit(indicator, effect, quality, update, jump);
+	
+	std::cerr << "INIT : PDDL" << std::endl;
     daex::Init<PlanningMOEO > init(pddl.chronoPartitionAtom(), stratInit, l_max_init_coef, l_min);
-    	  	
+    
+    std::cerr << "INIT : Variator" << std::endl;	  	
   	eoGenOp<PlanningMOEO>& variator = do_make_op<PlanningMOEO> (parser, state, pddl, stratInit);
   	 
   	/// definition of the archive
     moeoUnboundedArchive<PlanningMOEO > arch;
   	  	
   	/// initialization of the population
+  	std::cerr << "INIT : Pop" << std::endl;
     eoPop<PlanningMOEO >& pop = do_make_pop(parser, state, init);
      
     // The fitness evaluation
+    std::cerr << "INIT : Eval" << std::endl;
     eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval(parser, state, pop, init, stratInit);
         
     /// stopping criteria
+    std::cerr << "INIT : Continuator" << std::endl;
     eoContinue<PlanningMOEO >& continuator= do_make_continue_daemoeo(parser, state, eval_yahsp_moeo,arch);
        	 
     eoCheckPoint<PlanningMOEO >& checkpoint = do_make_checkpoint_daemoeo(parser, state, eval_yahsp_moeo, continuator, pop, arch);

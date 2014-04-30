@@ -19,8 +19,6 @@ class PlanningEval : public daeYahspEval< EOT >
 {
 public:
 
-    typedef typename EOT::Fitness Fitness;
-
     PlanningEval (
         Strategy<EOT> _strat,
         unsigned int l_max_ = 20,
@@ -55,22 +53,22 @@ public:
     
     virtual ~PlanningEval() {};
 
-    virtual void setFitness(EOT & _decompo)
+    virtual void setFitness(EOT & decompo)
     {
 	    PlanningObjectiveVector objVector;
 
-     	if (_decompo.state() == Feasible)
+     	if (decompo.state() == Feasible)
      	{
-     	    objVector[0] = daeYahspEval< EOT >::fitness_feasible(_decompo);
-     		objVector[1] = (this->*secondObjective)(_decompo);	
+     	    objVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
+     		objVector[1] = (this->*secondObjective)(decompo);	
       	}
       	else
       	{
-      	    if(_decompo.state() == UnfeasibleIntermediate)
-      	        objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_intermediate(_decompo);
-      	    else if(_decompo.state() == UnfeasibleFinal)
-      	        objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_final(_decompo);
-      	    else if(_decompo.state() == UnfeasibleTooLong)
+      	    if(decompo.state() == UnfeasibleIntermediate)
+      	        objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_intermediate(decompo);
+      	    else if(decompo.state() == UnfeasibleFinal)
+      	        objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_final(decompo);
+      	    else if(decompo.state() == UnfeasibleTooLong)
       	        objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
       	    //else
       	    //    objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible(decompo);
@@ -78,7 +76,7 @@ public:
     		objVector[1] = objVector[0];
         }
         
-    	_decompo.objectiveVector(objVector);
+    	decompo.objectiveVector(objVector);
     	
     }
 
@@ -117,6 +115,8 @@ public:
          
         if(rand_seed)
             yahsp_set_seed(rng.rand());
+        
+        
     }
     
     virtual void step_recorder(){};
@@ -126,7 +126,46 @@ public:
     
     void post_call(EOT& decompo)
     {
-        decompo.plan().search_steps(decompo.get_number_evaluated_nodes());   
+        decompo.plan().search_steps(decompo.get_number_evaluated_nodes());  
+         
+        //std::cerr << deltaPlus(decompo) << " " << deltaProd(decompo) << " " << deltaExp(decompo) << std::endl << decompo.plan() << std::endl;
+        
+        double eval = deltaPlus(decompo); // TODO : pouvoir changer l'indicateur
+        if(level == "Pop")
+        {
+            std::cerr << "Appel au niveau de la pop : " << this << std::endl;
+            std::cerr << eval << std::endl;
+            strat.update(eval);
+        }
+        else if(level == "Indi")
+            decompo.update(eval);
+        else if(level == "Goal")
+        {
+            for(daex::Decomposition::iterator igoal = decompo.begin(), 
+                    iend = decompo.end(); 
+                    igoal != iend; ++igoal) 
+            {
+                igoal->update(eval);
+            }
+        }
+        
+        /*std::cerr << "lambda : " << eval << " - efficiency : ";
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+        {
+            if(level == "Pop")
+                std::cerr << strat.efficiency(daex::Objective(i)) << " ";
+            else if(level == "Indi")
+                std::cerr << decompo.efficiency(daex::Objective(i)) << " ";
+            else if(level == "Goal")
+                std::cerr << decompo.efficiency(daex::Objective(i)) << " ";
+        }
+        std::cerr << std::endl;*/
+        
+        // Last step, we save the current state for next evaluation
+        decompo.prevState = decompo.state();
+        if(decompo.state() == Feasible)
+            decompo.prevObjVector = decompo.objectiveVector();
+        
     } 
                                 
     // Pointer towards the 2nd objective to optimize (tota cost / max cost)

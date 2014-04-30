@@ -29,7 +29,6 @@ namespace daex {
 
 void do_make_eval_param(eoParser &parser)
 {
-    parser.createParam( (std::string)"Pop", "strat-level", "Level for strategy (Pop,Indi,Goal)", 'L', "Evaluation");
 
     parser.createParam( (std::string)"Add", "objective", "2nd objective to take into account (Add(additive cost )/Max(max cost)", 'Z', "Problem");
   	
@@ -109,10 +108,9 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 
 	std::string strat_level = _parser.valueOf<std::string>("strat-level");
 	
-	Strategy< EOT > strat(stratInit());
-        
+	
     PlanningEvalInit< EOT > *eval_yahsp_init = new PlanningEvalInit< EOT >(
-        strat,
+        stratInit.operator()<EOT >(),
         _pop.size(), 
         _init.l_max(), 
         b_max_init, 
@@ -144,7 +142,7 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 	        goodguys=0;
 	        b_max_last = static_cast<unsigned int>(std::floor(b_max_in * b_max_last_weight));
 	        eval_yahsp = new PlanningEval< EOT >(
-	            strat,
+	            stratInit.operator()<EOT >(),
 	            _init.l_max(), 
 	            b_max_in, 
 	            b_max_last, 
@@ -189,7 +187,7 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 		assert( b_max_last > 0 );
 		// eval that uses the correct b_max
 		eval_yahsp = new PlanningEval< EOT >( 
-		    strat,
+		    stratInit.operator()<EOT >(),
 		    _init.l_max(), 
 		    b_max_in, 
 		    b_max_last, 
@@ -374,4 +372,4 @@ eoEvalFuncCounter< EOT >& do_make_eval_aggregation(eoParser& _parser, eoState& _
  
 } // namespace daex
 
-#endif  MAKE_EVAL_DAE_H_ /* MAKE_EVAL_DAE_H_*/
+#endif  /* MAKE_EVAL_DAE_H_*/

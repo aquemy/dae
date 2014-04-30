@@ -34,7 +34,8 @@ public:
      Planning(): 
         BaseT(), 
         daex::Decomposition(),
-        st(Unfeasible)
+        st(Unfeasible),
+        prevState(Unfeasible)
     {}
     
     void setStrategy(Strategy<Planning<BaseT> > _strat)
@@ -54,8 +55,13 @@ public:
      {
         if (this != &other) {
              BaseT::operator=(other);
-             Decomposition::operator=(other); 
-             st = other.st ;
+             Decomposition::operator=(other);
+             strat = other.strat;
+             
+             prevObjVector = other.prevObjVector;
+             prevState = other.prevState;
+             
+             st = other.st;
         }
         return *this;
     }
@@ -103,12 +109,28 @@ public:
     {
         return strat(*this);
     }
-   
+    
+    void update(double indicator)
+    {
+        strat.update(indicator);
+    }
+    
+    double efficiency(Objective obj)
+    {
+        return strat.efficiency(obj);
+    }
+    
+public : // A passer en protected 
+
+    PlanningObjectiveVector prevObjVector;
+    PlanningState prevState;
+
 protected:
    
     PlanningState st;
     Strategy<Planning<BaseT> > strat;
-  
+    
+
 };
 
 /**

@@ -92,7 +92,7 @@ public:
 
 
                 Goal new_goal = random_goal(0, decompo.iter_at( 0 )->earliest_start_time());
-                new_goal.setStratRates(stratInit());
+                new_goal.setStrategy(stratInit.operator()<Goal>());
 
 #ifndef NDEBUG
                 eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
@@ -137,7 +137,7 @@ public:
 
                     // draw a random goal in ] t1, t2 ]
                     Goal new_goal = random_goal( 0, t1 );
-                    new_goal.setStratRates(stratInit());
+                    new_goal.setStrategy(stratInit.operator()<Goal>());
 
 #ifndef NDEBUG
                     eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
@@ -172,7 +172,7 @@ public:
 
                     // draw a random goal in ] t1, t2 ]
                     Goal new_goal = random_goal( t1, t2 );
-                    new_goal.setStratRates(stratInit());
+                    new_goal.setStrategy(stratInit.operator()<Goal>());
 #ifndef NDEBUG
                     eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
                     eo::log << eo::xdebug << "\tinsert before index: " << j << std::endl;
@@ -218,7 +218,7 @@ public:
                     // that is in ] t0, t2 ]
                     //     not in ] t1, t2 ] !
                     Goal new_goal = random_goal( t0, t2 );
-                    new_goal.setStratRates(stratInit());
+                    new_goal.setStrategy(stratInit.operator()<Goal>());
 #ifndef NDEBUG
                     eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
                     eo::log << eo::xdebug << "\tpush back" << std::endl;
