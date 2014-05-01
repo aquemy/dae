@@ -21,11 +21,10 @@ public:
     // TODO autoriser les décomposition vides ? (_min_nb = 0 )
     Init(const ChronoPartition & times, StrategyInit& _stratInit, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1) :
         _times(times), 
-        stratInit(_stratInit),
         _min_nb(min_nb), 
         _l_max_init_coef(l_max_init_coef), 
-        _l_max(20)
-        
+        _l_max(20),
+        stratInit(_stratInit)
     {
         assert( ! _times.empty() );
 

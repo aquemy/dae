@@ -81,11 +81,6 @@ public:
     {
         strat = _strat;
     }
-    
-    void update(double indicator)
-    {
-        strat.update(indicator);
-    }
 
 protected:
 

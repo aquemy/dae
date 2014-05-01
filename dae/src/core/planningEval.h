@@ -38,10 +38,10 @@ public:
             fitness_weight, 
             fitness_penalty,
             _level
-       ), 
+       ),    
+       strat(_strat),
        rand_seed(_rand_seed),
-       level(_level),
-       strat(_strat)
+       level(_level)
     {
         if (_objective.compare("Add")==0)
        		secondObjective = &PlanningEval::additive_cost;
@@ -127,45 +127,6 @@ public:
     void post_call(EOT& decompo)
     {
         decompo.plan().search_steps(decompo.get_number_evaluated_nodes());  
-         
-        //std::cerr << deltaPlus(decompo) << " " << deltaProd(decompo) << " " << deltaExp(decompo) << std::endl << decompo.plan() << std::endl;
-        
-        double eval = deltaPlus(decompo); // TODO : pouvoir changer l'indicateur
-        if(level == "Pop")
-        {
-            std::cerr << "Appel au niveau de la pop : " << this << std::endl;
-            std::cerr << eval << std::endl;
-            strat.update(eval);
-        }
-        else if(level == "Indi")
-            decompo.update(eval);
-        else if(level == "Goal")
-        {
-            for(daex::Decomposition::iterator igoal = decompo.begin(), 
-                    iend = decompo.end(); 
-                    igoal != iend; ++igoal) 
-            {
-                igoal->update(eval);
-            }
-        }
-        
-        /*std::cerr << "lambda : " << eval << " - efficiency : ";
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-        {
-            if(level == "Pop")
-                std::cerr << strat.efficiency(daex::Objective(i)) << " ";
-            else if(level == "Indi")
-                std::cerr << decompo.efficiency(daex::Objective(i)) << " ";
-            else if(level == "Goal")
-                std::cerr << decompo.efficiency(daex::Objective(i)) << " ";
-        }
-        std::cerr << std::endl;*/
-        
-        // Last step, we save the current state for next evaluation
-        decompo.prevState = decompo.state();
-        if(decompo.state() == Feasible)
-            decompo.prevObjVector = decompo.objectiveVector();
-        
     } 
                                 
     // Pointer towards the 2nd objective to optimize (tota cost / max cost)

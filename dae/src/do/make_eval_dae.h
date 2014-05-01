@@ -93,7 +93,7 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 {
     unsigned int b_max_fixed = _parser.valueOf<unsigned int>("bmax-fixed");
     double b_max_last_weight = _parser.valueOf<double>("bmax-last-weight");
-    double b_max_quantile = _parser.valueOf<double>("bmax-quantile");
+    //double b_max_quantile = _parser.valueOf<double>("bmax-quantile");
    
 	double astar_weight = _parser.valueOf<double>("astar_weigth");
 	bool rand_seed = _parser.valueOf<bool>("rand_yahsp_seed");
@@ -103,8 +103,6 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 	unsigned int b_max_init = _parser.valueOf<unsigned int>("bmax-init"); 
     unsigned int fitness_weight = _parser.valueOf<unsigned int>("fitness-weight");
     unsigned int fitness_penalty = _parser.valueOf<unsigned int>("fitness-penalty");
-    
-    
 
 	std::string strat_level = _parser.valueOf<std::string>("strat-level");
 	

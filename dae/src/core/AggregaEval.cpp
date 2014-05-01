@@ -9,7 +9,7 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray )
 		}
 	}
 	return out;
-}
+} 
 
 PlanningAggregaEval::PlanningAggregaEval(unsigned int l_max_ ,
 		unsigned int b_max_in,

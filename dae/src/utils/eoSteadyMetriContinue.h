@@ -66,7 +66,8 @@ public:
         repMinGenerations( _minGens ), repSteadyGenerations( _steadyGens),
         steadyState(false), thisGenerationPlaceHolder(0),
         thisGeneration(thisGenerationPlaceHolder),
-        arch(_archive),metric(_normalize,_rho)
+        metric(_normalize,_rho),
+        arch(_archive)
     {};
       
     eoSteadyMetriContinue(unsigned long _minGens, 
@@ -117,6 +118,7 @@ public:
     */
     virtual bool operator() (const eoPop<MOEOT>& _pop )
     {
+        (void)_pop;
         double bestCurrentMetric=0.0; 
         
         std::vector < ObjectiveVector > currentParetoSet;

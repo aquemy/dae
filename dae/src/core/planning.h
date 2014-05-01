@@ -30,12 +30,12 @@ public:
     using daex::Decomposition :: end;
     using daex::Decomposition :: resize;
     using daex::Decomposition :: size;
-     
+      
      Planning(): 
         BaseT(), 
         daex::Decomposition(),
-        st(Unfeasible),
-        prevState(Unfeasible)
+        prevState(Unfeasible),
+        st(Unfeasible)
     {}
     
     void setStrategy(Strategy<Planning<BaseT> > _strat)

@@ -260,7 +260,7 @@ public:
         decompo.plan().search_steps( decompo.get_number_evaluated_nodes() ); 
     }
     
-    virtual void pre_call(EOT& decompo) {}  
+    virtual void pre_call(EOT& decompo) {(void)decompo;}  
      
     virtual  void operator()(EOT& decompo) 
     {

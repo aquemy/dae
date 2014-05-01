@@ -35,7 +35,13 @@ class moeoPopObjectiveVectorTimeSavingUpdater : public eoUpdater
      * @param _id own ID
      */
     moeoPopObjectiveVectorTimeSavingUpdater (eoPop<MOEOT> & _pop, const std::string & _filename, time_t _interval, bool _count = false,int _id = -1) :
-        pop(_pop), filename(_filename), interval(_interval), last_time(time(0)), first_time(time(0)), count(_count), id(_id)
+        pop(_pop), 
+        filename(_filename), 
+        count(_count), 
+        id(_id),
+        interval(_interval), 
+        last_time(time(0)), 
+        first_time(time(0))
     {}
 
 
@@ -54,13 +60,14 @@ class moeoPopObjectiveVectorTimeSavingUpdater : public eoUpdater
 	
 	    if (count)
             {
+            unsigned deltaT = now - first_time;
               if (id == -1)
                 {
-                  sprintf (buff, "%s.%u", filename.c_str(), (now - first_time));
+                  sprintf (buff, "%s.%u", filename.c_str(), deltaT);
                 }
               else
                 {
-                  sprintf (buff, "%s.%u.%u", filename.c_str(), id, (now - first_time));
+                  sprintf (buff, "%s.%u.%u", filename.c_str(), id, deltaT);
                 }
             }
           else
