@@ -97,7 +97,7 @@ public:
         _update(o, current);
         //_mutation(o, current);
         // Post condition
-        std::cerr << "Appel n°" << nbAppel << std::endl;
+        //std::cerr << "Appel n°" << nbAppel << std::endl;
         nbChoices[current]++;
         cycleChoices[current]++;
       
@@ -106,7 +106,7 @@ public:
     
      void update(double indicator)
     {
-        std::cerr << "Update strategy n°" << nbAppel << std::endl;
+        /*std::cerr << "Update strategy n°" << nbAppel << std::endl;
         std::cerr << "- Update information : " << std::endl;
         std::cerr << ":::: Indicator : " << indicator << std::endl;
         std::cerr << ":::: Objective : " << current << std::endl;
@@ -117,7 +117,7 @@ public:
                 std::cerr << indicatorsSerie[j][i] << " -> ";
             std::cerr << std::endl;
         }
-        std::cerr << std::endl;
+        std::cerr << std::endl;*/
         /*if(indicator > 0)
         {
             positiveChoices[current]++;
@@ -125,7 +125,7 @@ public:
         }*/
         
         {
-            std::cerr << "- Quality assessment : ";
+            //std::cerr << "- Quality assessment : ";
             
             // Exponential recency-weighted average
             //quality[current] = indicator + 0.7*(sumRewards[current] - indicator);
@@ -148,14 +148,14 @@ public:
                 indicatorsSerie[i].clear();
                 cycleChoices[i] = 0;
             }*/
-            std::cerr << "- Select new parameters : ";
+            //std::cerr << "- Select new parameters : ";
             adaptivePursuit(quality, distribution);
             //probabilityMatching(quality, distribution);
             
-            std::cerr << "Jump detection : ";
+            //std::cerr << "Jump detection : ";
             if(jump(quality))
             {
-                std::cerr << "Jump detected ! Reset strategy." << std::endl;
+                //std::cerr << "Jump detected ! Reset strategy." << std::endl;
                 for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
                 {
                     nbChoices[i] = 0;
@@ -240,7 +240,7 @@ protected:
                     const std::vector<int>& positiveChoices
                     )
     {
-        std::cerr << "- Average quality assessment strategy" << std::endl;
+        /*std::cerr << "- Average quality assessment strategy" << std::endl;
          std::cerr << "##### DUMP #####" << std::endl;
          std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
@@ -254,9 +254,9 @@ protected:
         std::cerr << std::endl;
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
             std::cerr << "CycleChoices : " << cycleChoices[i] << " ";
-        std::cerr << std::endl;
+        std::cerr << std::endl;*/
         
-        std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        //std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
         {
             //std::cerr << quality[i] << " -> ";
@@ -267,7 +267,7 @@ protected:
             {
                 for(unsigned j = 0; j < indicatorsSerie[i].size(); j++)
                 {
-                    std::cerr << "Quality " << quality[i] << " + " << indicatorsSerie[i][j] << std::endl;
+                    //std::cerr << "Quality " << quality[i] << " + " << indicatorsSerie[i][j] << std::endl;
                     quality[i] += indicatorsSerie[i][j];
                 }
                 quality[i] /= cycleChoices[i]; // Average quality
@@ -288,7 +288,7 @@ protected:
                     const std::vector<int>& positiveChoices
                     )
     {
-        std::cerr << "- Extreme quality assessment strategy" << std::endl;
+        /*std::cerr << "- Extreme quality assessment strategy" << std::endl;
          std::cerr << "##### DUMP #####" << std::endl;
          std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
@@ -302,9 +302,9 @@ protected:
         std::cerr << std::endl;
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
             std::cerr << "CycleChoices : " << cycleChoices[i] << " ";
-        std::cerr << std::endl;
+        std::cerr << std::endl;*/
         
-        std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        //std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
         {
             //std::cerr << quality[i] << " -> ";
@@ -318,23 +318,23 @@ protected:
                 {
                     quality[i] = std::max(indicatorsSerie[i][j], quality[i]);
                 }
-                std::cerr << "Quality : " << quality[i] << " ";
+                //std::cerr << "Quality : " << quality[i] << " ";
                 quality[i] *= efficiency(Objective(i), nbChoices, positiveChoices); // Ponderate by efficiency
                     
             }
             
-            std::cerr << quality[i] << " | ";
+            //std::cerr << quality[i] << " | ";
         }
-        std::cerr << std::endl;
+        //std::cerr << std::endl;
     }
 
     void probabilityMatching(const std::vector<double>& quality, std::vector<double>& distribution)
     {
-        std::cerr << "- Probability matching selection strategy" << std::endl;
+        //std::cerr << "- Probability matching selection strategy" << std::endl;
         double min = -std::min(0.,*std::min_element(quality.begin(), quality.end()));
             
         double sum = 0;
-        std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        //std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
         {
                 //std::cerr << "On ajoute " << (quality[i] + min) << " ( Q :" << quality[i] << " min : " << min << " E : " <<  efficiency(Objective(i)) << " )"<< std::endl;
@@ -346,37 +346,37 @@ protected:
             //std::cerr << "New distribution : ";
             for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
             {
-                std::cerr << distribution[i] << "  ->  ";
+                //std::cerr << distribution[i] << "  ->  ";
                 distribution[i] = pmin + ((1-NB_YAHSP_STRAT*pmin)*(quality[i] + min)) / sum;
-                std::cerr << distribution[i] << "  |  ";
+                //std::cerr << distribution[i] << "  |  ";
             }
-            std::cerr << std::endl;
+            //std::cerr << std::endl;
         }
     }
     
     void adaptivePursuit(const std::vector<double>& quality, std::vector<double>& distribution)
     {
-        std::cerr << "- Adaptive Pursuit selection strategy" << std::endl;
+        //std::cerr << "- Adaptive Pursuit selection strategy" << std::endl;
         double beta = 0.5;
         double pmax = 1 - (NB_YAHSP_STRAT - 1)*pmin;
         unsigned o = std::distance(quality.begin(), std::max_element(quality.begin(), quality.end()));    
-        std::cerr << "Best : " << o << " | " << pmin << " - " << pmax << std::endl;
+        //std::cerr << "Best : " << o << " | " << pmin << " - " << pmax << std::endl;
             //std::cerr << "New distribution : ";
             for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
             {
-                std::cerr << distribution[i] << "  ->  ";
+                //std::cerr << distribution[i] << "  ->  ";
                 if(i == o)
                     distribution[i] = distribution[i] + beta*(pmax - distribution[i]);
                 else
                     distribution[i] = distribution[i] + beta*(pmin - distribution[i]);
-                std::cerr << distribution[i] << "  |  ";
+                //std::cerr << distribution[i] << "  |  ";
             }
-            std::cerr << std::endl;
+            //std::cerr << std::endl;
     }
 
     bool jump(std::vector<double>& quality)
     {
-        std::cerr << "- Page Hinkley jump detection" << std::endl;
+        //std::cerr << "- Page Hinkley jump detection" << std::endl;
         it++;
         // Quality of the current distribution : sum of all qualities
         double qualityDistribution = 0;
@@ -390,7 +390,7 @@ protected:
         double PHT = fabs(maxM - M);
         
         // TODO : logger en debug
-            std::cerr << "##### Page-Hinkley Test #####" << std::endl;
+        /*    std::cerr << "##### Page-Hinkley Test #####" << std::endl;
             std::cerr << "Iteration : " << it << std::endl;
             std::cerr << "Average Distribution Quality : " << averageDistribQuality << std::endl;
             std::cerr << "Current M : " << M << std::endl;
@@ -400,7 +400,7 @@ protected:
                 std::cerr << "Changement détecté !" << std::endl;
             else
                 std::cerr << "Aucun changement." << std::endl;
-            std::cerr << "#############################" << std::endl;
+            std::cerr << "#############################" << std::endl;*/
         
         if(PHT > epsilon)
         {

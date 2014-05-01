@@ -101,24 +101,21 @@ int main (int argc, char *argv[])
     std::string update = parser.valueOf<std::string>("strat-update");
     bool jump = parser.valueOf<bool>("strat-jump");
     
-    std::cerr << "INIT : StratInit" << std::endl;
+    
 	StrategyInit stratInit(indicator, effect, quality, update, jump);
 	
-	std::cerr << "INIT : PDDL" << std::endl;
+
     daex::Init<PlanningMOEO > init(pddl.chronoPartitionAtom(), stratInit, l_max_init_coef, l_min);
-    
-    std::cerr << "INIT : Variator" << std::endl;	  	
+    	
   	eoGenOp<PlanningMOEO>& variator = do_make_op<PlanningMOEO> (parser, state, pddl, stratInit);
   	 
   	/// definition of the archive
     moeoUnboundedArchive<PlanningMOEO > arch;
   	  	
   	/// initialization of the population
-  	std::cerr << "INIT : Pop" << std::endl;
     eoPop<PlanningMOEO >& pop = do_make_pop(parser, state, init);
      
     // The fitness evaluation
-    std::cerr << "INIT : Eval" << std::endl;
     eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval(parser, state, pop, init, stratInit);
         
     /// stopping criteria
