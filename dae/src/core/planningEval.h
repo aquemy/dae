@@ -77,6 +77,7 @@ public:
         }
         
     	decompo.objectiveVector(objVector);
+    	decompo.fitness(objVector[0]);
     	
     }
 
@@ -117,6 +118,121 @@ public:
             yahsp_set_seed(rng.rand());
         
         
+    }
+    
+    virtual void operator()(EOT& decompo) 
+    {
+        if (decompo.invalid())
+        {
+            std::vector<PlanningObjectiveVector> objvectors(NB_YAHSP_STRAT);
+            std::vector<PlanningState> stats(NB_YAHSP_STRAT);
+            
+            PlanningObjectiveVector bestObjVector;
+            PlanningState bestState;
+            
+            /*if(decompo.state() == Feasible)
+                std::cerr <<"# Before" << std::endl << decompo.prevObjVector[0] << " " << decompo.prevObjVector[1] << std::endl << std::endl << std::endl ;   */
+            
+            //pre_call(decompo);
+            // Pour chaque objectif
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            {
+                Objective strategy = (Objective)i;
+                // Choix de la strategy
+                if (strategy == makespan_max) {
+                    yahsp_set_optimize_makespan_max(); } 
+                else if (strategy == cost)  {
+                    yahsp_set_optimize_cost();  }
+	            else if (strategy == makespan_add)  {
+	                yahsp_set_optimize_makespan_add();  }
+	            else {
+	                yahsp_set_optimize_length();}
+                 
+                if(rand_seed)
+                    yahsp_set_seed(rng.rand());
+               
+                // On résout selon l'objectif
+                
+                daeYahspEval<EOT>::call(decompo);
+                
+                if(i == 0)
+                {
+                    bestState = decompo.state();
+                    if (bestState == Feasible)
+             	    {
+             	        bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
+             		    bestObjVector[1] = (this->*secondObjective)(decompo);	
+              	    }
+                  	else
+                  	{
+                  	    if(decompo.state() == UnfeasibleIntermediate)
+                  	        bestObjVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_intermediate(decompo);
+                  	    else if(decompo.state() == UnfeasibleFinal)
+                  	        bestObjVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_final(decompo);
+                  	    else if(decompo.state() == UnfeasibleTooLong)
+                  	        bestObjVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
+                  	    //else
+                  	    //    objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible(decompo);
+                  	        
+                		bestObjVector[1] = bestObjVector[0];
+                    }
+                    /*std::cerr << "#" << i << std::endl << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << std::endl; */
+                }
+                else
+                {
+                    if(bestState != Feasible && decompo.state() == Feasible)
+                    {
+                        //std::cerr << "NF -  F : " << bestObjVector[0] << " -> " << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << std::endl;
+                        bestState = Feasible;
+                        bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
+             		    bestObjVector[1] = (this->*secondObjective)(decompo);
+                    }
+                    else if(bestState != Feasible && decompo.state() != Feasible)
+                    {
+                        
+                        double fit;
+                        if(decompo.state() == UnfeasibleIntermediate)
+                  	        fit = daeCptYahspEval<EOT>::fitness_unfeasible_intermediate(decompo);
+                  	    else if(decompo.state() == UnfeasibleFinal)
+                  	        fit = daeCptYahspEval<EOT>::fitness_unfeasible_final(decompo);
+                  	    else if(decompo.state() == UnfeasibleTooLong)
+                  	        fit = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
+                  	    //std::cerr << "NF - NF : " << bestObjVector[0] << " " << fit << std::endl;    
+                        bestObjVector[0] = std::min(bestObjVector[0], fit);
+                        bestObjVector[1] = bestObjVector[0];
+                    }
+                    else if(bestState == Feasible && decompo.state() == Feasible)
+                    {
+                    
+                    
+                        double f1,f2;
+                        /*// euclidian distance
+                        f1 = std::sqrt(bestObjVector[0]*bestObjVector[0] + bestObjVector[1]*bestObjVector[1]);
+                        f2 = std::sqrt(daeYahspEval< EOT >::fitness_feasible(decompo)*daeYahspEval< EOT >::fitness_feasible(decompo) + (this->*secondObjective)(decompo)*(this->*secondObjective)(decompo));*/
+                        // hypersurface
+                        f1 = (decompo.prevObjVector[0] - bestObjVector[0]) + (decompo.prevObjVector[1] - bestObjVector[1]);
+                        f2 = (decompo.prevObjVector[0] - daeYahspEval< EOT >::fitness_feasible(decompo)) + (decompo.prevObjVector[1] - (this->*secondObjective)(decompo));
+                        
+                        /*std::cerr << "#" << i << std::endl << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << " " << f1 << " " << f2 << std::endl; */
+                        if(f2 > f1)
+                        {
+                            bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
+                            bestObjVector[1] = (this->*secondObjective)(decompo);
+                        }
+                    }
+                }
+                 
+            }
+            
+            decompo.objectiveVector(bestObjVector);
+    	    decompo.fitness(bestObjVector[0]);
+    	    
+    	    decompo.prevObjVector = bestObjVector;
+    	    /*if(decompo.state() == Feasible)
+                std::cerr << std::endl << std::endl << "# After" << std::endl << decompo.prevObjVector[0] << " " << decompo.prevObjVector[1] << std::endl; */
+            post_call(decompo);
+            //std::cerr << std::endl << std::endl;
+        }
     }
     
     virtual void step_recorder(){};

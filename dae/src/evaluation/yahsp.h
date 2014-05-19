@@ -262,7 +262,7 @@ public:
     
     virtual void pre_call(EOT& decompo) {(void)decompo;}  
      
-    virtual  void operator()(EOT& decompo) 
+    virtual void operator()(EOT& decompo) 
     {
         if (decompo.invalid())
         {
@@ -273,7 +273,6 @@ public:
         }
     }
      
-
 protected:
 
     virtual unsigned int solve_next( EOT & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes )

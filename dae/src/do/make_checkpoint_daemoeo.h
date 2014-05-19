@@ -18,6 +18,7 @@
 
 #include <utils/checkpointing>
 
+
 namespace daex {
 
 #define DAEX_FEASIBILITY_SUFFIX "_f"
@@ -103,28 +104,33 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
 	//	typename EOT::ObjectiveVector* ref = new typename EOT::ObjectiveVector(2.0,false);
 	//ref->operator[](0) = PlanningObjectiveVector::Type(1000.0, false); // sans faire de reserve ?
 	//ref->operator[](1) = PlanningObjectiveVector::Type(1000.0, false); // sans faire de reserve ?
-
-	//(* ref)[0] = typename EOT::Fitness(1000.0, false); // sans faire de reserve ?
-	//(* ref)[1] = typename EOT::Fitness(1000.0, false); // sans faire de reserve ?
+	
+	typename EOT::ObjectiveVector* ref = new typename EOT::ObjectiveVector;
+	//	typename EOT::ObjectiveVector* ref = new typename EOT::ObjectiveVector(2.0,false);
+	// NOTE Alex : Passage de 1000 à 1000000 pour le point de référence car les bornes des objectifs
+	// sur les instances larges peuvent être très grandes.
+	(* ref)[0]= typename EOT::ObjectiveVector::Type(1000000.0, false); // sans faire de reserve ?
+	(* ref)[1]= typename EOT::ObjectiveVector::Type(1000000.0, false); // sans faire de reserve ?
 
 	//(* ref)[0]= typename OVT::Type(3000.0, false);
 	//(* ref)[1]= typename OVT::Type(2000.0, false);
-	//eo::log << eo::progress << FORMAT_LEFT_FILL_W_PARAM << "******************************** REF_POINT=" << *ref << std::endl;
+	eo::log << eo::progress << FORMAT_LEFT_FILL_W_PARAM << "******************************** REF_POINT=" << *ref << std::endl;
 
-        //PS moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,ref);
+    moeoDualHyperVolumeDifferenceMetric<typename EOT::ObjectiveVector> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<typename EOT::ObjectiveVector>(true,ref);
 
+    // NOTE Alex : Pas trouvé cette classe ! :(
 	//moeoDualHyperVolumeMetric<typename EOT::ObjectiveVector> * m_hypervolume = new moeoDualHyperVolumeMetric<typename EOT::ObjectiveVector>(false,*ref); //PS
 	//moeoDualHyperVolumeMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeMetric<OVT>(true,1.1); //PS
 
 
         // moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,1.1);
 
-        //PS eoStat<EOT,std::string>& hypervolume = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_hypervolume, "HypVol", state );
+     eoStat<EOT,std::string>& hypervolume = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_hypervolume, "HypVol", state );
 
         //eoStat<EOT,std::string>& hypervolume = make_dual_stat_param< moeoUnaryMetricStat<EOT> >( *m_hypervolume, "HypVol", state );
 
-        //checkpoint.add( hypervolume );
-        //clog_monitor.add( hypervolume );
+        checkpoint.add( hypervolume );
+        clog_monitor.add( hypervolume );
 
         // FIXME the epsilon stat cannot handle dual fitness, it must be overloaded
         // moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT> * m_epsilon = new moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT>;

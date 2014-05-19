@@ -10,13 +10,13 @@ void do_make_strategy_param(eoParser &parser)
     std::string level = parser.createParam( (std::string)"Pop", "strat-level", "Level for strategy (Pop,Indi,Goal)", 'l', "Strategy").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "strat-level" << level << std::endl;
 
-    std::string indicator = parser.createParam( (std::string)"DeltaPlus", "strat-indicator", "Measure the evolution between to evaluation (Hypervolume, Epsilon, DeltaPlus, DeltaProd, DeltaExp)", 'i', "Strategy").value();
+    std::string indicator = parser.createParam( (std::string)"DeltaPlus", "strat-indicator", "Measure the evolution between to evaluation (Hypervolume, Epsilon, DeltaPlus, DeltaProd, DeltaExp)", 'F', "Strategy").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "strat-indicator" << indicator << std::endl;
 
    bool effect = parser.createParam( (bool)true, "effect-estimation", "Estimate the effect of objective to ponderate quality.", 'e', "Strategy").value();
    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "effect-estimation" << effect << std::endl;
    
-   std::string quality = parser.createParam( (std::string)"AQA", "quality-assessment", "Quality assessment strategy (AQA : average quality, EQA : extreme value)", 'q', "Strategy").value();
+   std::string quality = parser.createParam( (std::string)"AQA", "quality-assessment", "Quality assessment strategy (AQA : average quality, EQA : extreme value)", ' ', "Strategy").value();
    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "quality-assessment" << quality << std::endl;
    
    std::string update = parser.createParam( (std::string)"PM", "strat-update", "Quality update method (PM : probability matching, AP : adaptive pursuit)", 'u', "Strategy").value();

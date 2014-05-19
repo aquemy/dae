@@ -53,8 +53,8 @@ public:
     {
         // Préconditions & invariants (serialisation, assertions...)
         current = _choice(o);
-        _update(o, current);
-        _mutation(o, current);
+        //_update(o, current);
+        //_mutation(o, current);
         // Post condition
       
         return current;
@@ -84,10 +84,7 @@ private:
     virtual void _mutation(const EOT& o, Objective choice)
     {
         (void)o;
-        std::cerr << "Distribution : ";
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << distribution[i] << " ";
-        std::cerr << std::endl;
+        
         //////////////////////////////////////////////////////////
         // Static mutation
         //////////////////////////////////////////////////////////
@@ -137,31 +134,39 @@ private:
         std::cerr << " -> " << mutRate << std::endl;
         if(p < mutRate)   
         {
-            
+            std::cerr << "Distribution : ";
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                std::cerr << distribution[i] << " ";
+            std::cerr << std::endl;
             unsigned pos = rng.uniform(0,NB_YAHSP_STRAT);
             do
                 pos = rng.uniform(0,NB_YAHSP_STRAT);
             while(pos == choice);
             
             // Un seul objectif muté
-            distribution[pos] += rng.normal(0.0, 0.1);
-            if(distribution[pos] < 0)
-                distribution[pos] = pmin;
+            //distribution[pos] += rng.normal(0.0, 0.1*NB_YAHSP_STRAT);
+            //if(distribution[pos] < 0)
+            //    distribution[pos] = pmin;
             // Tous les objectifs mutés
-            //for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            //    distribution[i] += rng.normal(0.0, 0.1);
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                distribution[i] += rng.normal(0.0, 0.25*NB_YAHSP_STRAT);
             
+            double m = std::min(0., *std::min_element(distribution.begin(), distribution.end()));
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                distribution[i] -= m;
+                 
             // Renormalisation
             double sum = 0;
             for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
                 sum += distribution[i];
             for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
                 distribution[i] /= sum;
+            std::cerr << "Nouvelle Distribution : ";
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                std::cerr << distribution[i] << " ";
+            std::cerr << std::endl;
         }
-        std::cerr << "Nouvelle Distribution : ";
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << distribution[i] << " ";
-        std::cerr << std::endl;
+        
     }
 };
 
