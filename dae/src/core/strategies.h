@@ -2,19 +2,10 @@
 #define __STRATEGIES_H__
 
 #include <map>
+#include <src/yahsp.h>
 #include "planningState.h"
 
 namespace daex {
-#define NB_YAHSP_STRAT 4
-enum Objective 
-{ 
-    makespan_add,
-    makespan_max, 
-    cost, 
-    length,
-};
-
-
 
 
 // Strategy class

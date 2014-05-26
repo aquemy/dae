@@ -35,6 +35,21 @@ struct Node {
 #endif
 };
 
+// A.Quemy (26/04/14)
+// Note : juste un switch pour éviter la redondance dans la partie DAE
+#define NB_YAHSP_STRAT 4
+enum Objective 
+{ 
+    makespan_add,
+    makespan_max, 
+    cost, 
+    length,
+};
+
+extern void yahsp_set_optimize(Objective _obj);
+
+// End A.Quemy
+
 extern bool yahsp_optimize_cost;
 extern bool yahsp_optimize_makespan;
 

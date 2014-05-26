@@ -72,6 +72,19 @@ static ulong yahsp_optimize_weight = 3;
 #define NODE_HVALUE(node) get_ainit(end_action)
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * yahsp_optimize_weight)
 
+void yahsp_set_optimize(Objective _obj)
+{
+    if (_obj == makespan_max)
+        yahsp_set_optimize_makespan_max(); 
+    else if (_obj == cost) 
+        yahsp_set_optimize_cost(); 
+    else if (_obj == makespan_add) 
+	    yahsp_set_optimize_makespan_add(); 
+    else
+	    yahsp_set_optimize_length();
+}
+
+
 void yahsp_set_optimize_length()
 {
   yahsp_optimize_cost = false;
