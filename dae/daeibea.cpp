@@ -15,7 +15,6 @@
 #include "src/do/make_continue_param.h"
 #include "src/do/make_general_param.h"
 #include "src/do/make_init_param.h"
-#include "src/do/make_strategy.h"
 
 /// how to initialize the population
 #include <do/make_pop.h>
@@ -57,7 +56,6 @@ int main (int argc, char *argv[])
     daex::do_make_variation_param(parser);        
     daex::do_make_checkpoint_param(parser);
     daex::do_make_continue_param(parser);
-    daex::do_make_strategy_param(parser);
     
     make_help(parser);
 
@@ -89,25 +87,12 @@ int main (int argc, char *argv[])
 	rates[makespan_add] = std::pair<double,double>(makespan_add_weigth_min,makespan_add_weigth_max);
 	rates[cost] = std::pair<double,double>(cost_weigth_min,cost_weigth_max);
 	rates[length] = std::pair<double,double>(length_weigth_min,length_weigth_max);
-	
-	for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-	    std::cerr << rates[i].first << " " << rates[i].second << std::endl;
-     
+	 
 	//StrategyInitStatic stratInit(rates);
 	
-	std::string indicator = parser.valueOf<std::string>("strat-indicator");
-    bool effect = parser.valueOf<bool>("effect-estimation");
-    std::string quality = parser.valueOf<std::string>("quality-assessment");
-    std::string update = parser.valueOf<std::string>("strat-update");
-    bool jump = parser.valueOf<bool>("strat-jump");
-    
-    
-	StrategyInit stratInit(indicator, effect, quality, update, jump);
-	
-
-    daex::Init<PlanningMOEO > init(pddl.chronoPartitionAtom(), stratInit, l_max_init_coef, l_min);
+    daex::Init<PlanningMOEO > init(pddl.chronoPartitionAtom(), l_max_init_coef, l_min);
     	
-  	eoGenOp<PlanningMOEO>& variator = do_make_op<PlanningMOEO> (parser, state, pddl, stratInit);
+  	eoGenOp<PlanningMOEO>& variator = do_make_op<PlanningMOEO> (parser, state, pddl);
   	 
   	/// definition of the archive
     moeoUnboundedArchive<PlanningMOEO > arch;
@@ -116,7 +101,7 @@ int main (int argc, char *argv[])
     eoPop<PlanningMOEO >& pop = do_make_pop(parser, state, init);
      
     // The fitness evaluation
-    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval(parser, state, pop, init, stratInit);
+    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval(parser, state, pop, init);
         
     /// stopping criteria
     std::cerr << "INIT : Continuator" << std::endl;

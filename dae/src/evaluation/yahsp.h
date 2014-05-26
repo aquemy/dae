@@ -172,7 +172,7 @@ public:
                     eo::log.flush();
                     #endif
                     
-                    // Choix de l'objectif à optimiser si l'on a une strategie au niveau des Goals
+                    /*// Choix de l'objectif à optimiser si l'on a une strategie au niveau des Goals
                     if(level == "Goal")
                     {
                         using namespace daex;
@@ -193,7 +193,7 @@ public:
                         
                         // TODO : Réinitialiser yashp ?
                         yahsp_set_seed(rng.rand());
-                    }
+                    }*/
                     
                     // copie des goals daex dans leur equivant YAHSP
                     // nouvelle allocation de tableau de goal

@@ -37,11 +37,6 @@ public:
         prevState(Unfeasible),
         st(Unfeasible)
     {}
-    
-    void setStrategy(Strategy<Planning<BaseT> > _strat)
-    {
-        strat = _strat;
-    }
      
     virtual ~Planning() {}   
       
@@ -50,13 +45,11 @@ public:
         return "Planning";
     } 
   	
-  	
-     Planning & operator=(const Planning & other)
-     {
+    Planning & operator=(const Planning & other)
+    {
         if (this != &other) {
              BaseT::operator=(other);
              Decomposition::operator=(other);
-             strat = other.strat;
              
              prevObjVector = other.prevObjVector;
              prevState = other.prevState;
@@ -105,22 +98,8 @@ public:
         return BaseT::operator<(_moeo);
     }
     
-    Objective objective()
-    {
-        return strat(*this);
-    }
-    
-    void update(double indicator)
-    {
-        strat.update(indicator);
-    }
-    
-    double efficiency(Objective obj)
-    {
-        return strat.efficiency(obj);
-    }
-    
-public : // A passer en protected 
+
+public : // TODO : A passer en protected 
 
     PlanningObjectiveVector prevObjVector;
     PlanningState prevState;
@@ -128,8 +107,6 @@ public : // A passer en protected
 protected:
    
     PlanningState st;
-    Strategy<Planning<BaseT> > strat;
-    
 
 };
 

@@ -20,7 +20,6 @@ class PlanningEval : public daeYahspEval< EOT >
 public:
 
     PlanningEval (
-        Strategy<EOT> _strat,
         unsigned int l_max_ = 20,
 		unsigned int b_max_in = 10, 
 		unsigned int b_max_last = 30,
@@ -28,20 +27,16 @@ public:
 		double fitness_penalty = 1e6,
 		std::string _objective="Add",
 		unsigned int astar_weigth=3,
-		bool _rand_seed = false,
-		std::string _level = "Pop"
+		bool _rand_seed = true
     ):
         daeYahspEval< EOT >(
             l_max_,
             b_max_in, 
             b_max_last, 
             fitness_weight, 
-            fitness_penalty,
-            _level
-       ),    
-       strat(_strat),
-       rand_seed(_rand_seed),
-       level(_level)
+            fitness_penalty
+       ),
+       rand_seed(_rand_seed)
     {
         if (_objective.compare("Add")==0)
        		secondObjective = &PlanningEval::additive_cost;
@@ -97,27 +92,8 @@ public:
    
     void pre_call(EOT & decompo)
     {
-    
-        Objective strategy;
-        
-        if(level == "Pop")
-            strategy = strat(decompo);
-        else if(level == "Indi")
-            strategy = decompo.objective();
-       
-        if (strategy == makespan_max) {
-            yahsp_set_optimize_makespan_max(); } 
-        else if (strategy == cost)  {
-            yahsp_set_optimize_cost();  }
-	    else if (strategy == makespan_add)  {
-	        yahsp_set_optimize_makespan_add();  }
-	    else {
-	        yahsp_set_optimize_length();}
-         
         if(rand_seed)
             yahsp_set_seed(rng.rand());
-        
-        
     }
     
     virtual void operator()(EOT& decompo) 
@@ -130,10 +106,8 @@ public:
             PlanningObjectiveVector bestObjVector;
             PlanningState bestState;
             
-            /*if(decompo.state() == Feasible)
-                std::cerr <<"# Before" << std::endl << decompo.prevObjVector[0] << " " << decompo.prevObjVector[1] << std::endl << std::endl << std::endl ;   */
             
-            //pre_call(decompo);
+            
             // Pour chaque objectif
             for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
             {
@@ -148,11 +122,9 @@ public:
 	            else {
 	                yahsp_set_optimize_length();}
                  
-                if(rand_seed)
-                    yahsp_set_seed(rng.rand());
+                pre_call(decompo);
                
                 // On résout selon l'objectif
-                
                 daeYahspEval<EOT>::call(decompo);
                 
                 if(i == 0)
@@ -176,13 +148,11 @@ public:
                   	        
                 		bestObjVector[1] = bestObjVector[0];
                     }
-                    /*std::cerr << "#" << i << std::endl << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << std::endl; */
                 }
                 else
                 {
                     if(bestState != Feasible && decompo.state() == Feasible)
                     {
-                        //std::cerr << "NF -  F : " << bestObjVector[0] << " -> " << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << std::endl;
                         bestState = Feasible;
                         bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
              		    bestObjVector[1] = (this->*secondObjective)(decompo);
@@ -197,23 +167,21 @@ public:
                   	        fit = daeCptYahspEval<EOT>::fitness_unfeasible_final(decompo);
                   	    else if(decompo.state() == UnfeasibleTooLong)
                   	        fit = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
-                  	    //std::cerr << "NF - NF : " << bestObjVector[0] << " " << fit << std::endl;    
+
                         bestObjVector[0] = std::min(bestObjVector[0], fit);
                         bestObjVector[1] = bestObjVector[0];
                     }
                     else if(bestState == Feasible && decompo.state() == Feasible)
                     {
-                    
-                    
-                        double f1,f2;
-                        /*// euclidian distance
-                        f1 = std::sqrt(bestObjVector[0]*bestObjVector[0] + bestObjVector[1]*bestObjVector[1]);
-                        f2 = std::sqrt(daeYahspEval< EOT >::fitness_feasible(decompo)*daeYahspEval< EOT >::fitness_feasible(decompo) + (this->*secondObjective)(decompo)*(this->*secondObjective)(decompo));*/
-                        // hypersurface
-                        f1 = (decompo.prevObjVector[0] - bestObjVector[0]) + (decompo.prevObjVector[1] - bestObjVector[1]);
-                        f2 = (decompo.prevObjVector[0] - daeYahspEval< EOT >::fitness_feasible(decompo)) + (decompo.prevObjVector[1] - (this->*secondObjective)(decompo));
+                        // TODO : Tester si la condition suivante plus élitiste :
+                        // Soit x le vecteur objectif précédent.
+                        // On écarte les vecteurs objectifs qui sont dominés par celui-ci
+                        // En dernier lieu, on applique la condition suivante
+                        double f1 = (decompo.prevObjVector[0] - bestObjVector[0]) 
+                            + (decompo.prevObjVector[1] - bestObjVector[1]);
+                        double f2 = (decompo.prevObjVector[0] - daeYahspEval< EOT >::fitness_feasible(decompo)) 
+                            + (decompo.prevObjVector[1] - (this->*secondObjective)(decompo));
                         
-                        /*std::cerr << "#" << i << std::endl << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << " " << f1 << " " << f2 << std::endl; */
                         if(f2 > f1)
                         {
                             bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
@@ -228,10 +196,8 @@ public:
     	    decompo.fitness(bestObjVector[0]);
     	    
     	    decompo.prevObjVector = bestObjVector;
-    	    /*if(decompo.state() == Feasible)
-                std::cerr << std::endl << std::endl << "# After" << std::endl << decompo.prevObjVector[0] << " " << decompo.prevObjVector[1] << std::endl; */
+    	    
             post_call(decompo);
-            //std::cerr << std::endl << std::endl;
         }
     }
     
@@ -248,13 +214,8 @@ public:
     // Pointer towards the 2nd objective to optimize (tota cost / max cost)
     double (PlanningEval::*secondObjective)(EOT &);  
      
-    // Weight vectors of the different strategies (lenght, cost,  makespan_max, makespan_add,)
-    Strategy<EOT> strat;
-     
     bool rand_seed; // flag for the random initialization of yashp at each call
     
-protected :
-    std::string level;  
 };
 
 //! Classe à utiliser lors de la première itération, pour estimer b_max
@@ -264,7 +225,6 @@ class PlanningEvalInit : public PlanningEval< EOT >
 public:
 
     PlanningEvalInit(
-        Strategy<EOT> _strat,
         unsigned int pop_size, 
         unsigned int l_max, 
         unsigned int b_max_in = 10000, 
@@ -273,10 +233,8 @@ public:
 	    double fitness_penalty = 1e6,
 	    std::string _objective="Add",
 	    unsigned int astar_weigth=3,
-	    bool _rand_seed = false,
-	    std::string _level = "Pop"):
+	    bool _rand_seed = true):
 	    PlanningEval<EOT >(
-	        _strat,
 	        l_max,
 	        b_max_in, 
 	        b_max_last, 
@@ -284,11 +242,10 @@ public:
 	        fitness_penalty,
 	        _objective,
 	        astar_weigth,
-	        _rand_seed,
-	        _level
+	        _rand_seed
 	        ) 
     {
-       node_numbers.reserve( pop_size * l_max );
+        node_numbers.reserve( pop_size * l_max );
     }
 
     void call(EOT& decompo ){
@@ -297,7 +254,7 @@ public:
     eo::log.flush();
     int prev = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
 #endif
-    PlanningEval< EOT >::call( decompo );
+    PlanningEval< EOT >::operator()(decompo);
 #ifndef NDEBUG
     int next = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
     eo::log << eo::logging << "     (" << next - prev << ")";

@@ -22,7 +22,6 @@ public:
     
     Goal operator=(const Goal& _o)
     {
-        strat = _o.strat;
         return *this;
     }
     
@@ -71,22 +70,12 @@ public:
 
         return it;
     }
-    
-    Objective objective()
-    {
-        return strat(*this);
-    }
-    
-    void setStrategy(Strategy<Goal> _strat)
-    {
-        strat = _strat;
-    }
 
 protected:
 
     //! Earliest start time among all atoms
     TimeVal _earliest_start_time;
-    Strategy<Goal> strat;
+
 };
 
 } // namespace daex
