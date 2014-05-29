@@ -27,70 +27,110 @@
 
 namespace daex {
 
+/*
+* @brief Create general parameters related to evaluation (mono and multi-objective).
+* @param eoParser used to create parameters.
+*/
 void do_make_eval_param(eoParser &parser)
 {
+    unsigned int fitness_weight = parser.createParam( (unsigned int)10, "fitness-weight", 
+        "Unknown weight in the feasible and unfeasible fitness computation", 'W', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "fitness_weight" << fitness_weight << std::endl;
 
-    parser.createParam( (std::string)"Add", "objective", "2nd objective to take into account (Add(additive cost )/Max(max cost)", 'Z', "Problem");
-  	
-	parser.createParam( (unsigned int)1e4, "bmax-init", "Number of allowed expanded nodes for the initial computation of b_max", 'B', "Evaluation" );
-        
-    parser.createParam( (unsigned int)10, "fitness-weight", "Unknown weight in the feasible and unfeasible fitness computation", 'W', "Evaluation" );
-        
-    parser.createParam( (unsigned int)1e4, "fitness-penalty", "Penalty in the unfeasible fitnesses computation", 'w', "Evaluation" );
+    unsigned int fitness_penalty = parser.createParam( (unsigned int)2, "fitness-penalty", 
+        "Penalty in the unfeasible fitnesses computation", 'w', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "fitness_penalty" << fitness_penalty << std::endl;
  
-	parser.createParam( (unsigned int)0, "bmax-fixed", "Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0", 'b', "Evaluation" );
-    
-    parser.createParam( (double)3, "bmax-last-weight",
-            "Weighting for the b_max used during the last search towards the end goal (must be strictly positive)", 'T', "Evaluation" );
-    
-    parser.createParam( (double)0.5, "bmax-quantile", 
-            "Quantile to use for estimating b_max (in [0,1], 0.5=median)", 'Q', "Evaluation" );
-    
-    parser.createParam( (double)1, "length_weigth",
-        "Weighting for the optimizing length during the search", 'H', "Evaluation" );
+    unsigned int b_max_init = parser.createParam( (unsigned int)1e4, "bmax-init", "Number of allowed expanded nodes for the initial computation of b_max", 'B', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_init" << b_max_init << std::endl;
 
-    parser.createParam( (double)1, "cost_weigth",
-        "Weighting for the optimizing cost during the search", 'U', "Evaluation" ); 	 
+    unsigned int b_max_fixed = parser.createParam( (unsigned int)0, "bmax-fixed", "Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0", 'b', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_fixed" << b_max_fixed << std::endl;
+
+    double b_max_last_weight = parser.createParam( (double)3, "bmax-last-weight",
+        "Weighting for the b_max used during the last search towards the end goal (must be strictly positive)", 'T', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_last_weight" << b_max_last_weight << std::endl;
+ 
+    double length_weigth = parser.createParam( (double)1, "length_weigth",
+        "Weighting for the optimizing length during the search", 'H', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "length_weigth" << length_weigth << std::endl;
+
+    double cost_weigth = parser.createParam( (double)1, "cost_weigth",
+        "Weighting for the optimizing cost during the search", 'U', "Evaluation").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "cost_weigth" << cost_weigth << std::endl;	 
     	
-    parser.createParam( (double)1, "makespan_max_weigth",
-        "Weighting for the optimizing makespan_max during the search", 'Y', "Evaluation" );
+    double makespan_max_weigth = parser.createParam( (double)1, "makespan_max_weigth",
+        "Weighting for the optimizing makespan_max during the search", 'Y', "Evaluation").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "makespan_max_weigth" << makespan_max_weigth << std::endl;	
  	 	
-    parser.createParam((double)1,"makespan_add_weigth",
-         "Weighting for the optimizing  makespan_add during the search", 'V', "Evaluation" );
-	       
-    parser.createParam((double)1,"astar_weigth",
-         "Weighting for the optimizing  A* heuristic during the search", 'O', "Evaluation" );
+    double makespan_add_weigth = parser.createParam((double)1,"makespan_add_weigth",
+         "Weighting for the optimizing  makespan_add during the search", 'V', "Evaluation").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "makespan_add_weigth" << makespan_add_weigth << std::endl;
 	 
-    parser.createParam((bool)false,"rand_yahsp_seed",
-         "flag  for the random initilaization of yahsp at each optimization", 'X', "Evaluation" );
+    bool rand_yahsp_seed = parser.createParam((bool)true,"rand_yahsp_seed",
+         "Random initilaization of yahsp at each optimization (default : true)", 'X', "Evaluation").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "rand_yahsp_seed" << rand_yahsp_seed << std::endl;
 
-    parser.createParam((double)2, "bmax-increase-coef", "Multiplier increment for the computation of b_max", 'K', "Evaluation" );
+    double bmax_increase_coef = parser.createParam((double)2, "bmax-increase-coef", 
+        "Multiplier increment for the computation of b_max", 'K', "Evaluation").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "bmax-increase-coef" << bmax_increase_coef << std::endl;
   
-    parser.createParam( 0.01, "bmax-ratio","Satisfying proportion of feasible individuals for the computation of b_max", 'J', "Evaluation" );
+    double bmax_ratio = parser.createParam(0.01, "bmax-ratio",
+        "Satisfying proportion of feasible individuals for the computation of b_max", 'J', "Evaluation").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "bmax-ratio" << bmax_ratio << std::endl;
  
 }
 
 /*
- * This function creates an eoEvalFuncCounter<eoFlowShop> that can later be used to evaluate an individual.
+* @brief Create general parameters related to multi-objective evaluation.
+* @param eoParser used to create parameters.
+*/
+void do_make_eval_mo_param(eoParser &parser)
+{
+    double astar_weight = parser.createParam((double)1, "astar-weight", // FIXME default value??
+        "A* weight within YAHSP", 'H', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "astar-weight" << astar_weight << std::endl;
+
+    bool cost_max = parser.createParam( (bool)false, "cost-max",
+        "Use max cost instead of additive costs as the second objective", 'M', "Multi-Objective" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "cost-max" << cost_max << std::endl;
+}
+
+/*
+ * @brief Create an eoEvalFuncCounter<eoFlowShop> that can later be used to evaluate an individual.
  * @param eoParser& _parser  to get user parameters
  * @param eoState& _state  to store the memory
  */
 template <class EOT >
-eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop, daex::Init< EOT > & _init)
+eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop, daex::Init< EOT > & _init)
 {
     unsigned int b_max_fixed = _parser.valueOf<unsigned int>("bmax-fixed");
     double b_max_last_weight = _parser.valueOf<double>("bmax-last-weight");
     //double b_max_quantile = _parser.valueOf<double>("bmax-quantile");
    
-	double astar_weight = _parser.valueOf<double>("astar_weigth");
+	double astar_weight = _parser.valueOf<double>("astar-weight");
 	bool rand_seed = _parser.valueOf<bool>("rand_yahsp_seed");
 
-  	std::string objective = _parser.valueOf<std::string>("objective");
+  	bool cost_max = _parser.valueOf<bool>("cost-max");
   	
 	unsigned int b_max_init = _parser.valueOf<unsigned int>("bmax-init"); 
     unsigned int fitness_weight = _parser.valueOf<unsigned int>("fitness-weight");
     unsigned int fitness_penalty = _parser.valueOf<unsigned int>("fitness-penalty");
-
+    
+    std::vector<double> rates(NB_YAHSP_STRAT);
+	rates[makespan_max] = parser.valueOf<double>("makespan_max_weigth");
+	rates[makespan_add] = parser.valueOf<double>("makespan_add_weigth");
+	rates[cost] = parser.valueOf<double>("cost_weigth");
+	rates[length] = parser.valueOf<double>("length_weigth");
+        
+    // Check parameters
+    if( b_max_last_weight <= 0 ) 
+    {
+        std::cout << "bmax-last-weight must be strictly positive (=" << b_max_last_weight << ") type --help for usage." << std::endl;
+        exit(1);
+    }
+    
+    // End check paramters
 
     PlanningEvalInit< EOT > *eval_yahsp_init = new PlanningEvalInit< EOT >(
         _pop.size(), 
@@ -99,7 +139,7 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
         b_max_last_weight, 
         fitness_weight, 
         fitness_penalty,
-        objective
+        cost_max
     );
 
 	_state.storeFunctor(eval_yahsp_init);
@@ -129,7 +169,7 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 	            b_max_last, 
 	            fitness_weight, 
 	            fitness_penalty,
-	            objective,
+	            cost_max,
 	            astar_weight,
 	            rand_seed
 	        );
@@ -172,7 +212,7 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
 		    b_max_last, 
 		    fitness_weight, 
 		    fitness_penalty,
-		    objective,
+		    cost_max,
 		    astar_weight, 
 		    rand_seed
         );

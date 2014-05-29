@@ -45,17 +45,20 @@ int main (int argc, char *argv[])
   	eoParser parser(argc, argv); // for user-parameter reading
  	eoState state;               // to keep all things allocated
   	make_verbose(parser);        // to keep all things allocated
-   
+
   	// General parameters
   	daex::do_make_general_param(parser);            // Common part
   	daex::do_make_ibea_param(parser);               // IBEA part
   	
-  	// Parameters makers
+  	// Parameters makers COMMON PART
     daex::do_make_eval_param(parser);             
     daex::do_make_init_param(parser);             
     daex::do_make_variation_param(parser);        
     daex::do_make_checkpoint_param(parser);
     daex::do_make_continue_param(parser);
+    
+    // Parameters makers MO PART
+    do_make_eval_mo_param(parser);
     
     make_help(parser);
     
@@ -101,12 +104,6 @@ int main (int argc, char *argv[])
     unsigned int l_max_init_coef = parser.valueOf<unsigned int>("lmax-initcoef");
     unsigned int l_min = parser.valueOf<unsigned int>("lmin");
 
-    std::vector<double> rates(NB_YAHSP_STRAT);
-	rates[makespan_max] = parser.valueOf<double>("makespan_max_weigth");
-	rates[makespan_add] = parser.valueOf<double>("makespan_add_weigth");
-	rates[cost] = parser.valueOf<double>("cost_weigth");
-	rates[length] = parser.valueOf<double>("length_weigth");
-	 
 	//StrategyInitStatic stratInit(rates);
 	
     daex::Init<PlanningMOEO > init(pddl.chronoPartitionAtom(), l_max_init_coef, l_min);
@@ -120,7 +117,7 @@ int main (int argc, char *argv[])
     eoPop<PlanningMOEO >& pop = do_make_pop(parser, state, init);
      
     // The fitness evaluation
-    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval(parser, state, pop, init);
+    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval_mo(parser, state, pop, init);
         
     /// stopping criteria
     eoContinue<PlanningMOEO >& continuator= do_make_continue_daemoeo(parser, state, eval_yahsp_moeo,arch);

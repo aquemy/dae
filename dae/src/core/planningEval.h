@@ -25,7 +25,7 @@ public:
 		unsigned int b_max_last = 30,
 		double fitness_weight = 10, 
 		double fitness_penalty = 1e6,
-		std::string _objective="Add",
+		bool _cost_max = false,
 		unsigned int astar_weigth=3,
 		bool _rand_seed = true
     ):
@@ -38,7 +38,7 @@ public:
        ),
        rand_seed(_rand_seed)
     {
-        if (_objective.compare("Add")==0)
+        if (!_cost_max)
        		secondObjective = &PlanningEval::additive_cost;
       	else
      		secondObjective = &PlanningEval::max_cost;
@@ -66,7 +66,7 @@ public:
       	    else if(decompo.state() == UnfeasibleTooLong)
       	        objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
       	    //else
-      	    //    objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible(decompo);
+      	    //    objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible(decompo); // Fixme
       	        
     		objVector[1] = objVector[0];
         }
@@ -231,7 +231,7 @@ public:
         unsigned int b_max_last = 30000, 
         double fitness_weight = 10,
 	    double fitness_penalty = 1e6,
-	    std::string _objective="Add",
+	    bool _cost_max = false,
 	    unsigned int astar_weigth=3,
 	    bool _rand_seed = true):
 	    PlanningEval<EOT >(
@@ -240,7 +240,7 @@ public:
 	        b_max_last, 
 	        fitness_weight, 
 	        fitness_penalty,
-	        _objective,
+	        _cost_max,
 	        astar_weigth,
 	        _rand_seed
 	        ) 
