@@ -86,9 +86,7 @@ int main (int argc, char *argv[])
     
 #endif
    
-        
-
-    
+ 
     daex::pddlLoad pddl(parser.valueOf<std::string>("domain"), parser.valueOf<std::string>("instance"));
     
  	///*** the representation-dependent things ***///

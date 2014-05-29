@@ -67,9 +67,9 @@ public:
             unsigned int b_max_last = 30, 
             double fitness_weight = 10, 
             double fitness_penalty = 1e6,
-            std::string _level = "Pop"):
+            bool _rand_seed = true):
         daeCptYahspEval<EOT>(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty ),
-        level(_level)//,
+        rand_seed(_rand_seed)//,
         //_previous_state( NULL ) //, _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
     {
         // some init steps are not done here, but in pddl_load.cpp
@@ -93,10 +93,6 @@ public:
         //free( _previous_state );
         //free( _intermediate_goal_state );
     };
-    
-    // Set the fitness to the individual. daeYahspEval does not depend on the fitness anymore allowing to use it
-    // for mono-objective, multi-objective with Pareto or aggregation approach, etc.
-    virtual void setFitness(EOT & decompo) = 0;
 
     virtual void step_recorder() {};
     virtual void step_recorder_fail() {};
@@ -260,18 +256,14 @@ public:
         decompo.plan().search_steps( decompo.get_number_evaluated_nodes() ); 
     }
     
-    virtual void pre_call(EOT& decompo) {(void)decompo;}  
-     
-    virtual void operator()(EOT& decompo) 
+    virtual void pre_call(EOT& decompo) 
     {
-        if (decompo.invalid())
-        {
-            pre_call(decompo);
-            call(decompo);
-            setFitness(decompo);
-            post_call(decompo);
-        }
-    }
+        if(rand_seed)
+            yahsp_set_seed(rng.rand());
+    }  
+     
+    // Should be defined
+    virtual void operator()(EOT& decompo) = 0;
      
 protected:
 
@@ -401,7 +393,7 @@ protected:
     /* Fluent * * _intermediate_goal_state; */
     /* unsigned int _intermediate_goal_state_nb; */
     
-    std::string level;
+    bool rand_seed; // flag for the random initialization of yashp at each call
 };
 
 
@@ -417,9 +409,8 @@ public:
             unsigned int b_max_in = 10000, 
             unsigned int b_max_last = 30000, 
             double fitness_weight = 10,
-	    double fitness_penalty = 1e6,
-	    std::string _level = "Pop"
-	    ) : daeYahspEval<EOT>( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty, _level ) 
+	    double fitness_penalty = 1e6) : 
+	        daeYahspEval<EOT>( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty) 
     {
         node_numbers.reserve( pop_size * l_max );
     }

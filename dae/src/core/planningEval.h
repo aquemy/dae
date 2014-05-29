@@ -27,29 +27,65 @@ public:
 		double fitness_penalty = 1e6,
 		bool _cost_max = false,
 		unsigned int astar_weigth=3,
-		bool _rand_seed = true
+		bool _rand_seed = true,
+		std::vector<double> _rates = std::vector<double>()
     ):
         daeYahspEval< EOT >(
             l_max_,
             b_max_in, 
             b_max_last, 
             fitness_weight, 
-            fitness_penalty
+            fitness_penalty,
+            _rand_seed
        ),
-       rand_seed(_rand_seed)
+       rates(_rates)
     {
         if (!_cost_max)
        		secondObjective = &PlanningEval::additive_cost;
       	else
      		secondObjective = &PlanningEval::max_cost;
+
+        if (!rates.empty())
+            evalMethod = &PlanningEval::standardEval;
+        else
+            evalMethod = &PlanningEval::greedyEval;
+        
         
 	    yahsp_set_weight(astar_weigth);
     }
     
     virtual ~PlanningEval() {};
 
-    virtual void setFitness(EOT & decompo)
+    void standardEval(EOT & decompo)
     {
+        // Determine the objective to use
+        Objective objective = (Objective)rng.roulette_wheel(rates);
+        
+        if (objective == makespan_max) {
+            yahsp_set_optimize_makespan_max(); } 
+        else if (objective == cost)  {
+            yahsp_set_optimize_cost();  }
+	    else if (objective == makespan_add)  {
+	        yahsp_set_optimize_makespan_add();  }
+	    else {
+	        yahsp_set_optimize_length();}
+	        
+	    #ifndef NDEBUG
+        eo::log << eo::xdebug << "standard evaluation with objective : ";
+        if (objective == makespan_max)
+            eo::log << eo::xdebug << "makespan_max" << std::endl;
+        else if (objective == cost)
+            eo::log << eo::xdebug << "cost" << std::endl;
+	    else if (objective == makespan_add) 
+	        eo::log << eo::xdebug << "makespan_add" << std::endl;
+	    else 
+	        eo::log << eo::xdebug << "length" << std::endl;
+        eo::log.flush();
+        #endif    
+
+        daeYahspEval<EOT>::pre_call(decompo);
+        daeYahspEval<EOT>::call(decompo);
+    
 	    PlanningObjectiveVector objVector;
 
      	if (decompo.state() == Feasible)
@@ -71,9 +107,15 @@ public:
     		objVector[1] = objVector[0];
         }
         
+        #ifndef NDEBUG
+        eo::log << eo::xdebug << "obj vector found : " << objVector[1] << " " << objVector[0] << std::endl;
+        eo::log.flush();
+        #endif 
+        
     	decompo.objectiveVector(objVector);
     	decompo.fitness(objVector[0]);
     	
+    	daeYahspEval<EOT>::post_call(decompo);
     }
 
    /**
@@ -89,24 +131,20 @@ public:
     {
         return _decompo.plan().cost_max();
     }
-   
-    void pre_call(EOT & decompo)
-    {
-        if(rand_seed)
-            yahsp_set_seed(rng.rand());
-    }
     
-    virtual void operator()(EOT& decompo) 
+    void greedyEval(EOT & decompo)
     {
-        if (decompo.invalid())
-        {
+    
             std::vector<PlanningObjectiveVector> objvectors(NB_YAHSP_STRAT);
             std::vector<PlanningState> stats(NB_YAHSP_STRAT);
             
             PlanningObjectiveVector bestObjVector;
             PlanningState bestState;
             
-            
+            #ifndef NDEBUG
+            eo::log << eo::xdebug << "greedy evaluation ";
+            eo::log.flush();
+            #endif
             
             // Pour chaque objectif
             for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
@@ -122,11 +160,23 @@ public:
 	            else {
 	                yahsp_set_optimize_length();}
                  
-                pre_call(decompo);
+                daeYahspEval<EOT>::pre_call(decompo);
                
                 // On résout selon l'objectif
                 daeYahspEval<EOT>::call(decompo);
-                
+                #ifndef NDEBUG
+                if (strategy == makespan_max)
+                    eo::log << eo::xdebug << "makespan_max :";
+                else if (strategy == cost)
+                    eo::log << eo::xdebug << "cost :";
+	            else if (strategy == makespan_add) 
+	                eo::log << eo::xdebug << "makespan_add :";
+	            else 
+	                eo::log << eo::xdebug << "length :";
+	            eo::log << eo::xdebug << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << std::endl;  
+	                
+                eo::log.flush();
+                #endif 
                 if(i == 0)
                 {
                     bestState = decompo.state();
@@ -189,33 +239,35 @@ public:
                         }
                     }
                 }
-                 
+                
             }
+            #ifndef NDEBUG
+	        eo::log << eo::xdebug << "selected : " << bestObjVector[0] << " " << bestObjVector[1] << std::endl;
+            eo::log.flush();
+            #endif 
             
             decompo.objectiveVector(bestObjVector);
     	    decompo.fitness(bestObjVector[0]);
     	    
     	    decompo.prevObjVector = bestObjVector;
     	    
-            post_call(decompo);
-        }
+            daeYahspEval<EOT>::post_call(decompo);    
     }
     
-    virtual void step_recorder(){};
-    
-    virtual void step_recorder_fail(){};
-  
-    
-    void post_call(EOT& decompo)
+    virtual void operator()(EOT& decompo) 
     {
-        decompo.plan().search_steps(decompo.get_number_evaluated_nodes());  
-    } 
+        if (decompo.invalid())
+        {
+            (this->*evalMethod)(decompo);
+        }
+    }
                                 
     // Pointer towards the 2nd objective to optimize (tota cost / max cost)
-    double (PlanningEval::*secondObjective)(EOT &);  
-     
-    bool rand_seed; // flag for the random initialization of yashp at each call
+    double (PlanningEval::*secondObjective)(EOT &);
     
+    void (PlanningEval::*evalMethod)(EOT &);
+     
+    std::vector<double> rates ;
 };
 
 //! Classe à utiliser lors de la première itération, pour estimer b_max
@@ -233,7 +285,8 @@ public:
 	    double fitness_penalty = 1e6,
 	    bool _cost_max = false,
 	    unsigned int astar_weigth=3,
-	    bool _rand_seed = true):
+	    bool _rand_seed = true,
+	    std::vector<double> _rates = std::vector<double>()):
 	    PlanningEval<EOT >(
 	        l_max,
 	        b_max_in, 
@@ -242,7 +295,8 @@ public:
 	        fitness_penalty,
 	        _cost_max,
 	        astar_weigth,
-	        _rand_seed
+	        _rand_seed,
+	        _rates
 	        ) 
     {
         node_numbers.reserve( pop_size * l_max );

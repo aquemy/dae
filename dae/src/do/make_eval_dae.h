@@ -94,6 +94,10 @@ void do_make_eval_mo_param(eoParser &parser)
     bool cost_max = parser.createParam( (bool)false, "cost-max",
         "Use max cost instead of additive costs as the second objective", 'M', "Multi-Objective" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "cost-max" << cost_max << std::endl;
+    
+    bool greedy = parser.createParam((bool)false,"greedy-eval",
+         "Eval using each YAHSP strategy and chose the best.", 'g', "Multi-Objective").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "greedy-eval" << greedy << std::endl;
 }
 
 /*
@@ -112,16 +116,22 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 	bool rand_seed = _parser.valueOf<bool>("rand_yahsp_seed");
 
   	bool cost_max = _parser.valueOf<bool>("cost-max");
+  	bool greedy = _parser.valueOf<bool>("greedy-eval");
   	
 	unsigned int b_max_init = _parser.valueOf<unsigned int>("bmax-init"); 
     unsigned int fitness_weight = _parser.valueOf<unsigned int>("fitness-weight");
     unsigned int fitness_penalty = _parser.valueOf<unsigned int>("fitness-penalty");
     
-    std::vector<double> rates(NB_YAHSP_STRAT);
-	rates[makespan_max] = parser.valueOf<double>("makespan_max_weigth");
-	rates[makespan_add] = parser.valueOf<double>("makespan_add_weigth");
-	rates[cost] = parser.valueOf<double>("cost_weigth");
-	rates[length] = parser.valueOf<double>("length_weigth");
+    std::vector<double> rates;
+
+    if(!greedy)
+    {
+        rates.resize(NB_YAHSP_STRAT);
+	    rates[makespan_max] = _parser.valueOf<double>("makespan_max_weigth");
+	    rates[makespan_add] = _parser.valueOf<double>("makespan_add_weigth");
+	    rates[cost] = _parser.valueOf<double>("cost_weigth");
+	    rates[length] = _parser.valueOf<double>("length_weigth");
+	}
         
     // Check parameters
     if( b_max_last_weight <= 0 ) 
@@ -139,7 +149,10 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
         b_max_last_weight, 
         fitness_weight, 
         fitness_penalty,
-        cost_max
+        cost_max,
+        astar_weight,
+	    rand_seed,
+	    rates         
     );
 
 	_state.storeFunctor(eval_yahsp_init);
@@ -171,7 +184,8 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 	            fitness_penalty,
 	            cost_max,
 	            astar_weight,
-	            rand_seed
+	            rand_seed,
+	            rates
 	        );
 // in non multi-threaded version, use the plan dumper
 //#ifndef SINGLE_EVAL_ITER_DUMP
@@ -214,7 +228,8 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 		    fitness_penalty,
 		    cost_max,
 		    astar_weight, 
-		    rand_seed
+		    rand_seed,
+		    rates
         );
 		apply(*eval_yahsp, _pop);
 	 }
