@@ -1,33 +1,35 @@
 ######################################################################################
 ### 0) Project definition
 ######################################################################################
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT(DESCARWIN)
-
-# Note: toplevel definition, because it is used also for dae
-set(CPT_WITH_OMP "off" CACHE BOOL "Build a parallel YAHSP with OpenMP (shared memory)")
-set(CPT_WITH_MPI "off" CACHE BOOL "Build a parallel YAHSP with MPI (message passing)")
-
-IF(NOT CMAKE_BUILD_TYPE)
-    SET(CMAKE_BUILD_TYPE Debug CACHE STRING
-      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-      FORCE)
-ENDIF(NOT CMAKE_BUILD_TYPE)
+cmake_minimum_required(VERSION 2.8)
+project(DESCARWIN)
 
 # include the install configuration file where are defined the main variables
-INCLUDE(${CMAKE_SOURCE_DIR}/install.cmake OPTIONAL)
+include(${CMAKE_SOURCE_DIR}/install.cmake OPTIONAL)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
 # TESTS
-set(ENABLE_CMAKE_TESTING "True")
-enable_testing()
-include(CTest REQUIRED)
-
+if(ENABLE_CMAKE_TESTING)
+    enable_testing()
+    include(CTest REQUIRED)
+endif()
 #
 
+if(WITH_OMP)
+    set(CPT_WITH_OMP "true" CACHE BOOL "Build a parallel YAHSP with OpenMP (shared memory)")
+    set(DAE_WITH_OMP "true" CACHE BOOL "Build a parallel DAE with OpenMP (shared memory)")
+endif()
+
+if(WITH_MPI)
+    set(CPT_WITH_MPI "true" CACHE BOOL "Build a parallel YAHSP with MPI (message passing)")
+    set(DAE_WITH_MPI "true" CACHE BOOL "Build a parallel DAE with MPI (message passing)")
+endif()
+
+set(BUILD_DAE_MO "true" CACHE BOOL "Build the Multi-Objective version of DAE")
+
 ######################################################################################
-### 0) Dependencies
+### 1) Dependencies
 ######################################################################################
 # Include ParadisEO
 find_package(Paradiseo COMPONENTS eo eoutils moeo REQUIRED)
@@ -38,22 +40,25 @@ include_directories(${PARADISEO_INCLUDE_DIR})
 set(DAE true) # YAHSP CONFIGURATION
 set(CPT_YAHSP_SRC_DIR ${CMAKE_SOURCE_DIR}/cpt-yahsp)
 
-SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
-SET(CPT_YAHSP_BIN_DIR "${LIBRARY_OUTPUT_PATH}")
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+set(CPT_YAHSP_BIN_DIR "${LIBRARY_OUTPUT_PATH}")
+
 include_directories(cpt-yahsp)
 include_directories(src/)
-LINK_DIRECTORIES(${PARADISEO_ROOT}/build/lib)
-LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/lib)
+
+link_directories(${PARADISEO_ROOT}/build/lib)
+link_directories(${CMAKE_BINARY_DIR}/lib)
+
 ######################################################################################
-### 0) DAEX Config
+### 2) DAEX Config
 ######################################################################################
 set(DAEX_SRC_DIR "${CMAKE_SOURCE_DIR}/dae/src")
 set(DAEXMOEO_SRC_DIR "${CMAKE_SOURCE_DIR}/dae/src")
 
 ######################################################################################
-### Include subdirectories
+### 3) Include subdirectories
 ######################################################################################
-ADD_SUBDIRECTORY(cpt-yahsp)
-ADD_SUBDIRECTORY(dae)
+add_subdirectory(cpt-yahsp)
+add_subdirectory(dae)
 
 

@@ -39,12 +39,21 @@ include_directories(
 ######################################################################################
 
 add_library(daex STATIC ${DAEX_SRC})
+add_library(daex-yahsp-mt STATIC ${DAEX_SRC})
 
-TARGET_LINK_LIBRARIES( daex cpt_yahsp_library eo eoutils )
+TARGET_LINK_LIBRARIES(daex cpt_yahsp_library eo eoutils eoserial)
+TARGET_LINK_LIBRARIES(daex-yahsp-mt cpt_yahsp_library eo eoutils eoserial)
 #TARGET_LINK_LIBRARIES( daex  cpt_yahsp_library-common-dae-omp  cpt_yahsp_library-dae eo eoutils )
 #TARGET_LINK_LIBRARIES( daex  cpt_yahsp_library-common-dae-noomp  cpt_yahsp_library-dae-noomp eo eoutils )
  
 SET_TARGET_PROPERTIES(daex PROPERTIES LINKER_LANGUAGE CXX)
+SET_TARGET_PROPERTIES(daex-yahsp-mt PROPERTIES LINKER_LANGUAGE CXX)
+
+SET_TARGET_PROPERTIES(
+  daex-yahsp-mt
+  PROPERTIES 
+  COMPILE_FLAGS "-DYAHSP_MT"
+  )
 
 
 #SET(DAEXMOEO_LIB_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
@@ -52,7 +61,7 @@ SET_TARGET_PROPERTIES(daex PROPERTIES LINKER_LANGUAGE CXX)
 
 INCLUDE(../install.cmake)
 
-ADD_DEFINITIONS(-W -Wall -DDAE )#-DCOST_ADD) 
+#ADD_DEFINITIONS(-W -Wall -DDAE )#-DCOST_ADD) 
 
 SET (DAEXMOEO_SRC
      core/planningObjectiveVectorTraits.h

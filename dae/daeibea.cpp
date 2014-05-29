@@ -58,7 +58,34 @@ int main (int argc, char *argv[])
     daex::do_make_continue_param(parser);
     
     make_help(parser);
+    
+    
+    
+    #ifndef NDEBUG  
+    struct rlimit limit;
+    getrlimit(RLIMIT_AS, &limit);
+    eo::log << eo::logging << "Maximum size of the process virtual memory (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
+    getrlimit(RLIMIT_DATA, &limit);
+    eo::log << eo::logging << "Maximum size of the process   data segment (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
 
+    /*
+    // Hard coded memory usage limits
+    limit.rlim_cur=100000000;
+    limit.rlim_max=100000000;
+    setrlimit(RLIMIT_AS, &limit);
+    setrlimit(RLIMIT_DATA, &limit);
+
+    getrlimit(RLIMIT_AS, &limit);
+    std::cout << "Maximum size of the process virtual memory (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
+    getrlimit(RLIMIT_DATA, &limit);
+    std::cout << "Maximum size of the process   data segment (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
+    */
+    
+#endif
+   
+        
+
+    
     daex::pddlLoad pddl(parser.valueOf<std::string>("domain"), parser.valueOf<std::string>("instance"));
     
  	///*** the representation-dependent things ***///
@@ -73,20 +100,12 @@ int main (int argc, char *argv[])
     /// Initialization
     unsigned int l_max_init_coef = parser.valueOf<unsigned int>("lmax-initcoef");
     unsigned int l_min = parser.valueOf<unsigned int>("lmin");
-    double length_weigth_min = parser.valueOf<double>("length_weigth-min");
-    double cost_weigth_min = parser.valueOf<double>("cost_weigth-min"); 	 
-    double makespan_max_weigth_min = parser.valueOf<double>("makespan_max_weigth-min");
- 	double makespan_add_weigth_min = parser.valueOf<double>("makespan_add_weigth-min");
- 	double length_weigth_max = parser.valueOf<double>("length_weigth-max");
-    double cost_weigth_max = parser.valueOf<double>("cost_weigth-max"); 	 
-    double makespan_max_weigth_max = parser.valueOf<double>("makespan_max_weigth-max");
- 	double makespan_add_weigth_max = parser.valueOf<double>("makespan_add_weigth-max");
-    std::vector<std::pair<double, double> > rates(NB_YAHSP_STRAT);
 
-	rates[makespan_max] = std::pair<double,double>(makespan_max_weigth_min,makespan_max_weigth_max);
-	rates[makespan_add] = std::pair<double,double>(makespan_add_weigth_min,makespan_add_weigth_max);
-	rates[cost] = std::pair<double,double>(cost_weigth_min,cost_weigth_max);
-	rates[length] = std::pair<double,double>(length_weigth_min,length_weigth_max);
+    std::vector<double> rates(NB_YAHSP_STRAT);
+	rates[makespan_max] = parser.valueOf<double>("makespan_max_weigth");
+	rates[makespan_add] = parser.valueOf<double>("makespan_add_weigth");
+	rates[cost] = parser.valueOf<double>("cost_weigth");
+	rates[length] = parser.valueOf<double>("length_weigth");
 	 
 	//StrategyInitStatic stratInit(rates);
 	
@@ -104,7 +123,6 @@ int main (int argc, char *argv[])
     eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval(parser, state, pop, init);
         
     /// stopping criteria
-    std::cerr << "INIT : Continuator" << std::endl;
     eoContinue<PlanningMOEO >& continuator= do_make_continue_daemoeo(parser, state, eval_yahsp_moeo,arch);
        	 
     eoCheckPoint<PlanningMOEO >& checkpoint = do_make_checkpoint_daemoeo(parser, state, eval_yahsp_moeo, continuator, pop, arch);

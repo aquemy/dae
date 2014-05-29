@@ -20,9 +20,5 @@ do
     done
 done
 
-## NOTE
-# Le nombre de runs de validations est 0 car je n'ai pas trouvé le moyen séparer 
-# les runs normaux des runs de tests. Les runs de validations sont effectués à l'aide
-# des scripts dans /benchmarks.
 
 

@@ -5,17 +5,13 @@ IF(COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 # include the install configuration file where are defined the main variables
-set(PARADISEO_DIR "/home/aquemy/dev/Inria/descarwin/paradiseo" CACHE PATH "ParadisEO directory")
-set(PARADISEO_BUILD_DIR "/home/aquemy/dev/Inria/descarwin/paradiseo/build" CACHE PATH "ParadisEO directory")
-set(PARADISEO_ROOT "/home/aquemy/dev/Inria/descarwin/paradiseo")
-set(CMAKE_BUILD_TYPE "Debug")
-SET(EO_SRC_DIR "${PARADISEO_DIR}/eo/src")
+SET(  EO_SRC_DIR "${PARADISEO_DIR}/eo/src")
 SET(MOEO_SRC_DIR "${PARADISEO_DIR}/moeo/src")
-SET(MO_SRC_DIR "${PARADISEO_DIR}/mo/src")
+SET  (MO_SRC_DIR "${PARADISEO_DIR}/mo/src")
 
-SET(EO_BIN_DIR "${PARADISEO_BUILD_DIR}/lib")
+SET(  EO_BIN_DIR "${PARADISEO_BUILD_DIR}/lib")
 SET(MOEO_BIN_DIR "${PARADISEO_BUILD_DIR}/lib")
-SET(MO_BIN_DIR "${PARADISEO_BUILD_DIR}/lib")
+SET(  MO_BIN_DIR "${PARADISEO_BUILD_DIR}/lib")
 
 # include useful features for cmake
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
@@ -152,22 +148,6 @@ IF (CPT_WITH_OMP AND DAE_WITH_OMP )
         )
     ENDIF()
 
-ENDIF()
-
-IF (CMAKE_BUILD_TYPE MATCHES Debug)
-    # Debug + OMP
-    IF( CPT_WITH_OMP )
-        ADD_EXECUTABLE(featureselector featureselector.cpp)
-        ADD_DEPENDENCIES(featureselector daex)
-        TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-    ELSE()
-    # Debug without OMP
-        ADD_EXECUTABLE(featureselector featureselector.cpp)
-        ADD_DEPENDENCIES(featureselector daex)
-        TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
-    ENDIF()
-
-    ADD_SUBDIRECTORY(tests)
 ENDIF()
 
 # process to sources

@@ -46,31 +46,18 @@ void do_make_eval_param(eoParser &parser)
     parser.createParam( (double)0.5, "bmax-quantile", 
             "Quantile to use for estimating b_max (in [0,1], 0.5=median)", 'Q', "Evaluation" );
     
-    parser.createParam( (double)1, "length_weigth-max",
-        "Weighting for the optimizing length during the search (max-bound)", 'H', "Evaluation" );
+    parser.createParam( (double)1, "length_weigth",
+        "Weighting for the optimizing length during the search", 'H', "Evaluation" );
 
-    parser.createParam( (double)1, "cost_weigth-max",
-        "Weighting for the optimizing cost during the search (max-bound)", 'U', "Evaluation" ); 	 
+    parser.createParam( (double)1, "cost_weigth",
+        "Weighting for the optimizing cost during the search", 'U', "Evaluation" ); 	 
     	
-    parser.createParam( (double)1, "makespan_max_weigth-max",
-        "Weighting for the optimizing makespan_max during the search (max-bound)", 'Y', "Evaluation" );
+    parser.createParam( (double)1, "makespan_max_weigth",
+        "Weighting for the optimizing makespan_max during the search", 'Y', "Evaluation" );
  	 	
-    parser.createParam((double)1,"makespan_add_weigth-max",
-         "Weighting for the optimizing  makespan_add during the search (max-bound)", 'V', "Evaluation" );
-         
-    parser.createParam( (double)1, "length_weigth-min",
-        "Weighting for the optimizing length during the search (min-bound)", 'H', "Evaluation" );
-
-    parser.createParam( (double)1, "cost_weigth-min",
-        "Weighting for the optimizing cost during the search (min-bound)", 'U', "Evaluation" ); 	 
-    	
-    parser.createParam( (double)1, "makespan_max_weigth-min",
-        "Weighting for the optimizing makespan_max during the search (min-bound)", 'Y', "Evaluation" );
- 	 	
-    parser.createParam((double)1,"makespan_add_weigth-min",
-         "Weighting for the optimizing  makespan_add during the search (min-bound)", 'V', "Evaluation" );
-	      
-	 
+    parser.createParam((double)1,"makespan_add_weigth",
+         "Weighting for the optimizing  makespan_add during the search", 'V', "Evaluation" );
+	       
     parser.createParam((double)1,"astar_weigth",
          "Weighting for the optimizing  A* heuristic during the search", 'O', "Evaluation" );
 	 
@@ -109,7 +96,7 @@ eoEvalFuncCounter< EOT >& do_make_eval(eoParser& _parser, eoState& _state,eoPop<
         _pop.size(), 
         _init.l_max(), 
         b_max_init, 
-        b_max_init, 
+        b_max_last_weight, 
         fitness_weight, 
         fitness_penalty,
         objective

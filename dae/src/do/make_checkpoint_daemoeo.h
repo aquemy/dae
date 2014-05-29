@@ -89,7 +89,7 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         checkpoint.add( median_stat );
         clog_monitor.add( best_fit_stat );
         clog_monitor.add( median_stat );
-
+        
         // typename OVT::Type m( 0.0, true);
         // typename OVT::Type c( 0.0, true);
         //PS typename OVT::Type m( std::numeric_limits<int>::max(), false);

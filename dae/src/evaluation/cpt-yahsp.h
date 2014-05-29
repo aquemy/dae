@@ -96,6 +96,16 @@ public:
     {
         _l_max = l; 
     }
+    
+    unsigned int b_max() const 
+    { 
+        return _b_max_in; 
+    }
+    
+    void b_max( unsigned int b ) 
+    {
+        _b_max_in = b; 
+    }
 
     //! Proxy EO avec appels aux timers
     virtual void operator() ( EOT & decompo ) = 0; 
