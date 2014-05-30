@@ -140,6 +140,7 @@ public:
             
             PlanningObjectiveVector bestObjVector;
             PlanningState bestState;
+            daex::Plan bestPlan;
             
             #ifndef NDEBUG
             eo::log << eo::xdebug << "greedy evaluation ";
@@ -147,9 +148,9 @@ public:
             #endif
             
             // Pour chaque objectif
-            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            for(unsigned i = 0; i < NB_YAHSP_STRAT*10; i++)
             {
-                Objective strategy = (Objective)i;
+                Objective strategy = (Objective)(i%NB_YAHSP_STRAT);
                 // Choix de la strategy
                 if (strategy == makespan_max) {
                     yahsp_set_optimize_makespan_max(); } 
@@ -180,10 +181,11 @@ public:
                 if(i == 0)
                 {
                     bestState = decompo.state();
+                    bestPlan = decompo.plan();	
                     if (bestState == Feasible)
              	    {
              	        bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
-             		    bestObjVector[1] = (this->*secondObjective)(decompo);	
+             		    bestObjVector[1] = (this->*secondObjective)(decompo);
               	    }
                   	else
                   	{
@@ -206,6 +208,7 @@ public:
                         bestState = Feasible;
                         bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
              		    bestObjVector[1] = (this->*secondObjective)(decompo);
+             		    bestPlan = decompo.plan();	
                     }
                     else if(bestState != Feasible && decompo.state() != Feasible)
                     {
@@ -218,8 +221,12 @@ public:
                   	    else if(decompo.state() == UnfeasibleTooLong)
                   	        fit = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
 
-                        bestObjVector[0] = std::min(bestObjVector[0], fit);
-                        bestObjVector[1] = bestObjVector[0];
+                        if(bestObjVector[0] > fit)
+                        {
+                            bestObjVector[0] = fit;
+                            bestObjVector[1] = bestObjVector[0];
+                            bestPlan = decompo.plan();	
+                        }
                     }
                     else if(bestState == Feasible && decompo.state() == Feasible)
                     {
@@ -236,6 +243,7 @@ public:
                         {
                             bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
                             bestObjVector[1] = (this->*secondObjective)(decompo);
+                            bestPlan = decompo.plan();
                         }
                     }
                 }
@@ -248,6 +256,7 @@ public:
             
             decompo.objectiveVector(bestObjVector);
     	    decompo.fitness(bestObjVector[0]);
+    	    decompo.plan_global(bestPlan);
     	    
     	    decompo.prevObjVector = bestObjVector;
     	    
