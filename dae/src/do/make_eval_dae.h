@@ -98,6 +98,10 @@ void do_make_eval_mo_param(eoParser &parser)
     bool greedy = parser.createParam((bool)false,"greedy-eval",
          "Eval using each YAHSP strategy and chose the best.", 'g', "Multi-Objective").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "greedy-eval" << greedy << std::endl;
+    
+    unsigned nbEval = parser.createParam((unsigned)1,"nb-eval",
+         "Number of calls to YAHSP before assigning fitness.", 'e', "Multi-Objective").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "nb-eval" << nbEval << std::endl;
 }
 
 /*
@@ -117,6 +121,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 
   	bool cost_max = _parser.valueOf<bool>("cost-max");
   	bool greedy = _parser.valueOf<bool>("greedy-eval");
+  	unsigned nbEval = _parser.valueOf<unsigned>("nb-eval");
   	
 	unsigned int b_max_init = _parser.valueOf<unsigned int>("bmax-init"); 
     unsigned int fitness_weight = _parser.valueOf<unsigned int>("fitness-weight");
@@ -150,6 +155,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
         fitness_weight, 
         fitness_penalty,
         cost_max,
+        nbEval,
         astar_weight,
 	    rand_seed,
 	    rates         
@@ -183,6 +189,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 	            fitness_weight, 
 	            fitness_penalty,
 	            cost_max,
+	            nbEval,
 	            astar_weight,
 	            rand_seed,
 	            rates
@@ -227,6 +234,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 		    fitness_weight, 
 		    fitness_penalty,
 		    cost_max,
+		    nbEval,
 		    astar_weight, 
 		    rand_seed,
 		    rates

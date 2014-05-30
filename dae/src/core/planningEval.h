@@ -26,6 +26,7 @@ public:
 		double fitness_weight = 10, 
 		double fitness_penalty = 1e6,
 		bool _cost_max = false,
+		unsigned _nbEvaluations = 1,
 		unsigned int astar_weigth=3,
 		bool _rand_seed = true,
 		std::vector<double> _rates = std::vector<double>()
@@ -38,25 +39,20 @@ public:
             fitness_penalty,
             _rand_seed
        ),
-       rates(_rates)
+       rates(_rates),
+       nbEvaluations(_nbEvaluations)
     {
         if (!_cost_max)
        		secondObjective = &PlanningEval::additive_cost;
       	else
      		secondObjective = &PlanningEval::max_cost;
-
-        if (!rates.empty())
-            evalMethod = &PlanningEval::standardEval;
-        else
-            evalMethod = &PlanningEval::greedyEval;
-        
-        
+       
 	    yahsp_set_weight(astar_weigth);
     }
     
     virtual ~PlanningEval() {};
 
-    void standardEval(EOT & decompo)
+    /*void standardEval(EOT & decompo)
     {
         // Determine the objective to use
         Objective objective = (Objective)rng.roulette_wheel(rates);
@@ -116,42 +112,42 @@ public:
     	decompo.fitness(objVector[0]);
     	
     	daeYahspEval<EOT>::post_call(decompo);
-    }
-
-   /**
-    * computation of the cost
-    * @param _decompo the genotype to evaluate
-    */
-    double additive_cost(EOT & _decompo)
-    {
-        return _decompo.plan().cost_add();
-    }
-
-    double max_cost(EOT & _decompo)
-    {
-        return _decompo.plan().cost_max();
-    }
+    }*/
     
-    void greedyEval(EOT & decompo)
-    {
     
+    
+    virtual void operator()(EOT& decompo) 
+    {
+        if (decompo.invalid())
+        {
             std::vector<PlanningObjectiveVector> objvectors(NB_YAHSP_STRAT);
             std::vector<PlanningState> stats(NB_YAHSP_STRAT);
             
             PlanningObjectiveVector bestObjVector;
             PlanningState bestState;
             daex::Plan bestPlan;
-            
+               
+            unsigned k;
+            if(!rates.empty())
+                k = nbEvaluations;
+            else
+                k = NB_YAHSP_STRAT*nbEvaluations;
+                
             #ifndef NDEBUG
-            eo::log << eo::xdebug << "greedy evaluation ";
-            eo::log.flush();
-            #endif
+            PlanningObjectiveVector ref = decompo.prevObjVector;
+            std::vector<PlanningObjectiveVector> vectors(k);
+            #endif 
             
             // Pour chaque objectif
-            for(unsigned i = 0; i < NB_YAHSP_STRAT*10; i++)
+            Objective strategy;
+            for(unsigned i = 0; i < k; i++)
             {
-                Objective strategy = (Objective)(i%NB_YAHSP_STRAT);
-                // Choix de la strategy
+                if(!rates.empty())
+                    strategy = (Objective)rng.roulette_wheel(rates);
+                else
+                    strategy = (Objective)(i%NB_YAHSP_STRAT);
+                    
+                // Choix de la strategie
                 if (strategy == makespan_max) {
                     yahsp_set_optimize_makespan_max(); } 
                 else if (strategy == cost)  {
@@ -177,6 +173,9 @@ public:
 	            eo::log << eo::xdebug << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << std::endl;  
 	                
                 eo::log.flush();
+                
+                vectors[i][0] = daeYahspEval< EOT >::fitness_feasible(decompo);
+                vectors[i][1] = (this->*secondObjective)(decompo);
                 #endif 
                 if(i == 0)
                 {
@@ -254,29 +253,78 @@ public:
             eo::log.flush();
             #endif 
             
+            /*#ifndef NDEBUG
+            unsigned lx = 0;
+            unsigned ly = 0;
+            unsigned mx = 0;
+            unsigned my = 0;
+            for(unsigned i = 0; i < k; i++)
+            {
+                //std::cout << vectors[i][0] << " " << vectors[i][1] << std::endl;
+                if(vectors[i][0] < vectors[lx][0])
+                    lx = i;
+                if(vectors[i][0] > vectors[mx][0])
+                    mx = i;
+                if(vectors[i][1] < vectors[ly][1])
+                    ly = i;
+                if(vectors[i][1] > vectors[my][1])
+                    my = i;    
+            }
+            //std::cout << "Max / Min : " << " " << lx << " " << mx << " " << ly << " " << my << std::endl;
+            double r, cx, cy;
+            if(vectors[mx][0]-vectors[lx][0] > vectors[my][1]-vectors[ly][1])
+            {
+                r = (vectors[mx][0]-vectors[lx][0]) / 2;
+                cx = (vectors[mx][0]+vectors[lx][0]) / 2;
+                cy = (vectors[mx][1]+vectors[lx][1]) / 2;
+            }
+            else
+            {
+                r = (vectors[my][1]-vectors[ly][1]) / 2;
+                cx = (vectors[ly][0]+vectors[my][0]) / 2;
+                cy = (vectors[ly][1]+vectors[my][1]) / 2;
+            }    
+            // Circles
+            std::cerr << cx << " " << cy << " " << r << std::endl;
+            
+            // Points + ref + best
+            for(unsigned i = 0; i < k; i++)
+                std::cout << i << " " << vectors[i][0] << " " << vectors[i][1] << " " 
+                          << ref[0] << " " << ref[1] << " " 
+                          << bestObjVector[0] << " " << bestObjVector[1] << std::endl;
+            std::cout << std::endl << std::endl;
+            #endif */
+            
             decompo.objectiveVector(bestObjVector);
     	    decompo.fitness(bestObjVector[0]);
     	    decompo.plan_global(bestPlan);
     	    
     	    decompo.prevObjVector = bestObjVector;
     	    
-            daeYahspEval<EOT>::post_call(decompo);    
-    }
-    
-    virtual void operator()(EOT& decompo) 
-    {
-        if (decompo.invalid())
-        {
-            (this->*evalMethod)(decompo);
+            daeYahspEval<EOT>::post_call(decompo); 
+            
         }
+    }
+
+   /**
+    * computation of the cost
+    * @param _decompo the genotype to evaluate
+    */
+    double additive_cost(EOT & _decompo)
+    {
+        return _decompo.plan().cost_add();
+    }
+
+    double max_cost(EOT & _decompo)
+    {
+        return _decompo.plan().cost_max();
     }
                                 
     // Pointer towards the 2nd objective to optimize (tota cost / max cost)
     double (PlanningEval::*secondObjective)(EOT &);
-    
-    void (PlanningEval::*evalMethod)(EOT &);
      
-    std::vector<double> rates ;
+    unsigned nbEvaluations;
+    std::vector<double> rates;
 };
 
 //! Classe à utiliser lors de la première itération, pour estimer b_max
@@ -293,6 +341,7 @@ public:
         double fitness_weight = 10,
 	    double fitness_penalty = 1e6,
 	    bool _cost_max = false,
+	    unsigned _nbEvaluations = 1,
 	    unsigned int astar_weigth=3,
 	    bool _rand_seed = true,
 	    std::vector<double> _rates = std::vector<double>()):
@@ -303,6 +352,7 @@ public:
 	        fitness_weight, 
 	        fitness_penalty,
 	        _cost_max,
+	        _nbEvaluations,
 	        astar_weigth,
 	        _rand_seed,
 	        _rates
