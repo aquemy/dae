@@ -148,15 +148,8 @@ public:
                     strategy = (Objective)(i%NB_YAHSP_STRAT);
                     
                 // Choix de la strategie
-                if (strategy == makespan_max) {
-                    yahsp_set_optimize_makespan_max(); } 
-                else if (strategy == cost)  {
-                    yahsp_set_optimize_cost();  }
-	            else if (strategy == makespan_add)  {
-	                yahsp_set_optimize_makespan_add();  }
-	            else {
-	                yahsp_set_optimize_length();}
-                 
+                yahsp_set_optimize(strategy); 
+                
                 daeYahspEval<EOT>::pre_call(decompo);
                
                 // On résout selon l'objectif
