@@ -20,7 +20,7 @@ class Init : public eoInit<EOT> //Decomposition>
 public:
 
     // TODO autoriser les décomposition vides ? (_min_nb = 0 )
-    Init(const ChronoPartition & times, StrategyInit<EOT>& _stratInit, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1) :
+    Init(const ChronoPartition & times, StrategyInit& _stratInit, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1) :
         _times(times),
         stratInit(_stratInit),
         _min_nb(min_nb), 
@@ -99,6 +99,7 @@ public:
 
         // FIXME random_subset semble retourner tous les atomes existants, et pas un sous-ensemble
         Goal goal = random_subset(nomutex(_times.at(*idate)));
+        goal.strategy(stratInit.operator()<Goal>());
 /* Already checked at the beginning of an eval
 #ifndef NDEBUG
         eo::log << eo::xdebug << std::endl << "Check if atoms are no mutex...";
@@ -134,7 +135,7 @@ public:
     decompo.invalidate();
     
     // Set the strategy
-    decompo.strategy(stratInit());
+    decompo.strategy(stratInit.operator()<EOT>());
     
 } // 
 
@@ -145,7 +146,7 @@ protected:
 
     const ChronoPartition & _times;
     
-    StrategyInit<EOT> stratInit;
+    StrategyInit stratInit;
 
    // TODO faire des tests pour vérifier si doit etre à 0 ou à 1 par défaut
     const unsigned int _min_nb;

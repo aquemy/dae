@@ -111,11 +111,11 @@ int main (int argc, char *argv[])
     rates[cost] = parser.valueOf<double>("cost_weigth");
     rates[length] = parser.valueOf<double>("length_weigth");
     
-    StrategyInit<PlanningMOEO> stratInit(stratType, rates);
+    StrategyInit stratInit(stratType, rates);
 	
     daex::Init<PlanningMOEO> init(pddl.chronoPartitionAtom(), stratInit, l_max_init_coef, l_min);
     	
-  	eoGenOp<PlanningMOEO>& variator = do_make_op<PlanningMOEO> (parser, state, pddl);
+  	eoGenOp<PlanningMOEO>& variator = do_make_op<PlanningMOEO> (parser, state, pddl, stratInit);
   	 
   	/// definition of the archive
     moeoUnboundedArchive<PlanningMOEO > arch;

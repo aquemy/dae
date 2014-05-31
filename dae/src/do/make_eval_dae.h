@@ -115,7 +115,7 @@ void do_make_eval_mo_param(eoParser &parser)
  * @param eoState& _state  to store the memory
  */
 template <class EOT >
-eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop, daex::Init< EOT > & _init, StrategyInit<EOT>& _stratInit)
+eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop, daex::Init< EOT > & _init, StrategyInit& _stratInit)
 {
     unsigned int b_max_fixed = _parser.valueOf<unsigned int>("bmax-fixed");
     double b_max_last_weight = _parser.valueOf<double>("bmax-last-weight");
@@ -143,7 +143,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
     // End check paramters
 
     PlanningEvalInit< EOT > *eval_yahsp_init = new PlanningEvalInit< EOT >(
-        _stratInit(),
+        _stratInit.operator()< EOT >(),
         stratLevel,
         _pop.size(), 
         _init.l_max(), 
@@ -179,7 +179,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 	        goodguys=0;
 	        b_max_last = static_cast<unsigned int>(std::floor(b_max_in * b_max_last_weight));
 	        eval_yahsp = new PlanningEval< EOT >(
-	            _stratInit(),
+	            _stratInit.operator()< EOT >(),
 	            stratLevel,
 	            _init.l_max(), 
 	            b_max_in, 
@@ -225,7 +225,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 		assert( b_max_last > 0 );
 		// eval that uses the correct b_max
 		eval_yahsp = new PlanningEval< EOT >(
-		    _stratInit(),
+		    _stratInit.operator()< EOT >(),
 		    stratLevel,
 		    _init.l_max(), 
 		    b_max_in, 

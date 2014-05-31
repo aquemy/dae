@@ -52,7 +52,7 @@ void do_make_variation_param(eoParser &parser)
 }
 
 template <class EOT >
-eoGenOp< EOT >  &do_make_op (eoParser& _parser, eoState & _state, daex::pddlLoad & _pddl)
+eoGenOp< EOT >  &do_make_op (eoParser& _parser, eoState & _state, daex::pddlLoad & _pddl, StrategyInit& _stratInit)
 {
     // Crossovers 
     eoQuadOp< EOT > *ptQuad =  new daex::CrossOverTimeFilterHalf< EOT >;
@@ -106,7 +106,7 @@ eoGenOp< EOT >  &do_make_op (eoParser& _parser, eoState & _state, daex::pddlLoad
         
        
     // partition, radius, l_max
-     ptMon = new daex::MutationAddGoal< EOT >( _pddl.chronoPartitionAtom() ,radius /*,
+     ptMon = new daex::MutationAddGoal< EOT >( _pddl.chronoPartitionAtom(), _stratInit ,radius  /*,
      init.l_max()*/);
      
      _state.storeFunctor(ptMon); 
@@ -119,7 +119,7 @@ eoGenOp< EOT >  &do_make_op (eoParser& _parser, eoState & _state, daex::pddlLoad
       
       _state.storeFunctor(ptMon); 
       
-      ptCombinedMonOp  -> add(*ptMon, w_addatom); 
+      ptCombinedMonOp->add(*ptMon, w_addatom); 
       
       _state.storeFunctor(ptCombinedMonOp); 
      

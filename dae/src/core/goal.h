@@ -17,14 +17,34 @@ class Goal : public std::list<Atom*>
 public:
 
     Goal(TimeVal t) :
-        _earliest_start_time(t)
+        _earliest_start_time(t),
+        strat(NULL)
     {}
     
-    Goal operator=(const Goal& _o)
+    // FixMe : Ca fait segfault sans raison apparante. Du coup, fuite mémoire...
+    /*virtual ~Goal() 
     {
+        if(strat != NULL)
+            delete strat;
+    }   
+    
+    Goal (const Goal& other)
+    {
+        *this = other;
+    }*/
+  	
+    
+    Goal operator=(const Goal& other)
+    {
+        _earliest_start_time = other._earliest_start_time;
+        if (this != &other) {
+            if(other.strat != NULL)
+                strat = other.strat->clone(); // We need to clone the strategy
+        }
+        
         return *this;
     }
-    
+  
 
     TimeVal earliest_start_time(  ) const
     {
@@ -70,11 +90,25 @@ public:
 
         return it;
     }
+    
+    void strategy(Strategy<Goal>* _strat)
+    {
+        strat = _strat;
+    }
+    
+    Objective strategy()
+    {   
+        #ifndef NDEBUG
+        assert(strat != NULL);
+        #endif
+        return (*strat)(*this);
+    }
 
 protected:
 
     //! Earliest start time among all atoms
     TimeVal _earliest_start_time;
+    Strategy<Goal>* strat;
 
 };
 

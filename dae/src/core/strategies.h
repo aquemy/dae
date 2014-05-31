@@ -220,7 +220,7 @@ std::ostream& operator << (std::ostream& os, const AutoAdaptiveStrategy<EOT>& s)
     return s.printOn(os);
 }
 
-template <class EOT>
+
 class StrategyInit
 {
 public:
@@ -230,6 +230,7 @@ public:
         rates(_rates)
     {}
 
+    template <class EOT>
     Strategy<EOT>* operator()()
     {
         if(stratType == Greedy) {
