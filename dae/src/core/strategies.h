@@ -15,6 +15,12 @@ enum StrategyType
     Adaptive  
 };
 
+enum StrategyLevel
+{
+    Population,
+    Individual,
+    Gene
+};
 
 // Strategy class
 // Generic functor for strategy. It takes an object and return a objective to send to YAHSP.
@@ -31,6 +37,16 @@ public:
         current((Objective)0)
     {}
     
+    Strategy(const Strategy& _o)
+    {
+        *this = _o;
+    }
+    
+    virtual Strategy<EOT>* clone()
+    {
+        return new Strategy<EOT>(rates);
+    }
+    
     virtual ~Strategy()
     {}
     
@@ -40,6 +56,8 @@ public:
         
         return *this;
     }
+    
+    
     
     double operator[](Objective obj)
     {
@@ -92,6 +110,11 @@ public:
         Strategy<EOT>()
     {}
     
+    virtual GreedyStrategy<EOT>* clone()
+    {
+        return new GreedyStrategy<EOT>();
+    }
+    
     virtual ~GreedyStrategy()
     {}
     
@@ -120,6 +143,13 @@ public:
         Strategy<EOT>(_rates)
     { Strategy<EOT>::current = (Objective)rng.roulette_wheel(_rates); }
     
+    virtual AutoAdaptiveStrategy<EOT>* clone()
+    {
+        AutoAdaptiveStrategy<EOT>* p = new AutoAdaptiveStrategy<EOT>(Strategy<EOT>::rates);
+        p->Strategy<EOT>::current = Strategy<EOT>::current;
+        return p;
+    }
+    
     virtual ~AutoAdaptiveStrategy()
     {}
     
@@ -147,6 +177,11 @@ public:
     AdaptiveStrategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1)) :
         Strategy<EOT>(_rates)
     {}
+    
+    virtual AdaptiveStrategy<EOT>* clone()
+    {
+        return new AdaptiveStrategy<EOT>(Strategy<EOT>::rates);
+    }
     
     virtual ~AdaptiveStrategy()
     {}
@@ -197,14 +232,14 @@ public:
 
     Strategy<EOT>* operator()()
     {
-        if(stratType == Static) {
-            return new Strategy<EOT>(rates); }
-        else if(stratType == Greedy) {
+        if(stratType == Greedy) {
             return new GreedyStrategy<EOT>(); }
         else if(stratType == Adaptive) {
             return new AdaptiveStrategy<EOT>(rates); }
         else if(stratType == AutoAdaptive){
             return new AutoAdaptiveStrategy<EOT>(rates); }
+        else
+            return new Strategy<EOT>(rates);
     }
     
 protected:

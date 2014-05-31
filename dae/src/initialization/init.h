@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "core/decomposition.h"
+#include "core/planning.h"
 #include "utils/pddl_load.h"
 #include "utils/utils.h"
 #include <iomanip>
@@ -12,15 +13,16 @@
 
 namespace daex {
 
-template<class EOT = daex::Decomposition>
+template<class EOT>
 class Init : public eoInit<EOT> //Decomposition>
 {
 
 public:
 
     // TODO autoriser les décomposition vides ? (_min_nb = 0 )
-    Init(const ChronoPartition & times, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1) :
-        _times(times), 
+    Init(const ChronoPartition & times, StrategyInit<EOT>& _stratInit, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1) :
+        _times(times),
+        stratInit(_stratInit),
         _min_nb(min_nb), 
         _l_max_init_coef(l_max_init_coef), 
         _l_max(20)
@@ -131,6 +133,9 @@ public:
     } // for idate in t_candidates
     decompo.invalidate();
     
+    // Set the strategy
+    decompo.strategy(stratInit());
+    
 } // 
 
     void l_max( unsigned int l ) { _l_max = l; }
@@ -139,6 +144,8 @@ public:
 protected:
 
     const ChronoPartition & _times;
+    
+    StrategyInit<EOT> stratInit;
 
    // TODO faire des tests pour vérifier si doit etre à 0 ou à 1 par défaut
     const unsigned int _min_nb;

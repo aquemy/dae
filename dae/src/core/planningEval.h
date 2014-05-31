@@ -21,6 +21,7 @@ public:
 
     PlanningEval (
         Strategy<EOT>* _strategy,
+        StrategyLevel _stratLevel,
         unsigned int l_max_ = 20,
 		unsigned int b_max_in = 10, 
 		unsigned int b_max_last = 30,
@@ -40,7 +41,8 @@ public:
             _rand_seed
        ),
        nbEvaluations(_nbEvaluations),
-       strategy(_strategy)
+       strategy(_strategy),
+       stratLevel(_stratLevel)
     {
         if (!_cost_max)
        		secondObjective = &PlanningEval::additive_cost;
@@ -53,13 +55,15 @@ public:
     
     virtual ~PlanningEval() 
     { 
-        delete strategy; 
+        if(strategy != NULL)
+            delete strategy;
     };
 
     virtual void operator()(EOT& decompo) 
     {
         if (decompo.invalid())
         {
+            
             std::vector<PlanningObjectiveVector> objvectors(NB_YAHSP_STRAT);
             std::vector<PlanningState> stats(NB_YAHSP_STRAT);
             
@@ -76,10 +80,13 @@ public:
             Objective objective;
             for(unsigned i = 0; i < nbEvaluations; i++)
             {
-                objective = (*strategy)(decompo);
-                    
-                // Choix de la strategie
-                yahsp_set_optimize(objective); 
+                
+                if(stratLevel == Population)
+                     objective = (*strategy)(decompo);
+                else if(stratLevel == Individual)
+                     objective = decompo.strategy();
+                     
+                yahsp_set_optimize(objective);
                 
                 daeYahspEval<EOT>::pre_call(decompo);
                
@@ -249,6 +256,7 @@ public:
      
     unsigned nbEvaluations;
     Strategy<EOT>* strategy;
+    StrategyLevel stratLevel;
 };
 
 //! Classe à utiliser lors de la première itération, pour estimer b_max
@@ -259,6 +267,7 @@ public:
 
     PlanningEvalInit(
         Strategy<EOT>* _strategy,
+        StrategyLevel _stratLevel,
         unsigned int pop_size, 
         unsigned int l_max, 
         unsigned int b_max_in = 10000, 
@@ -271,6 +280,7 @@ public:
 	    bool _rand_seed = true):
 	    PlanningEval<EOT >(
 	        _strategy,
+	        _stratLevel,
 	        l_max,
 	        b_max_in, 
 	        b_max_last, 

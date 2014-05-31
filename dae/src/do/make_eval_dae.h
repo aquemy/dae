@@ -50,23 +50,7 @@ void do_make_eval_param(eoParser &parser)
     double b_max_last_weight = parser.createParam( (double)3, "bmax-last-weight",
         "Weighting for the b_max used during the last search towards the end goal (must be strictly positive)", 'T', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_last_weight" << b_max_last_weight << std::endl;
- 
-    double length_weigth = parser.createParam( (double)1, "length_weigth",
-        "Weighting for the optimizing length during the search", 'H', "Evaluation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "length_weigth" << length_weigth << std::endl;
-
-    double cost_weigth = parser.createParam( (double)1, "cost_weigth",
-        "Weighting for the optimizing cost during the search", 'U', "Evaluation").value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "cost_weigth" << cost_weigth << std::endl;	 
-    	
-    double makespan_max_weigth = parser.createParam( (double)1, "makespan_max_weigth",
-        "Weighting for the optimizing makespan_max during the search", 'Y', "Evaluation").value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "makespan_max_weigth" << makespan_max_weigth << std::endl;	
- 	 	
-    double makespan_add_weigth = parser.createParam((double)1,"makespan_add_weigth",
-         "Weighting for the optimizing  makespan_add during the search", 'V', "Evaluation").value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "makespan_add_weigth" << makespan_add_weigth << std::endl;
-	 
+  
     bool rand_yahsp_seed = parser.createParam((bool)true,"rand_yahsp_seed",
          "Random initilaization of yahsp at each optimization (default : true)", 'X', "Evaluation").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "rand_yahsp_seed" << rand_yahsp_seed << std::endl;
@@ -87,21 +71,42 @@ void do_make_eval_param(eoParser &parser)
 */
 void do_make_eval_mo_param(eoParser &parser)
 {
+
     double astar_weight = parser.createParam((double)1, "astar-weight", // FIXME default value??
-        "A* weight within YAHSP", 'H', "Evaluation" ).value();
+        "A* weight within YAHSP", 'H', "Multi-Objective" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "astar-weight" << astar_weight << std::endl;
 
     bool cost_max = parser.createParam( (bool)false, "cost-max",
         "Use max cost instead of additive costs as the second objective", 'M', "Multi-Objective" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "cost-max" << cost_max << std::endl;
     
+    StrategyLevel stratLevel = (StrategyLevel)parser.createParam((unsigned)0, "strat-level",
+        "Strategy level (0: Population, 1: Individual, 2:Gene)", 'l', "Multi-Objective" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "strat-level" << stratLevel << std::endl;
+    
     StrategyType stratType = (StrategyType)parser.createParam((unsigned)0,"strat-eval",
-         "Evaluation strategy (0 : Static, 1 : Greedy, 2 : Adaptive, 3 : AutoAdaptive)", 'g', "Multi-Objective").value();
+         "Evaluation strategy (0: Static, 1: Greedy, 2: SelfAdaptive, 3: Adaptive)", 'g', "Multi-Objective").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "strat-eval" << stratType << std::endl;
     
     unsigned nbEval = parser.createParam((unsigned)1,"nb-eval",
          "Number of calls to YAHSP before assigning fitness.", 'e', "Multi-Objective").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "nb-eval" << nbEval << std::endl;
+    
+    double length_weigth = parser.createParam( (double)1, "length_weigth",
+        "Weighting for the optimizing length during the search", 'H', "Multi-Objective" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "length_weigth" << length_weigth << std::endl;
+
+    double cost_weigth = parser.createParam( (double)1, "cost_weigth",
+        "Weighting for the optimizing cost during the search", 'U', "Multi-Objective").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "cost_weigth" << cost_weigth << std::endl;	 
+    	
+    double makespan_max_weigth = parser.createParam( (double)1, "makespan_max_weigth",
+        "Weighting for the optimizing makespan_max during the search", 'Y', "Multi-Objective").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "makespan_max_weigth" << makespan_max_weigth << std::endl;	
+ 	 	
+    double makespan_add_weigth = parser.createParam((double)1,"makespan_add_weigth",
+         "Weighting for the optimizing  makespan_add during the search", 'V', "Multi-Objective").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "makespan_add_weigth" << makespan_add_weigth << std::endl;
 }
 
 /*
@@ -110,7 +115,7 @@ void do_make_eval_mo_param(eoParser &parser)
  * @param eoState& _state  to store the memory
  */
 template <class EOT >
-eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop, daex::Init< EOT > & _init)
+eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop, daex::Init< EOT > & _init, StrategyInit<EOT>& _stratInit)
 {
     unsigned int b_max_fixed = _parser.valueOf<unsigned int>("bmax-fixed");
     double b_max_last_weight = _parser.valueOf<double>("bmax-last-weight");
@@ -120,22 +125,13 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 	bool rand_seed = _parser.valueOf<bool>("rand_yahsp_seed");
 
   	bool cost_max = _parser.valueOf<bool>("cost-max");
-  	StrategyType stratType = (StrategyType)_parser.valueOf<unsigned>("strat-eval");
+  	StrategyLevel stratLevel = (StrategyLevel)_parser.valueOf<unsigned>("strat-level");
   	unsigned nbEval = _parser.valueOf<unsigned>("nb-eval");
   	
 	unsigned int b_max_init = _parser.valueOf<unsigned int>("bmax-init"); 
     unsigned int fitness_weight = _parser.valueOf<unsigned int>("fitness-weight");
     unsigned int fitness_penalty = _parser.valueOf<unsigned int>("fitness-penalty");
     
-    std::vector<double> rates;
-
-    rates.resize(NB_YAHSP_STRAT);
-    rates[makespan_max] = _parser.valueOf<double>("makespan_max_weigth");
-    rates[makespan_add] = _parser.valueOf<double>("makespan_add_weigth");
-    rates[cost] = _parser.valueOf<double>("cost_weigth");
-    rates[length] = _parser.valueOf<double>("length_weigth");
-    
-    StrategyInit<EOT> stratInit(stratType, rates);
     
     // Check parameters
     if( b_max_last_weight <= 0 ) 
@@ -147,7 +143,8 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
     // End check paramters
 
     PlanningEvalInit< EOT > *eval_yahsp_init = new PlanningEvalInit< EOT >(
-        stratInit(),
+        _stratInit(),
+        stratLevel,
         _pop.size(), 
         _init.l_max(), 
         b_max_init, 
@@ -182,7 +179,8 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 	        goodguys=0;
 	        b_max_last = static_cast<unsigned int>(std::floor(b_max_in * b_max_last_weight));
 	        eval_yahsp = new PlanningEval< EOT >(
-	            stratInit(),
+	            _stratInit(),
+	            stratLevel,
 	            _init.l_max(), 
 	            b_max_in, 
 	            b_max_last, 
@@ -227,7 +225,8 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 		assert( b_max_last > 0 );
 		// eval that uses the correct b_max
 		eval_yahsp = new PlanningEval< EOT >(
-		    stratInit(),
+		    _stratInit(),
+		    stratLevel,
 		    _init.l_max(), 
 		    b_max_in, 
 		    b_max_last, 

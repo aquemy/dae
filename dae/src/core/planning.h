@@ -35,15 +35,25 @@ public:
         BaseT(), 
         daex::Decomposition(),
         prevState(Unfeasible),
-        st(Unfeasible)
+        st(Unfeasible),
+        strat(NULL)
     {}
      
-    virtual ~Planning() {}   
+    virtual ~Planning() 
+    {
+        if(strat != NULL)
+            delete strat;
+    }   
       
     std::string className() const 
     { 
         return "Planning";
     } 
+    
+    Planning (const Planning& other)
+    {
+        *this = other;
+    }
   	
     Planning & operator=(const Planning & other)
     {
@@ -51,6 +61,9 @@ public:
              BaseT::operator=(other);
              Decomposition::operator=(other);
              
+             if(other.strat != NULL)
+                strat = other.strat->clone(); // We need to clone the strategy
+                
              prevObjVector = other.prevObjVector;
              prevState = other.prevState;
              
@@ -82,7 +95,6 @@ public:
        Decomposition::readFrom(_is);
     }
 
-  
     void state(PlanningState _state)
     {
 	    st = _state;
@@ -98,6 +110,19 @@ public:
         return BaseT::operator<(_moeo);
     }
     
+    void strategy(Strategy<Planning<BaseT > >*_strat)
+    {
+        strat = _strat;
+    }
+    
+    Objective strategy()
+    {   
+        #ifndef NDEBUG
+        assert(strat != NULL);
+        #endif
+        return (*strat)(*this);
+    }
+    
 
 public : // TODO : A passer en protected 
 
@@ -107,7 +132,7 @@ public : // TODO : A passer en protected
 protected:
    
     PlanningState st;
-
+    Strategy<Planning<BaseT > >* strat;
 };
 
 /**

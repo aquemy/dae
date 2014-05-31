@@ -102,9 +102,18 @@ int main (int argc, char *argv[])
     unsigned int l_max_init_coef = parser.valueOf<unsigned int>("lmax-initcoef");
     unsigned int l_min = parser.valueOf<unsigned int>("lmin");
 
-	//StrategyInitStatic stratInit(rates);
+    StrategyType stratType = (StrategyType)parser.valueOf<unsigned>("strat-eval");
+	std::vector<double> rates;
+
+    rates.resize(NB_YAHSP_STRAT);
+    rates[makespan_max] = parser.valueOf<double>("makespan_max_weigth");
+    rates[makespan_add] = parser.valueOf<double>("makespan_add_weigth");
+    rates[cost] = parser.valueOf<double>("cost_weigth");
+    rates[length] = parser.valueOf<double>("length_weigth");
+    
+    StrategyInit<PlanningMOEO> stratInit(stratType, rates);
 	
-    daex::Init<PlanningMOEO > init(pddl.chronoPartitionAtom(), l_max_init_coef, l_min);
+    daex::Init<PlanningMOEO> init(pddl.chronoPartitionAtom(), stratInit, l_max_init_coef, l_min);
     	
   	eoGenOp<PlanningMOEO>& variator = do_make_op<PlanningMOEO> (parser, state, pddl);
   	 
@@ -115,7 +124,7 @@ int main (int argc, char *argv[])
     eoPop<PlanningMOEO >& pop = do_make_pop(parser, state, init);
      
     // The fitness evaluation
-    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval_mo(parser, state, pop, init);
+    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval_mo(parser, state, pop, init, stratInit);
         
     /// stopping criteria
     eoContinue<PlanningMOEO >& continuator= do_make_continue_daemoeo(parser, state, eval_yahsp_moeo,arch);
