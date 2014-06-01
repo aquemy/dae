@@ -57,18 +57,21 @@ void bindDaeYahsp(daex::pddlLoad & pddl);
 
 
 //! Évaluateur principal, à utiliser pour les itérations normales
-template<class EOT = daex::Decomposition >
+template<class EOT>
 class daeYahspEval : public daeCptYahspEval<EOT>
 {
 public:
 
-    daeYahspEval(unsigned int l_max_ = 20, 
+    daeYahspEval(
+            daex::StrategyLevel _stratLevel,
+            unsigned int l_max_ = 20, 
             unsigned int b_max_in = 10, 
             unsigned int b_max_last = 30, 
             double fitness_weight = 10, 
             double fitness_penalty = 1e6,
-            bool _rand_seed = true):
+            bool _rand_seed = true) :
         daeCptYahspEval<EOT>(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty ),
+        stratLevel(_stratLevel),
         rand_seed(_rand_seed)//,
         //_previous_state( NULL ) //, _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
     {
@@ -163,33 +166,37 @@ public:
                     iend = decompo.end(); 
                     igoal != iend; ++igoal) 
                 {
-                    #ifndef NDEBUG
-                    eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
-                    eo::log.flush();
-                    #endif
                     
-                    /*// Choix de l'objectif à optimiser si l'on a une strategie au niveau des Goals
-                    if(level == "Goal")
+                    
+                    // Choix de l'objectif à optimiser si l'on a une strategie au niveau des Goals
+                    using namespace daex;
+                    if(stratLevel == Gene)
                     {
-                        using namespace daex;
-                        Objective strategy = igoal->objective();
-                        //std::cerr << "LevelGoal Obj : ";
-                        if (strategy == makespan_max) {
-                           //std::cerr << "Makespan Max" << std::endl;
-                            yahsp_set_optimize_makespan_max(); } 
-                        else if (strategy == cost)  {
-                            //std::cerr << "Cost" << std::endl;
-                            yahsp_set_optimize_cost();  }
-	                    else if (strategy == makespan_add)  {
-                            //std::cerr << "Makespan Add" << std::endl;
-	                        yahsp_set_optimize_makespan_add();  }
-	                    else {
-                            //std::cerr << "Makespan Length" << std::endl;
-	                        yahsp_set_optimize_length();}
-                        
+                        Objective objective = igoal->strategy();
+                        #ifndef NDEBUG
+
+                        if (objective == makespan_max)
+                            eo::log << eo::xdebug << "optimize makespan_max" << std::endl;
+                        else if (objective == cost)
+                            eo::log << eo::xdebug << "optimize cost" << std::endl;
+	                    else if (objective == makespan_add) 
+	                        eo::log << eo::xdebug << "optimize makespan_add" << std::endl;
+	                    else 
+	                        eo::log << eo::xdebug << "optimize length" << std::endl;
+                        	                    
+                        eo::log.flush();
+                        #endif 
+                        yahsp_set_optimize(objective);
+                       
                         // TODO : Réinitialiser yashp ?
-                        yahsp_set_seed(rng.rand());
-                    }*/
+                        if(rand_seed)
+                            yahsp_set_seed(rng.rand());
+                            
+                        #ifndef NDEBUG
+                        eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
+                        eo::log.flush();
+                        #endif
+                    }
                     
                     // copie des goals daex dans leur equivant YAHSP
                     // nouvelle allocation de tableau de goal
@@ -393,6 +400,7 @@ protected:
     /* Fluent * * _intermediate_goal_state; */
     /* unsigned int _intermediate_goal_state_nb; */
     
+    daex::StrategyLevel stratLevel;
     bool rand_seed; // flag for the random initialization of yashp at each call
 };
 
@@ -404,13 +412,14 @@ class daeYahspEvalInit : public daeYahspEval<EOT>
 public:
 
     daeYahspEvalInit( 
+            daex::StrategyLevel _stratLevel,
             unsigned int pop_size, 
             unsigned int l_max, 
             unsigned int b_max_in = 10000, 
             unsigned int b_max_last = 30000, 
             double fitness_weight = 10,
-	    double fitness_penalty = 1e6) : 
-	        daeYahspEval<EOT>( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty) 
+	        double fitness_penalty = 1e6) : 
+	            daeYahspEval<EOT>(_stratLevel, l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty) 
     {
         node_numbers.reserve( pop_size * l_max );
     }

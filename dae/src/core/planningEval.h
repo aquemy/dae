@@ -33,6 +33,7 @@ public:
 		bool _rand_seed = true
     ):
         daeYahspEval< EOT >(
+            _stratLevel,
             l_max_,
             b_max_in, 
             b_max_last, 
@@ -93,21 +94,26 @@ public:
                 // On résout selon l'objectif
                 daeYahspEval<EOT>::call(decompo);
                 #ifndef NDEBUG
-                if (objective == makespan_max)
-                    eo::log << eo::xdebug << "makespan_max :";
-                else if (objective == cost)
-                    eo::log << eo::xdebug << "cost :";
-	            else if (objective == makespan_add) 
-	                eo::log << eo::xdebug << "makespan_add :";
-	            else 
-	                eo::log << eo::xdebug << "length :";
-	            eo::log << eo::xdebug << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << std::endl;  
+                if(stratLevel != Gene)
+                {
+                    if (objective == makespan_max)
+                        eo::log << eo::xdebug << "makespan_max : ";
+                    else if (objective == cost)
+                        eo::log << eo::xdebug << "cost : ";
+	                else if (objective == makespan_add) 
+	                    eo::log << eo::xdebug << "makespan_add : ";
+	                else 
+	                    eo::log << eo::xdebug << "length : ";
 	                
+                }
+                eo::log << eo::xdebug << daeYahspEval< EOT >::fitness_feasible(decompo) << " " << (this->*secondObjective)(decompo) << std::endl;  
+	                    
                 eo::log.flush();
                 
                 vectors[i][0] = daeYahspEval< EOT >::fitness_feasible(decompo);
                 vectors[i][1] = (this->*secondObjective)(decompo);
                 #endif 
+                
                 if(i == 0)
                 {
                     bestState = decompo.state();

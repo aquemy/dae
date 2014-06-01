@@ -69,7 +69,7 @@ public:
         // Préconditions & invariants (serialisation, assertions...)
         current = _choice(o);
         _update(o, current);
-        //_mutation(o, current);
+        
         // Post condition
       
         return current;
@@ -139,12 +139,21 @@ class AutoAdaptiveStrategy : public Strategy<EOT>
 {
 public:
 
-    AutoAdaptiveStrategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1)) :
-        Strategy<EOT>(_rates)
+    AutoAdaptiveStrategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1), double _mutRate = 0.1) :
+        Strategy<EOT>(_rates),
+        mutRate(_mutRate)
     { Strategy<EOT>::current = (Objective)rng.roulette_wheel(_rates); }
     
     virtual AutoAdaptiveStrategy<EOT>* clone()
     {
+        double r = rng.uniform(0,1);
+        if(r < mutRate)
+        {
+            
+            unsigned pos = rng.uniform(0,NB_YAHSP_STRAT);
+                Strategy<EOT>::current = (Objective)pos;
+        }
+
         AutoAdaptiveStrategy<EOT>* p = new AutoAdaptiveStrategy<EOT>(Strategy<EOT>::rates);
         p->Strategy<EOT>::current = Strategy<EOT>::current;
         return p;
@@ -165,6 +174,10 @@ private:
         (void)o;
         return Strategy<EOT>::current;
     }
+
+protected:
+   
+    double mutRate;
             
 };
 
