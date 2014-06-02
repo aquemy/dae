@@ -96,11 +96,11 @@ public:
             
             PlanningObjectiveVector bestObjVector;
             PlanningObjectiveVector currentObjVector;
+            PlanningObjectiveVector ref = decompo.prevObjVector;
             PlanningState bestState;
             daex::Plan bestPlan;
                 
             #ifndef NDEBUG
-            PlanningObjectiveVector ref = decompo.prevObjVector;
             std::vector<PlanningObjectiveVector> vectors(nbEvaluations);
             #endif
             
@@ -142,69 +142,26 @@ public:
                 #endif 
                 
                 currentObjVector = setObjectiveVector(decompo);
-               
-                // TODO : Sortir les indicateurs
-                // Amélioration absolue par rapport au précédent vecteur (attention à inverser l'inégalité plus bas)
-                /*double f1 = (decompo.prevObjVector[0] - bestObjVector[0]) 
-                    + (decompo.prevObjVector[1] - bestObjVector[1]);
-                double f2 = (decompo.prevObjVector[0] - daeYahspEval< EOT >::fitness_feasible(decompo)) 
-                    + (decompo.prevObjVector[1] - (this->*secondObjective)(decompo));*/
-                        
-                /*// Norme 1
-                double f1 = bestObjVector[0] + bestObjVector[1];
-                double f2 = daeYahspEval< EOT >::fitness_feasible(decompo) + (this->*secondObjective)(decompo);*/
-                /*
-                double f1 = bestObjVector[0]*bestObjVector[1];
-                if(!(decompo.prevObjVector[0] < bestObjVector[0] 
-                    && decompo.prevObjVector[1] < bestObjVector[1]))
-                    f1 -= (decompo.prevObjVector[0] - bestObjVector[0]) 
-                        + (decompo.prevObjVector[1] - bestObjVector[1]);
-                        
-                double f2 = currentObjVector[0]*currentObjVector[1];
-                if(!(decompo.prevObjVector[0] < currentObjVector[0] 
-                    && decompo.prevObjVector[1] < currentObjVector[1]))
-                    f2 -= (decompo.prevObjVector[0] - currentObjVector[0]) 
-                        + (decompo.prevObjVector[1] - currentObjVector[0]);
-                */
+                double f1 = deltaPlus(currentObjVector, ref);
+                double f2 = deltaPlus(bestObjVector, ref);
                 
-                double r1 = decompo.prevObjVector[0];
-                double r2 = decompo.prevObjVector[1];
-                double x1 = bestObjVector[0];
-                double x2 = bestObjVector[1];
-                double y1 = currentObjVector[0];
-                double y2 = currentObjVector[1];
-                
-                double theta1 = (x1 - r1) + (x2 - r2);
-                double f1 = x1*x2;
-                if(theta1 < 0)
-                {
-                    f1 -=  (std::abs(x1 - r1)*std::abs(x2 - r2)*(theta1) );
-                }
-                
-                double theta2 = (y1 - r1) + (y2 - r2);
-                double f2 = y1*y2;
-                if(theta2 < 0)
-                {
-                    f2 -=  (std::abs(y1 - r1)*std::abs(y2 - r2) );    
-                }
-                
-                
-                if(i == 0 || f2 < f1)
+                double indicator = f2;
+                if(i == 0 || f1 < f2)
                 {
                     bestPlan = decompo.plan();
                     bestObjVector = currentObjVector;
+                    indicator = f1;
                 }
-                
                 
                 // Update the strategy according to this evaluation
                 //decompo.objectiveVector(currentObjVector); // TODO : Fix me ! lorsque l'on assigne le vecteur, le résultat d'un appel à YAHSP est toujours le même. Du coup on peut pas updater la strategy (problematique pour une strat adaptative)
         	    if(stratLevel == Population)
-                    strategy->update(decompo);
+                    strategy->update(indicator);
                 else if(stratLevel == Individual)
-                    decompo.strategyUpdate();
+                    decompo.strategyUpdate(indicator);
                 else if(stratLevel == Gene)
                     for(daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal) 
-                        igoal->strategyUpdate(decompo);
+                        igoal->strategyUpdate(indicator);
                 
             }
             #ifndef NDEBUG
@@ -255,7 +212,6 @@ public:
             #endif */
             
             decompo.objectiveVector(bestObjVector);
-    	    //decompo.fitness(bestObjVector[0]);
     	    decompo.plan_global(bestPlan);
     	    
     	    decompo.prevObjVector = bestObjVector;

@@ -123,12 +123,12 @@ public:
         return (*strat)(*this);
     }
     
-    void strategyUpdate()
+    void strategyUpdate(double indicator)
     {
         #ifndef NDEBUG
         assert(strat != NULL);
         #endif
-        strat->update(*this);
+        strat->update(indicator);
     }
     
 

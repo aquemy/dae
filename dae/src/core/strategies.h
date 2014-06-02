@@ -81,9 +81,9 @@ public:
         return current;
     }
     
-    virtual void update(IndiMOEO& o) 
+    virtual void update(double indicator) 
     { 
-        (void)o; 
+        (void)indicator; 
     }
     
     virtual std::ostream& printOn(std::ostream& os) const
@@ -288,12 +288,12 @@ public:
     virtual ~AdaptiveStrategy()
     {}
     
-    virtual void update(IndiMOEO& o)
+    virtual void update(double indicator)
     {
         #ifndef NDEBUG
         eo::log << eo::xdebug << "update adaptive strategy" << std::endl;
         #endif 
-        double indicator = deltaPlus(o);
+        
         /*std::cerr << "Update strategy n°" << nbAppel << std::endl;
         std::cerr << "- Update information : " << std::endl;
         std::cerr << ":::: Indicator : " << indicator << std::endl;
@@ -306,11 +306,11 @@ public:
             std::cerr << std::endl;
         }
         std::cerr << std::endl;*/
-        if(indicator > 0)
+        /*if(indicator > 0)
         {
             positiveChoices[Strategy<EOT>::current]++;
             indicatorsSerie[Strategy<EOT>::current].push_back(indicator);
-        }
+        }*/
         
         {
             //std::cerr << "- Quality assessment : ";

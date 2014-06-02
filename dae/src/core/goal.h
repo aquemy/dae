@@ -104,13 +104,12 @@ public:
         return (*strat)(*this);
     }
     
-    template <class EOT>
-    void strategyUpdate(EOT& o)
+    void strategyUpdate(double indicator)
     {   
         #ifndef NDEBUG
         assert(strat != NULL);
         #endif
-        return strat->update(o);
+        return strat->update(indicator);
     }
 
 protected:
