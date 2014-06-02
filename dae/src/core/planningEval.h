@@ -145,23 +145,20 @@ public:
                 double f1 = deltaPlus(currentObjVector, ref);
                 double f2 = deltaPlus(bestObjVector, ref);
                 
-                double indicator = f2;
                 if(i == 0 || f1 < f2)
                 {
                     bestPlan = decompo.plan();
                     bestObjVector = currentObjVector;
-                    indicator = f1;
                 }
                 
                 // Update the strategy according to this evaluation
-                //decompo.objectiveVector(currentObjVector); // TODO : Fix me ! lorsque l'on assigne le vecteur, le résultat d'un appel à YAHSP est toujours le même. Du coup on peut pas updater la strategy (problematique pour une strat adaptative)
         	    if(stratLevel == Population)
-                    strategy->update(indicator);
+                    strategy->update(-f1);
                 else if(stratLevel == Individual)
-                    decompo.strategyUpdate(indicator);
+                    decompo.strategyUpdate(-f1);
                 else if(stratLevel == Gene)
                     for(daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal) 
-                        igoal->strategyUpdate(indicator);
+                        igoal->strategyUpdate(-f1);
                 
             }
             #ifndef NDEBUG

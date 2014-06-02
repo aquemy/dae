@@ -181,7 +181,7 @@ public:
 
 private:
 
-    virtual void _mutation() 
+    virtual void _mutation() // TODO : put the rate in the interface
     { 
         // Static mutation for SelfAdaptive mutation
         double r = rng.uniform(0,1);
@@ -209,14 +209,13 @@ protected:
             
 };
 
-
 template <class EOT>
 class AdaptiveStrategy : public Strategy<EOT>
 {
 public:
 
-    AdaptiveStrategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1),
-             int updateRate = 1,
+    AdaptiveStrategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1./NB_YAHSP_STRAT),
+             int updateRate = 10,
              bool _efficiencyEstimation = false,
              double _pmin = 0.05,
              double _delta = 0.15, 
@@ -237,8 +236,8 @@ public:
         maxM(0),
         delta(_delta),
         epsilon(_epsilon),
-        it(1)
-    {}
+        it(0)
+    { Strategy<EOT>::rates = std::vector<double>(NB_YAHSP_STRAT,1./NB_YAHSP_STRAT); }
     
     AdaptiveStrategy(const AdaptiveStrategy& _o)
     {
@@ -292,28 +291,52 @@ public:
     {
         #ifndef NDEBUG
         eo::log << eo::xdebug << "update adaptive strategy" << std::endl;
-        #endif 
+        #endif
         
-        /*std::cerr << "Update strategy n°" << nbAppel << std::endl;
+        indicatorsSerie[Strategy<EOT>::current].push_back(indicator);
+        cycleChoices[Strategy<EOT>::current]++;
+        nbChoices[Strategy<EOT>::current]++;
+        it++;
+        nbAppel++;
+        
+        /*std::cerr << "Update strategy n°" << nbAppel << " ( " << it << ")" << std::endl;
         std::cerr << "- Update information : " << std::endl;
         std::cerr << ":::: Indicator : " << indicator << std::endl;
-        std::cerr << ":::: Objective : " << current << std::endl;
-        
-        for(unsigned j = 0; j < indicatorsSerie.size(); j++)
+        std::cerr << ":::: Objective : " << Strategy<EOT>::current << std::endl;
+        std::cerr << ":::: Indicator Serie : " << std::endl;*/
+        /*for(unsigned j = 0; j < indicatorsSerie.size(); j++)
         {
             for(unsigned i = 0; i < indicatorsSerie[j].size(); i++)
                 std::cerr << indicatorsSerie[j][i] << " -> ";
             std::cerr << std::endl;
-        }
-        std::cerr << std::endl;*/
-        /*if(indicator > 0)
+        }*/
+        /*if(indicator > 0) // TODO : Comment définir un choix positif pour l'estimation de l'efficacité ?
         {
             positiveChoices[Strategy<EOT>::current]++;
-            indicatorsSerie[Strategy<EOT>::current].push_back(indicator);
+            
         }*/
+        // Adds the current indicator and increments the choice and iteration
         
+        
+        if(it >= updateDistribRate)
         {
-            //std::cerr << "- Quality assessment : ";
+            it = 0;
+            /*std::cerr << "Efficiency : ";
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                std::cerr  << efficiency(Objective(i), nbChoices, positiveChoices) << " ";
+            std::cerr << std::endl;
+            std::cerr << "NbChoices : ";
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                std::cerr << nbChoices[i] << " ";
+            std::cerr << std::endl;
+            std::cerr << "CycleChoices : ";
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                std::cerr << cycleChoices[i] << " ";
+            std::cerr << std::endl;
+            std::cerr << "- Quality assessment : " << std::endl;*/
+            
+            averageQuality(quality, indicatorsSerie, cycleChoices, nbChoices, positiveChoices);
+            
             
             // Exponential recency-weighted average
             //quality[current] = indicator + 0.7*(sumRewards[current] - indicator);
@@ -323,24 +346,24 @@ public:
             //quality[current] += indicator;
             
             // Moyenne
-            quality[Strategy<EOT>::current] = ((nbChoices[Strategy<EOT>::current]-1)*quality[Strategy<EOT>::current]+indicator)/nbChoices[Strategy<EOT>::current];     
+            //quality[Strategy<EOT>::current] = ((nbChoices[Strategy<EOT>::current]-1)*quality[Strategy<EOT>::current]+indicator)/nbChoices[Strategy<EOT>::current];     
               
             // Extreme value
             //quality[current] = std::max(quality[current], indicator);
             
-            
+            //std::cerr << "- Select new parameters : " << std::endl;
+            adaptivePursuit(quality, Strategy<EOT>::rates);
+            //probabilityMatching(quality, Strategy<EOT>::rates);
             
             // Clear information
-            /*for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
             {
                 indicatorsSerie[i].clear();
                 cycleChoices[i] = 0;
-            }*/
-            //std::cerr << "- Select new parameters : ";
-            adaptivePursuit(quality, Strategy<EOT>::rates);
-            //probabilityMatching(quality, distribution);
+            }
             
-            //std::cerr << "Jump detection : ";
+            
+            //std::cerr << "- Jump detection : " << std::endl;
             if(jump(quality))
             {
                 //std::cerr << "Jump detected ! Reset strategy." << std::endl;
@@ -367,9 +390,7 @@ public:
     double efficiency(Objective obj, const std::vector<int>& nbChoices, const std::vector<int>& positiveChoices)
     {
         //std::cerr << "( p : " << positiveChoice[obj] << " | n : " << nbChoices[obj] << ")"; 
-        if(!efficiencyEstimation)
-            return 1;
-        if(nbChoices[obj] == 0)
+        if(!efficiencyEstimation or nbChoices[obj] == 0)
             return 1;
         return ((double) positiveChoices[obj]) / nbChoices[obj];
     }
@@ -381,23 +402,10 @@ public:
                     const std::vector<int>& positiveChoices
                     )
     {
-        /*std::cerr << "- Average quality assessment strategy" << std::endl;
-         std::cerr << "##### DUMP #####" << std::endl;
-         std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << "Efficiency : " << efficiency(Objective(i), nbChoices, positiveChoices) << " ";
-        std::cerr << std::endl;
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << "NbChoices : " <<nbChoices[i] << " ";
-        std::cerr << std::endl;
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << "PosChoices : " << positiveChoices[i] << " ";
-        std::cerr << std::endl;
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << "CycleChoices : " << cycleChoices[i] << " ";
-        std::cerr << std::endl;*/
+        //std::cerr << "- Average quality assessment strategy" << std::endl;
+         
         
-        //std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        //std::cerr << "Quality : ";
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
         {
             //std::cerr << quality[i] << " -> ";
@@ -412,13 +420,12 @@ public:
                     quality[i] += indicatorsSerie[i][j];
                 }
                 quality[i] /= cycleChoices[i]; // Average quality
-                quality[i] *= efficiency(Objective(i), nbChoices, positiveChoices); // Ponderate by efficiency
-                    
+                quality[i] *= efficiency(Objective(i), nbChoices, positiveChoices); // Ponderate by efficiency   
             }
             
-            std::cerr << quality[i] << " - ";
+            //std::cerr << quality[i] << " | ";
         }
-        std::cerr << std::endl;
+        //std::cerr << std::endl;
     }
     
     
@@ -429,23 +436,7 @@ public:
                     const std::vector<int>& positiveChoices
                     )
     {
-        /*std::cerr << "- Extreme quality assessment strategy" << std::endl;
-         std::cerr << "##### DUMP #####" << std::endl;
-         std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << "Efficiency : " << efficiency(Objective(i), nbChoices, positiveChoices) << " ";
-        std::cerr << std::endl;
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << "NbChoices : " <<nbChoices[i] << " ";
-        std::cerr << std::endl;
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << "PosChoices : " << positiveChoices[i] << " ";
-        std::cerr << std::endl;
-        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-            std::cerr << "CycleChoices : " << cycleChoices[i] << " ";
-        std::cerr << std::endl;*/
-        
-        //std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        //std::cerr << "Quality : ";
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
         {
             //std::cerr << quality[i] << " -> ";
@@ -464,9 +455,9 @@ public:
                     
             }
             
-            //std::cerr << quality[i] << " | ";
+            std::cerr << quality[i] << " | ";
         }
-        //std::cerr << std::endl;
+        std::cerr << std::endl;
     }
 
     void probabilityMatching(const std::vector<double>& quality, std::vector<double>& distribution)
@@ -475,20 +466,16 @@ public:
         double min = -std::min(0.,*std::min_element(quality.begin(), quality.end()));
             
         double sum = 0;
-        //std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
         for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
-        {
-                //std::cerr << "On ajoute " << (quality[i] + min) << " ( Q :" << quality[i] << " min : " << min << " E : " <<  efficiency(Objective(i)) << " )"<< std::endl;
-                sum += (quality[i] + min);
-        }
-
-        if(sum > 0)
+            sum += quality[i];
+        //std::cerr << "sum : " << sum << std::endl;
+        //if(sum > 0)
         {
             //std::cerr << "New distribution : ";
             for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
             {
                 //std::cerr << distribution[i] << "  ->  ";
-                distribution[i] = pmin + ((1-NB_YAHSP_STRAT*pmin)*(quality[i] + min)) / sum;
+                distribution[i] = pmin + ((1-NB_YAHSP_STRAT*pmin)*(quality[i])) / sum;
                 //std::cerr << distribution[i] << "  |  ";
             }
             //std::cerr << std::endl;
@@ -532,7 +519,7 @@ public:
         
         // TODO : logger en debug
         /*    std::cerr << "##### Page-Hinkley Test #####" << std::endl;
-            std::cerr << "Iteration : " << it << std::endl;
+            std::cerr << "Cycle : " << nbAppel / it << std::endl;
             std::cerr << "Average Distribution Quality : " << averageDistribQuality << std::endl;
             std::cerr << "Current M : " << M << std::endl;
             std::cerr << "Max M : " << maxM << std::endl;
