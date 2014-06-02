@@ -123,6 +123,14 @@ public:
         return (*strat)(*this);
     }
     
+    void strategyUpdate()
+    {
+        #ifndef NDEBUG
+        assert(strat != NULL);
+        #endif
+        strat->update(*this);
+    }
+    
 
 public : // TODO : A passer en protected 
 

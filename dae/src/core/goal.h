@@ -103,6 +103,15 @@ public:
         #endif
         return (*strat)(*this);
     }
+    
+    template <class EOT>
+    void strategyUpdate(EOT& o)
+    {   
+        #ifndef NDEBUG
+        assert(strat != NULL);
+        #endif
+        return strat->update(o);
+    }
 
 protected:
 

@@ -59,6 +59,32 @@ public:
         if(strategy != NULL)
             delete strategy;
     };
+    
+    PlanningObjectiveVector setObjectiveVector(EOT& decompo)
+    {
+        PlanningObjectiveVector objVector;
+    
+        if (decompo.state() == Feasible)
+        {
+            objVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
+            objVector[1] = (this->*secondObjective)(decompo);
+        }
+        else
+        {
+            if(decompo.state() == UnfeasibleIntermediate)
+                objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_intermediate(decompo);
+            else if(decompo.state() == UnfeasibleFinal)
+                objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_final(decompo);
+            else if(decompo.state() == UnfeasibleTooLong)
+                objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
+            //else
+            //    objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible(decompo);
+                  	        
+            objVector[1] = objVector[0];
+        }
+    
+        return objVector;
+    }
 
     virtual void operator()(EOT& decompo) 
     {
@@ -69,13 +95,14 @@ public:
             std::vector<PlanningState> stats(NB_YAHSP_STRAT);
             
             PlanningObjectiveVector bestObjVector;
+            PlanningObjectiveVector currentObjVector;
             PlanningState bestState;
             daex::Plan bestPlan;
                 
             #ifndef NDEBUG
             PlanningObjectiveVector ref = decompo.prevObjVector;
             std::vector<PlanningObjectiveVector> vectors(nbEvaluations);
-            #endif 
+            #endif
             
             // Pour chaque objectif
             Objective objective;
@@ -114,75 +141,70 @@ public:
                 vectors[i][1] = (this->*secondObjective)(decompo);
                 #endif 
                 
-                if(i == 0)
-                {
-                    bestState = decompo.state();
-                    bestPlan = decompo.plan();	
-                    if (bestState == Feasible)
-             	    {
-             	        bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
-             		    bestObjVector[1] = (this->*secondObjective)(decompo);
-              	    }
-                  	else
-                  	{
-                  	    if(decompo.state() == UnfeasibleIntermediate)
-                  	        bestObjVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_intermediate(decompo);
-                  	    else if(decompo.state() == UnfeasibleFinal)
-                  	        bestObjVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_final(decompo);
-                  	    else if(decompo.state() == UnfeasibleTooLong)
-                  	        bestObjVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
-                  	    //else
-                  	    //    objVector[0] = daeCptYahspEval<EOT>::fitness_unfeasible(decompo);
-                  	        
-                		bestObjVector[1] = bestObjVector[0];
-                    }
-                }
-                else
-                {
-                    if(bestState != Feasible && decompo.state() == Feasible)
-                    {
-                        bestState = Feasible;
-                        bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
-             		    bestObjVector[1] = (this->*secondObjective)(decompo);
-             		    bestPlan = decompo.plan();	
-                    }
-                    else if(bestState != Feasible && decompo.state() != Feasible)
-                    {
+                currentObjVector = setObjectiveVector(decompo);
+               
+                // TODO : Sortir les indicateurs
+                // Amélioration absolue par rapport au précédent vecteur (attention à inverser l'inégalité plus bas)
+                /*double f1 = (decompo.prevObjVector[0] - bestObjVector[0]) 
+                    + (decompo.prevObjVector[1] - bestObjVector[1]);
+                double f2 = (decompo.prevObjVector[0] - daeYahspEval< EOT >::fitness_feasible(decompo)) 
+                    + (decompo.prevObjVector[1] - (this->*secondObjective)(decompo));*/
                         
-                        double fit;
-                        if(decompo.state() == UnfeasibleIntermediate)
-                  	        fit = daeCptYahspEval<EOT>::fitness_unfeasible_intermediate(decompo);
-                  	    else if(decompo.state() == UnfeasibleFinal)
-                  	        fit = daeCptYahspEval<EOT>::fitness_unfeasible_final(decompo);
-                  	    else if(decompo.state() == UnfeasibleTooLong)
-                  	        fit = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
-
-                        if(bestObjVector[0] > fit)
-                        {
-                            bestObjVector[0] = fit;
-                            bestObjVector[1] = bestObjVector[0];
-                            bestPlan = decompo.plan();	
-                        }
-                    }
-                    else if(bestState == Feasible && decompo.state() == Feasible)
-                    {
-                        // TODO : Tester si la condition suivante plus élitiste :
-                        // Soit x le vecteur objectif précédent.
-                        // On écarte les vecteurs objectifs qui sont dominés par celui-ci
-                        // En dernier lieu, on applique la condition suivante
-                        double f1 = (decompo.prevObjVector[0] - bestObjVector[0]) 
-                            + (decompo.prevObjVector[1] - bestObjVector[1]);
-                        double f2 = (decompo.prevObjVector[0] - daeYahspEval< EOT >::fitness_feasible(decompo)) 
-                            + (decompo.prevObjVector[1] - (this->*secondObjective)(decompo));
+                /*// Norme 1
+                double f1 = bestObjVector[0] + bestObjVector[1];
+                double f2 = daeYahspEval< EOT >::fitness_feasible(decompo) + (this->*secondObjective)(decompo);*/
+                /*
+                double f1 = bestObjVector[0]*bestObjVector[1];
+                if(!(decompo.prevObjVector[0] < bestObjVector[0] 
+                    && decompo.prevObjVector[1] < bestObjVector[1]))
+                    f1 -= (decompo.prevObjVector[0] - bestObjVector[0]) 
+                        + (decompo.prevObjVector[1] - bestObjVector[1]);
                         
-                        if(f2 > f1)
-                        {
-                            bestObjVector[0] = daeYahspEval< EOT >::fitness_feasible(decompo);
-                            bestObjVector[1] = (this->*secondObjective)(decompo);
-                            bestPlan = decompo.plan();
-                        }
-                    }
+                double f2 = currentObjVector[0]*currentObjVector[1];
+                if(!(decompo.prevObjVector[0] < currentObjVector[0] 
+                    && decompo.prevObjVector[1] < currentObjVector[1]))
+                    f2 -= (decompo.prevObjVector[0] - currentObjVector[0]) 
+                        + (decompo.prevObjVector[1] - currentObjVector[0]);
+                */
+                
+                double r1 = decompo.prevObjVector[0];
+                double r2 = decompo.prevObjVector[1];
+                double x1 = bestObjVector[0];
+                double x2 = bestObjVector[1];
+                double y1 = currentObjVector[0];
+                double y2 = currentObjVector[1];
+                
+                double theta1 = (x1 - r1) + (x2 - r2);
+                double f1 = x1*x2;
+                if(theta1 < 0)
+                {
+                    f1 -=  (std::abs(x1 - r1)*std::abs(x2 - r2)*(theta1) );
                 }
+                
+                double theta2 = (y1 - r1) + (y2 - r2);
+                double f2 = y1*y2;
+                if(theta2 < 0)
+                {
+                    f2 -=  (std::abs(y1 - r1)*std::abs(y2 - r2) );    
+                }
+                
+                
+                if(i == 0 || f2 < f1)
+                {
+                    bestPlan = decompo.plan();
+                    bestObjVector = currentObjVector;
+                }
+                
+                
+                // Update the strategy according to this evaluation
+                //decompo.objectiveVector(currentObjVector); // TODO : Fix me ! lorsque l'on assigne le vecteur, le résultat d'un appel à YAHSP est toujours le même. Du coup on peut pas updater la strategy (problematique pour une strat adaptative)
+        	    if(stratLevel == Population)
+                    strategy->update(decompo);
+                else if(stratLevel == Individual)
+                    decompo.strategyUpdate();
+                else if(stratLevel == Gene)
+                    for(daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal) 
+                        igoal->strategyUpdate(decompo);
                 
             }
             #ifndef NDEBUG
@@ -233,13 +255,12 @@ public:
             #endif */
             
             decompo.objectiveVector(bestObjVector);
-    	    decompo.fitness(bestObjVector[0]);
+    	    //decompo.fitness(bestObjVector[0]);
     	    decompo.plan_global(bestPlan);
     	    
     	    decompo.prevObjVector = bestObjVector;
     	    
             daeYahspEval<EOT>::post_call(decompo); 
-            
         }
     }
 

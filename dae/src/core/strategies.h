@@ -4,8 +4,14 @@
 #include <map>
 #include <src/yahsp.h>
 #include "planningState.h"
+#include "planningObjectiveVector.h"
+#include "strategyIndicators.h"
 
 namespace daex {
+
+template <class T>
+class Planning;
+typedef Planning<MOEO<PlanningObjectiveVector, double, double> > IndiMOEO;
 
 enum StrategyType
 {
@@ -22,6 +28,7 @@ enum StrategyLevel
     Gene
 };
 
+
 // Strategy class
 // Generic functor for strategy. It takes an object and return a objective to send to YAHSP.
 // The implementation is a NVI pattern to ensure precondition and post conditions.
@@ -32,9 +39,10 @@ class Strategy
 {
 public:
 
-    Strategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1)) :
+    Strategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1), double _mutRate = 0.1) :
         rates(_rates),
-        current((Objective)0)
+        current((Objective)0),
+        mutRate(_mutRate)
     {}
     
     Strategy(const Strategy& _o)
@@ -53,11 +61,10 @@ public:
     Strategy operator=(const Strategy& _o)
     {
         rates = _o.rates;
+        mutRate = _o.mutRate;
         
         return *this;
     }
-    
-    
     
     double operator[](Objective obj)
     {
@@ -68,11 +75,15 @@ public:
     {
         // Préconditions & invariants (serialisation, assertions...)
         current = _choice(o);
-        _update(o, current);
-        
+        _mutation();
         // Post condition
       
         return current;
+    }
+    
+    virtual void update(IndiMOEO& o) 
+    { 
+        (void)o; 
     }
     
     virtual std::ostream& printOn(std::ostream& os) const
@@ -88,17 +99,17 @@ private:
         return (Objective)rng.roulette_wheel(rates);
     }
     
-    virtual void _update(const EOT& o, Objective choice) 
-    { 
-        (void)o; 
-        (void)choice;
-    }
     
+    
+    virtual void _mutation() 
+    { }
         
 protected:
 
     std::vector<double> rates;
     Objective current;
+    double mutRate;
+    
 };
 
 template <class EOT>
@@ -139,21 +150,22 @@ class AutoAdaptiveStrategy : public Strategy<EOT>
 {
 public:
 
-    AutoAdaptiveStrategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1), double _mutRate = 0.1) :
-        Strategy<EOT>(_rates),
-        mutRate(_mutRate)
-    { Strategy<EOT>::current = (Objective)rng.roulette_wheel(_rates); }
+    AutoAdaptiveStrategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1)) :
+        Strategy<EOT>(_rates)
+    { 
+        // Randomly choose an objective according to user defined rates (may be a hint).
+        Strategy<EOT>::current = (Objective)rng.roulette_wheel(_rates); 
+        
+        // Reset rates (and we use the Static operator () to return an objective)
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            if(i == (unsigned)Strategy<EOT>::current)
+                Strategy<EOT>::rates[i] = 1;
+            else
+                Strategy<EOT>::rates[i] = 0;
+    }
     
     virtual AutoAdaptiveStrategy<EOT>* clone()
     {
-        double r = rng.uniform(0,1);
-        if(r < mutRate)
-        {
-            
-            unsigned pos = rng.uniform(0,NB_YAHSP_STRAT);
-                Strategy<EOT>::current = (Objective)pos;
-        }
-
         AutoAdaptiveStrategy<EOT>* p = new AutoAdaptiveStrategy<EOT>(Strategy<EOT>::rates);
         p->Strategy<EOT>::current = Strategy<EOT>::current;
         return p;
@@ -169,15 +181,31 @@ public:
 
 private:
 
-    virtual Objective _choice(const EOT& o)
-    {
-        (void)o;
-        return Strategy<EOT>::current;
+    virtual void _mutation() 
+    { 
+        // Static mutation for SelfAdaptive mutation
+        double r = rng.uniform(0,1);
+        if(r < Strategy<EOT>::mutRate)
+        {
+            unsigned pos;
+            do {
+                pos = rng.uniform(0,NB_YAHSP_STRAT);
+            } while(pos != Strategy<EOT>::current);
+            #ifndef NDEBUG
+            eo::log << eo::xdebug << "strategy mutation : " 
+                    << Strategy<EOT>::current << " to " << pos << std::endl;
+            #endif 
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            if(i == pos)
+                Strategy<EOT>::rates[i] = 1;
+            else
+                Strategy<EOT>::rates[i] = 0;
+        }
     }
 
 protected:
    
-    double mutRate;
+    
             
 };
 
@@ -187,22 +215,370 @@ class AdaptiveStrategy : public Strategy<EOT>
 {
 public:
 
-    AdaptiveStrategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1)) :
-        Strategy<EOT>(_rates)
+    AdaptiveStrategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1),
+             int updateRate = 1,
+             bool _efficiencyEstimation = false,
+             double _pmin = 0.05,
+             double _delta = 0.15, 
+             double _epsilon = 1) :
+        Strategy<EOT>(_rates),
+        nbChoices(std::vector<int>(NB_YAHSP_STRAT,0)),
+        positiveChoices(std::vector<int>(NB_YAHSP_STRAT,0)),
+        nbAppel(0),
+        quality(std::vector<double>(NB_YAHSP_STRAT,0)),
+        sumRewards(std::vector<double>(NB_YAHSP_STRAT,0)),
+        indicatorsSerie(std::vector<std::vector<double> >(NB_YAHSP_STRAT)),
+        cycleChoices(std::vector<int>(NB_YAHSP_STRAT,0)),
+        updateDistribRate(updateRate),
+        efficiencyEstimation(_efficiencyEstimation),
+        pmin(_pmin),
+        averageDistribQuality(0),
+        M(0),
+        maxM(0),
+        delta(_delta),
+        epsilon(_epsilon),
+        it(1)
     {}
+    
+    AdaptiveStrategy(const AdaptiveStrategy& _o)
+    {
+        *this = _o;
+    }
+    
+    AdaptiveStrategy operator=(const AdaptiveStrategy& _o)
+    {
+        Strategy<EOT>::rates = _o.rates;
+        Strategy<EOT>::mutRate = _o.mutRate;
+        
+        nbChoices = _o.nbChoices;
+        positiveChoices = _o.positiveChoices;
+        nbAppel = _o.nbAppel;
+        quality = _o.quality,
+        sumRewards = _o.sumRewards;
+        indicatorsSerie = _o.indicatorsSerie;
+        cycleChoices = _o.cycleChoices;
+        updateDistribRate = _o.updateDistribRate;
+        
+        efficiencyEstimation = _o.efficiencyEstimation;
+    
+        pmin = _o.pmin;
+        
+        averageDistribQuality = _o.averageDistribQuality;
+        M = _o.M;
+        maxM = _o.maxM;
+        delta = _o.delta;
+        epsilon = _o.epsilon;
+        it = _o.it;
+        
+        return *this;
+    }
+        
     
     virtual AdaptiveStrategy<EOT>* clone()
     {
-        return new AdaptiveStrategy<EOT>(Strategy<EOT>::rates);
+        return new AdaptiveStrategy<EOT>(
+            Strategy<EOT>::rates, 
+            updateDistribRate,
+            efficiencyEstimation,
+            pmin,
+            delta,
+            epsilon);
     }
     
     virtual ~AdaptiveStrategy()
     {}
     
+    virtual void update(IndiMOEO& o)
+    {
+        #ifndef NDEBUG
+        eo::log << eo::xdebug << "update adaptive strategy" << std::endl;
+        #endif 
+        double indicator = deltaPlus(o);
+        /*std::cerr << "Update strategy n°" << nbAppel << std::endl;
+        std::cerr << "- Update information : " << std::endl;
+        std::cerr << ":::: Indicator : " << indicator << std::endl;
+        std::cerr << ":::: Objective : " << current << std::endl;
+        
+        for(unsigned j = 0; j < indicatorsSerie.size(); j++)
+        {
+            for(unsigned i = 0; i < indicatorsSerie[j].size(); i++)
+                std::cerr << indicatorsSerie[j][i] << " -> ";
+            std::cerr << std::endl;
+        }
+        std::cerr << std::endl;*/
+        if(indicator > 0)
+        {
+            positiveChoices[Strategy<EOT>::current]++;
+            indicatorsSerie[Strategy<EOT>::current].push_back(indicator);
+        }
+        
+        {
+            //std::cerr << "- Quality assessment : ";
+            
+            // Exponential recency-weighted average
+            //quality[current] = indicator + 0.7*(sumRewards[current] - indicator);
+            //sumRewards[current] += indicator;
+            
+            // Sum
+            //quality[current] += indicator;
+            
+            // Moyenne
+            quality[Strategy<EOT>::current] = ((nbChoices[Strategy<EOT>::current]-1)*quality[Strategy<EOT>::current]+indicator)/nbChoices[Strategy<EOT>::current];     
+              
+            // Extreme value
+            //quality[current] = std::max(quality[current], indicator);
+            
+            
+            
+            // Clear information
+            /*for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            {
+                indicatorsSerie[i].clear();
+                cycleChoices[i] = 0;
+            }*/
+            //std::cerr << "- Select new parameters : ";
+            adaptivePursuit(quality, Strategy<EOT>::rates);
+            //probabilityMatching(quality, distribution);
+            
+            //std::cerr << "Jump detection : ";
+            if(jump(quality))
+            {
+                //std::cerr << "Jump detected ! Reset strategy." << std::endl;
+                for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+                {
+                    nbChoices[i] = 0;
+                    positiveChoices[i] = 0;
+                    sumRewards[i] = 0;
+                    quality[i] = 0;
+                    // Doit-on réinitialiser la distribution ? À priori oui.
+                    Strategy<EOT>::rates[i] = 1./NB_YAHSP_STRAT;
+                }
+    
+            }
+        }
+
+    }
+    
     virtual std::ostream& printOn(std::ostream& os) const
     {
         return os;
     }
+    
+    double efficiency(Objective obj, const std::vector<int>& nbChoices, const std::vector<int>& positiveChoices)
+    {
+        //std::cerr << "( p : " << positiveChoice[obj] << " | n : " << nbChoices[obj] << ")"; 
+        if(!efficiencyEstimation)
+            return 1;
+        if(nbChoices[obj] == 0)
+            return 1;
+        return ((double) positiveChoices[obj]) / nbChoices[obj];
+    }
+    
+    void averageQuality(std::vector<double>& quality, 
+                    const std::vector<std::vector<double> >& indicatorsSerie,
+                    const std::vector<int>& cycleChoices, 
+                    const std::vector<int>& nbChoices,
+                    const std::vector<int>& positiveChoices
+                    )
+    {
+        /*std::cerr << "- Average quality assessment strategy" << std::endl;
+         std::cerr << "##### DUMP #####" << std::endl;
+         std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            std::cerr << "Efficiency : " << efficiency(Objective(i), nbChoices, positiveChoices) << " ";
+        std::cerr << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            std::cerr << "NbChoices : " <<nbChoices[i] << " ";
+        std::cerr << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            std::cerr << "PosChoices : " << positiveChoices[i] << " ";
+        std::cerr << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            std::cerr << "CycleChoices : " << cycleChoices[i] << " ";
+        std::cerr << std::endl;*/
+        
+        //std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+        {
+            //std::cerr << quality[i] << " -> ";
+            quality[i] = 0;
+            
+            // If the objective never has been picked, we assume it does not participate to the quality
+            if(cycleChoices[i] != 0) 
+            {
+                for(unsigned j = 0; j < indicatorsSerie[i].size(); j++)
+                {
+                    //std::cerr << "Quality " << quality[i] << " + " << indicatorsSerie[i][j] << std::endl;
+                    quality[i] += indicatorsSerie[i][j];
+                }
+                quality[i] /= cycleChoices[i]; // Average quality
+                quality[i] *= efficiency(Objective(i), nbChoices, positiveChoices); // Ponderate by efficiency
+                    
+            }
+            
+            std::cerr << quality[i] << " - ";
+        }
+        std::cerr << std::endl;
+    }
+    
+    
+    void extremeQuality(std::vector<double>& quality, 
+                    const std::vector<std::vector<double> >& indicatorsSerie,
+                    const std::vector<int>& cycleChoices, 
+                    const std::vector<int>& nbChoices,
+                    const std::vector<int>& positiveChoices
+                    )
+    {
+        /*std::cerr << "- Extreme quality assessment strategy" << std::endl;
+         std::cerr << "##### DUMP #####" << std::endl;
+         std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            std::cerr << "Efficiency : " << efficiency(Objective(i), nbChoices, positiveChoices) << " ";
+        std::cerr << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            std::cerr << "NbChoices : " <<nbChoices[i] << " ";
+        std::cerr << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            std::cerr << "PosChoices : " << positiveChoices[i] << " ";
+        std::cerr << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            std::cerr << "CycleChoices : " << cycleChoices[i] << " ";
+        std::cerr << std::endl;*/
+        
+        //std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+        {
+            //std::cerr << quality[i] << " -> ";
+            quality[i] = 0;
+            
+            // If the objective never has been picked, we assume it does not participate to the quality
+            if(cycleChoices[i] != 0 && indicatorsSerie[i].size() > 0) 
+            {
+                quality[i] = indicatorsSerie[i][0];
+                for(unsigned j = 0; j < indicatorsSerie[i].size(); j++)
+                {
+                    quality[i] = std::max(indicatorsSerie[i][j], quality[i]);
+                }
+                //std::cerr << "Quality : " << quality[i] << " ";
+                quality[i] *= efficiency(Objective(i), nbChoices, positiveChoices); // Ponderate by efficiency
+                    
+            }
+            
+            //std::cerr << quality[i] << " | ";
+        }
+        //std::cerr << std::endl;
+    }
+
+    void probabilityMatching(const std::vector<double>& quality, std::vector<double>& distribution)
+    {
+        //std::cerr << "- Probability matching selection strategy" << std::endl;
+        double min = -std::min(0.,*std::min_element(quality.begin(), quality.end()));
+            
+        double sum = 0;
+        //std::cerr << "Makespan Add  -  Makespan Max  -  Cost  - Length" << std::endl;
+        for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+        {
+                //std::cerr << "On ajoute " << (quality[i] + min) << " ( Q :" << quality[i] << " min : " << min << " E : " <<  efficiency(Objective(i)) << " )"<< std::endl;
+                sum += (quality[i] + min);
+        }
+
+        if(sum > 0)
+        {
+            //std::cerr << "New distribution : ";
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            {
+                //std::cerr << distribution[i] << "  ->  ";
+                distribution[i] = pmin + ((1-NB_YAHSP_STRAT*pmin)*(quality[i] + min)) / sum;
+                //std::cerr << distribution[i] << "  |  ";
+            }
+            //std::cerr << std::endl;
+        }
+    }
+    
+    void adaptivePursuit(const std::vector<double>& quality, std::vector<double>& distribution)
+    {
+        //std::cerr << "- Adaptive Pursuit selection strategy" << std::endl;
+        double beta = 0.5;
+        double pmax = 1 - (NB_YAHSP_STRAT - 1)*pmin;
+        unsigned o = std::distance(quality.begin(), std::max_element(quality.begin(), quality.end()));    
+        //std::cerr << "Best : " << o << " | " << pmin << " - " << pmax << std::endl;
+            //std::cerr << "New distribution : ";
+            for(unsigned i = 0; i < NB_YAHSP_STRAT; i++)
+            {
+                //std::cerr << distribution[i] << "  ->  ";
+                if(i == o)
+                    distribution[i] = distribution[i] + beta*(pmax - distribution[i]);
+                else
+                    distribution[i] = distribution[i] + beta*(pmin - distribution[i]);
+                //std::cerr << distribution[i] << "  |  ";
+            }
+            //std::cerr << std::endl;
+    }
+
+    bool jump(std::vector<double>& quality)
+    {
+        //std::cerr << "- Page Hinkley jump detection" << std::endl;
+        it++;
+        // Quality of the current distribution : sum of all qualities
+        double qualityDistribution = 0;
+        double min = -std::min(0.,*std::min_element(quality.begin(), quality.end()));
+        for(unsigned i = 0; i < quality.size(); i++)
+            qualityDistribution += (quality[i] + min);
+
+        M += (qualityDistribution - averageDistribQuality + (delta/2));
+        maxM = std::max(M,maxM);
+        averageDistribQuality = ((it-1)*averageDistribQuality + M) / it;
+        double PHT = fabs(maxM - M);
+        
+        // TODO : logger en debug
+        /*    std::cerr << "##### Page-Hinkley Test #####" << std::endl;
+            std::cerr << "Iteration : " << it << std::endl;
+            std::cerr << "Average Distribution Quality : " << averageDistribQuality << std::endl;
+            std::cerr << "Current M : " << M << std::endl;
+            std::cerr << "Max M : " << maxM << std::endl;
+            std::cerr << "PHT : " << PHT << std::endl;
+            if(PHT > epsilon)
+                std::cerr << "Changement détecté !" << std::endl;
+            else
+                std::cerr << "Aucun changement." << std::endl;
+            std::cerr << "#############################" << std::endl;*/
+        
+        if(PHT > epsilon)
+        {
+            averageDistribQuality = 0;
+            maxM = 0;
+            it = 0;
+            return true;
+        }
+        else
+            return false;
+    }
+
+    bool dummyJump(std::vector<double>& quality)
+    {
+        return false;
+    }
+
+    std::vector<int> nbChoices;
+    std::vector<int> positiveChoices;
+    unsigned nbAppel;
+    std::vector<double> quality;
+    std::vector<double> sumRewards;
+    std::vector<std::vector<double> > indicatorsSerie;
+    std::vector<int> cycleChoices;
+
+    unsigned updateDistribRate;
+    
+    bool efficiencyEstimation;
+    
+    double pmin;
+    
+    double averageDistribQuality;
+    double M;
+    double maxM;
+    double delta;                   ///< Tolerance factor
+    double epsilon;                 ///< Threshold
+    double it;                      ///< Iterations
 
 private:
 
@@ -214,25 +590,6 @@ std::ostream& operator << (std::ostream& os, const Strategy<EOT>& s)
 {
     return s.printOn(os);
 }
-
-template <class EOT>
-std::ostream& operator << (std::ostream& os, const GreedyStrategy<EOT>& s)
-{
-    return s.printOn(os);
-}
-
-template <class EOT>
-std::ostream& operator << (std::ostream& os, const AdaptiveStrategy<EOT>& s)
-{
-    return s.printOn(os);
-}
-
-template <class EOT>
-std::ostream& operator << (std::ostream& os, const AutoAdaptiveStrategy<EOT>& s)
-{
-    return s.printOn(os);
-}
-
 
 class StrategyInit
 {
