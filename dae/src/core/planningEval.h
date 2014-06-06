@@ -22,6 +22,7 @@ public:
     PlanningEval (
         Strategy<EOT>* _strategy,
         StrategyLevel _stratLevel,
+        moeoUnboundedArchive<Planning<MOEO<PlanningObjectiveVector, double, double> > >& _arch,
         unsigned int l_max_ = 20,
 		unsigned int b_max_in = 10, 
 		unsigned int b_max_last = 30,
@@ -31,6 +32,7 @@ public:
 		unsigned _nbEvaluations = 1,
 		unsigned int astar_weigth=3,
 		bool _rand_seed = true
+		
     ):
         daeYahspEval< EOT >(
             _stratLevel,
@@ -43,7 +45,8 @@ public:
        ),
        nbEvaluations(_nbEvaluations),
        strategy(_strategy),
-       stratLevel(_stratLevel)
+       stratLevel(_stratLevel),
+       globArch(_arch)
     {
         if (!_cost_max)
        		secondObjective = &PlanningEval::additive_cost;
@@ -90,6 +93,10 @@ public:
     {
         if (decompo.invalid())
         {
+            // TEST
+            moeoUnboundedArchive<Planning<MOEO<PlanningObjectiveVector, double, double> > > arch;
+            EOT copyDecompo = decompo;
+            // END TEST
             
             std::vector<PlanningObjectiveVector> objvectors(NB_YAHSP_STRAT);
             std::vector<PlanningState> stats(NB_YAHSP_STRAT);
@@ -153,60 +160,119 @@ public:
                 
                 // Update the strategy according to this evaluation
         	    if(stratLevel == Population)
+        	    {
                     strategy->update(-f1);
+                }
                 else if(stratLevel == Individual)
+                {
                     decompo.strategyUpdate(-f1);
+                }
                 else if(stratLevel == Gene)
-                    for(daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal) 
-                        igoal->strategyUpdate(-f1);
+                {
+                    daex::Decomposition::iterator iter = decompo.begin();
+                    for(unsigned i = 0; i < decompo.subplans_size(); i++)
+                    {
+                        PlanningObjectiveVector v;
+                        v[0] = decompo.subplan(i).makespan();
+                        v[1] = decompo.subplan(i).cost_add(); // TODO : Fix me for cost max
+                        
+                        double f3 = manhattan(v, ref);
+                        if(iter != decompo.end())
+                        {
+                            iter->strategyUpdate(-f3);
+                            iter++;
+                        }
+                    }
+                    
+                }
+                // TEST
+                copyDecompo.objectiveVector(currentObjVector);
+                arch(copyDecompo);
                 
+                // END TEST
             }
             #ifndef NDEBUG
 	        eo::log << eo::xdebug << "selected : " << bestObjVector[0] << " " << bestObjVector[1] << std::endl;
             eo::log.flush();
             #endif 
             
-            /*#ifndef NDEBUG
-            unsigned lx = 0;
-            unsigned ly = 0;
-            unsigned mx = 0;
-            unsigned my = 0;
-            for(unsigned i = 0; i < k; i++)
-            {
-                //std::cout << vectors[i][0] << " " << vectors[i][1] << std::endl;
-                if(vectors[i][0] < vectors[lx][0])
-                    lx = i;
-                if(vectors[i][0] > vectors[mx][0])
-                    mx = i;
-                if(vectors[i][1] < vectors[ly][1])
-                    ly = i;
-                if(vectors[i][1] > vectors[my][1])
-                    my = i;    
-            }
-            //std::cout << "Max / Min : " << " " << lx << " " << mx << " " << ly << " " << my << std::endl;
-            double r, cx, cy;
-            if(vectors[mx][0]-vectors[lx][0] > vectors[my][1]-vectors[ly][1])
-            {
-                r = (vectors[mx][0]-vectors[lx][0]) / 2;
-                cx = (vectors[mx][0]+vectors[lx][0]) / 2;
-                cy = (vectors[mx][1]+vectors[lx][1]) / 2;
-            }
-            else
-            {
-                r = (vectors[my][1]-vectors[ly][1]) / 2;
-                cx = (vectors[ly][0]+vectors[my][0]) / 2;
-                cy = (vectors[ly][1]+vectors[my][1]) / 2;
-            }    
-            // Circles
-            std::cerr << cx << " " << cy << " " << r << std::endl;
-            
+            #ifndef NDEBUG
             // Points + ref + best
-            for(unsigned i = 0; i < k; i++)
-                std::cout << i << " " << vectors[i][0] << " " << vectors[i][1] << " " 
+            PlanningObjectiveVector average;
+            average[0] = 0;
+            average[1] = 0;
+            for(unsigned i = 0; i < nbEvaluations; i++)
+            {
+                std::cout << vectors[i][0] << " " << vectors[i][1] << " " 
                           << ref[0] << " " << ref[1] << " " 
                           << bestObjVector[0] << " " << bestObjVector[1] << std::endl;
+               average[0] += vectors[i][0];
+               average[1] += vectors[i][1];
+                          
+            }    
+            average[0] /= nbEvaluations;   
+            average[1] /= nbEvaluations;
+            bestObjVector = average; 
             std::cout << std::endl << std::endl;
-            #endif */
+            
+            
+            // TEST
+            // Archive
+            std::vector<PlanningObjectiveVector> localArchVector;
+            for(unsigned i = 0; i < globArch.size(); i++)
+            {
+                arch(globArch[i]);
+            }
+            for(unsigned i = 0; i < arch.size(); i++)
+            {
+                std::cout << arch[i].objectiveVector(0) << " " << arch[i].objectiveVector(1) << std::endl;
+                //globArch(arch[i]);
+                localArchVector.push_back(arch[i].objectiveVector());
+            }
+            std::cout << std::endl << std::endl;
+            
+            std::vector<PlanningObjectiveVector> globalArchVector;
+            for(unsigned i = 0; i < globArch.size(); i++)
+            {
+                std::cout << globArch[i].objectiveVector(0) << " " << globArch[i].objectiveVector(1) << std::endl;
+                globalArchVector.push_back(globArch[i].objectiveVector());
+                arch(globArch[i]);
+            }
+            std::cout << std::endl << std::endl;
+            
+            if(globalArchVector.size() > 0)
+            {
+                moeoHyperVolumeDifferenceMetric<PlanningObjectiveVector> diffHypervolume;
+                std::cerr << diffHypervolume(globalArchVector,localArchVector) << std::endl;
+            }
+            
+            // Mise à jour de l'archive
+            for(unsigned i = 0; i < arch.size(); i++)
+            {
+                globArch(arch[i]);
+            }
+            // END TEST
+            #endif
+            
+            // Mutate the strategy according to this evaluation
+        	    if(stratLevel == Population)
+        	    {
+                    strategy->mutation();
+                }
+                else if(stratLevel == Individual)
+                {
+                    decompo.strategyMutation();
+                }
+                else if(stratLevel == Gene)
+                {
+                    for(daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal)
+                    {
+                        
+                        igoal->strategyMutation();
+                    }
+                    
+                    
+                }
             
             decompo.objectiveVector(bestObjVector);
     	    decompo.plan_global(bestPlan);
@@ -237,6 +303,7 @@ public:
     unsigned nbEvaluations;
     Strategy<EOT>* strategy;
     StrategyLevel stratLevel;
+    moeoUnboundedArchive<Planning<MOEO<PlanningObjectiveVector, double, double> > >& globArch;
 };
 
 //! Classe à utiliser lors de la première itération, pour estimer b_max
@@ -248,6 +315,7 @@ public:
     PlanningEvalInit(
         Strategy<EOT>* _strategy,
         StrategyLevel _stratLevel,
+        moeoUnboundedArchive<Planning<MOEO<PlanningObjectiveVector, double, double> > >& _arch,
         unsigned int pop_size, 
         unsigned int l_max, 
         unsigned int b_max_in = 10000, 
@@ -257,10 +325,12 @@ public:
 	    bool _cost_max = false,
 	    unsigned _nbEvaluations = 1,
 	    unsigned int astar_weigth=3,
-	    bool _rand_seed = true):
+	    bool _rand_seed = true
+	    ):
 	    PlanningEval<EOT >(
 	        _strategy,
 	        _stratLevel,
+	        _arch,
 	        l_max,
 	        b_max_in, 
 	        b_max_last, 
@@ -270,6 +340,7 @@ public:
 	        _nbEvaluations,
 	        astar_weigth,
 	        _rand_seed
+	        
 	        ) 
     {
         node_numbers.reserve( pop_size * l_max );

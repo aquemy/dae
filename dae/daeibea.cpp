@@ -124,7 +124,7 @@ int main (int argc, char *argv[])
     eoPop<PlanningMOEO >& pop = do_make_pop(parser, state, init);
      
     // The fitness evaluation
-    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval_mo(parser, state, pop, init, stratInit);
+    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval_mo(parser, state, pop, init, stratInit, arch);
         
     /// stopping criteria
     eoContinue<PlanningMOEO >& continuator= do_make_continue_daemoeo(parser, state, eval_yahsp_moeo,arch);

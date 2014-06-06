@@ -131,6 +131,13 @@ public:
         strat->update(indicator);
     }
     
+    void strategyMutation()
+    {   
+        #ifndef NDEBUG
+        assert(strat != NULL);
+        #endif
+        return strat->mutation();
+    }
 
 public : // TODO : A passer en protected 
 

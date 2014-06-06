@@ -39,7 +39,7 @@ class Strategy
 {
 public:
 
-    Strategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1), double _mutRate = 0.1) :
+    Strategy(std::vector<double> _rates = std::vector<double>(NB_YAHSP_STRAT,1), double _mutRate = 0.05) :
         rates(_rates),
         current((Objective)0),
         mutRate(_mutRate)
@@ -75,7 +75,6 @@ public:
     {
         // Préconditions & invariants (serialisation, assertions...)
         current = _choice(o);
-        _mutation();
         // Post condition
       
         return current;
@@ -84,6 +83,11 @@ public:
     virtual void update(double indicator) 
     { 
         (void)indicator; 
+    }
+    
+    virtual void mutation() 
+    { 
+        _mutation();
     }
     
     virtual std::ostream& printOn(std::ostream& os) const

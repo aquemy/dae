@@ -111,6 +111,14 @@ public:
         #endif
         return strat->update(indicator);
     }
+    
+    void strategyMutation()
+    {   
+        #ifndef NDEBUG
+        assert(strat != NULL);
+        #endif
+        return strat->mutation();
+    }
 
 protected:
 

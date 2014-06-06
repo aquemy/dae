@@ -115,7 +115,7 @@ void do_make_eval_mo_param(eoParser &parser)
  * @param eoState& _state  to store the memory
  */
 template <class EOT >
-eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop, daex::Init< EOT > & _init, StrategyInit& _stratInit)
+eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoPop< EOT > & _pop, daex::Init< EOT > & _init, StrategyInit& _stratInit, moeoUnboundedArchive<Planning<MOEO<PlanningObjectiveVector, double, double> > >& arch)
 {
     unsigned int b_max_fixed = _parser.valueOf<unsigned int>("bmax-fixed");
     double b_max_last_weight = _parser.valueOf<double>("bmax-last-weight");
@@ -145,6 +145,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
     PlanningEvalInit< EOT > *eval_yahsp_init = new PlanningEvalInit< EOT >(
         _stratInit.operator()< EOT >(),
         stratLevel,
+        arch,
         _pop.size(), 
         _init.l_max(), 
         b_max_init, 
@@ -154,7 +155,8 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
         cost_max,
         nbEval,
         astar_weight,
-	    rand_seed      
+	    rand_seed
+	          
     );
 
 	_state.storeFunctor(eval_yahsp_init);
@@ -181,6 +183,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 	        eval_yahsp = new PlanningEval< EOT >(
 	            _stratInit.operator()< EOT >(),
 	            stratLevel,
+	            arch,
 	            _init.l_max(), 
 	            b_max_in, 
 	            b_max_last, 
@@ -227,6 +230,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 		eval_yahsp = new PlanningEval< EOT >(
 		    _stratInit.operator()< EOT >(),
 		    stratLevel,
+		    arch,
 		    _init.l_max(), 
 		    b_max_in, 
 		    b_max_last, 
