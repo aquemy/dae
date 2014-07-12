@@ -1,5 +1,0 @@
-seed 11
-tournament 2
-indicator 0
-kappa 0.05
-rho 1.1
