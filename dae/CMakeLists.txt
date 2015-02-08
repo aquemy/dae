@@ -9,11 +9,11 @@ INCLUDE_DIRECTORIES(
   ${DAEX_SRC_DIR}/pack
   ${DAEX_SRC_DIR}/initialization
   ${DAEX_SRC_DIR}/evaluation
-  ${DAEX_SRC_DIR}/variation	
+  ${DAEX_SRC_DIR}/variation
   ${CPT_YAHSP_SRC_DIR}
-  ${GDSL_LIBRARY}   
+  ${GDSL_LIBRARY}
 )
-  
+
 ######################################################################################
 ### 0) Include subdirectories
 ######################################################################################
@@ -30,7 +30,7 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # flags to use with compiler
 # VV : -DDAE pour les headers de YAHSP
-add_definitions(-W -Wall -DDAE)#-DCOST_ADD) 
+add_definitions(-W -Wall -DDAE)#-DCOST_ADD)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
   #ADD_DEFINITIONS(-DPAPERVERSION)
@@ -71,7 +71,7 @@ IF(DAE_WITH_MPI)
     LINK_DIRECTORIES(${MPI_DIR}/lib)
 ENDIF()
 
- 
+
 # target + link libraries
 
 #ADD_EXECUTABLE(dae test3.cpp)
@@ -80,20 +80,28 @@ ENDIF()
 
 #LINK_LIBRARIES(daex  daexmoeo eoutils gmp rt ncurses eo gcov gdsl)
 
-#ADD_EXECUTABLE(daeaggreg aggregation.cpp) 
+#ADD_EXECUTABLE(daeaggreg aggregation.cpp)
 #ADD_DEPENDENCIES(daeaggreg daex daexmoeo moeo)
 #TARGET_LINK_LIBRARIES(daeaggreg ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common cpt_yahsp_library  daex daexmoeo)
 
-#ADD_EXECUTABLE(daemoeo daemoeo.cpp) 
+#ADD_EXECUTABLE(daemoeo daemoeo.cpp)
 #ADD_DEPENDENCIES(daemoeo daex daexmoeo moeo)
 #TARGET_LINK_LIBRARIES(daemoeo ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common cpt_yahsp_library  daex daexmoeo )
 
-add_executable(daeibea daeibea.cpp) 
+add_executable(daeibea daeibea.cpp)
 add_dependencies(daeibea daex moeo)
 IF(CPT_WITH_OMP)
     target_link_libraries(daeibea ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae daex daexmoeo)
 ELSE()
     target_link_libraries(daeibea ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common cpt_yahsp_library daex daexmoeo)
+ENDIF()
+
+add_executable(evalPop evalPop.cpp)
+add_dependencies(evalPop daex moeo)
+IF(CPT_WITH_OMP)
+    target_link_libraries(evalPop ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae daex daexmoeo)
+ELSE()
+    target_link_libraries(evalPop ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common cpt_yahsp_library daex daexmoeo)
 ENDIF()
 
 IF(WITH_OMP)
@@ -112,10 +120,10 @@ IF(WITH_OMP)
 endif()
 
 
-#ADD_EXECUTABLE(daensgaII daensgaII.cpp) 
+#ADD_EXECUTABLE(daensgaII daensgaII.cpp)
 #ADD_DEPENDENCIES(daensgaII daex daexmoeo moeo)
 #TARGET_LINK_LIBRARIES(daensgaII ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common cpt_yahsp_library  daex daexmoeo )
 
-#ADD_EXECUTABLE(daespeaII daespeaII.cpp) 
+#ADD_EXECUTABLE(daespeaII daespeaII.cpp)
 #ADD_DEPENDENCIES(daespeaII daex daexmoeo moeo)
 #TARGET_LINK_LIBRARIES(daespeaII ${PARADISEO_LIBRARIES} gmp gcov gdsl cpt_yahsp_library-common cpt_yahsp_library daex daexmoeo )

@@ -1,4 +1,4 @@
- 
+
 #ifndef MAKE_IBEA_MOEO_H_
 #define MAKE_IBEA_MOEO_H_
 
@@ -21,10 +21,10 @@ void do_make_ibea_param(eoParser &_parser)
     _parser.createParam(std::string("Epsilon"), "indicator",
                                  "Binary indicator for IndicatorBased: Epsilon, Hypervolume", 'i',
                                  "Evolution Engine");
-  
+
     _parser.createParam(1.1, "rho", "reference point for the hypervolume indicator", '\0',
                                    "Evolution Engine");
-                                   
+
     _parser.createParam(0.05, "kappa", "Scaling factor kappa for IndicatorBased", 'k',
                                      "Evolution Engine");
 }
@@ -39,7 +39,7 @@ void do_make_ibea_param(eoParser &_parser)
  * @param _archive the archive of non-dominated solutions
  */
 template < class MOEOT >
-moeoIBEA < MOEOT > & do_make_ibea_moeo(eoParser & _parser, eoState & _state, eoEvalFunc < MOEOT > & _eval, eoContinue < MOEOT > & _continue, eoGenOp < MOEOT > & _op)
+moeoIBEA < MOEOT > & do_make_ibea_moeo(eoParser & _parser, eoState & _state, eoPopEvalFunc < MOEOT > & _eval, eoContinue < MOEOT > & _continue, eoGenOp < MOEOT > & _op)
 {
 
     /* the objective vector type */
@@ -49,7 +49,7 @@ moeoIBEA < MOEOT > & do_make_ibea_moeo(eoParser & _parser, eoState & _state, eoE
     std::string indicatorParam = _parser.valueOf<std::string>("indicator");
     double rho = _parser.valueOf<double>("rho");
     double kappa = _parser.valueOf<double>("kappa");
-  
+
     // metric
     moeoNormalizedSolutionVsSolutionBinaryMetric < ObjectiveVector, double > *metric;
     if (indicatorParam == std::string("Epsilon"))
@@ -65,13 +65,14 @@ moeoIBEA < MOEOT > & do_make_ibea_moeo(eoParser & _parser, eoState & _state, eoE
         std::string stmp = std::string("Invalid binary quality indicator: ") + indicatorParam;
         throw std::runtime_error(stmp.c_str());
     }
-       
+
     // _state.storeFunctor(metric);
     /// the moeoIBEA
+    std::cout << "Construct IBEA" << std::endl;
     moeoIBEA < MOEOT > * algo = new moeoIBEA < MOEOT > (_continue, _eval, _op,  *metric, kappa);
-  
+    std::cout << "Construct IBEA END" << std::endl;
    //_state.storeFunctor(algo);
-  
+
    return *algo;
 
 }

@@ -241,6 +241,7 @@ eoEvalFuncCounter< EOT >& do_make_eval_mo(eoParser& _parser, eoState& _state,eoP
 		    astar_weight, 
 		    rand_seed
         );
+
 		apply(*eval_yahsp, _pop);
 	 }
 

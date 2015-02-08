@@ -119,26 +119,29 @@ int main (int argc, char *argv[])
 
   	/// definition of the archive
     moeoUnboundedArchive<PlanningMOEO > arch;
-    moeoUnboundedArchive<PlanningMOEO > localArch;
 
   	/// initialization of the population
     eoPop<PlanningMOEO >& pop = do_make_pop(parser, state, init);
 
     // The fitness evaluation
-    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval_mo(parser, state, pop, init, stratInit, localArch);
-    PlanningSampleLookEval<PlanningMOEO > psle(eval_yahsp_moeo, localArch);
+    eoEvalFuncCounter<PlanningMOEO >& eval_yahsp_moeo = do_make_eval_mo(parser, state, pop, init, stratInit, arch);
 
     /// stopping criteria
-    eoContinue<PlanningMOEO >& continuator= do_make_continue_daemoeo(parser, state, eval_yahsp_moeo, arch);
+    eoContinue<PlanningMOEO >& continuator= do_make_continue_daemoeo(parser, state, eval_yahsp_moeo,arch);
 
     eoCheckPoint<PlanningMOEO >& checkpoint = do_make_checkpoint_daemoeo(parser, state, eval_yahsp_moeo, continuator, pop, arch);
 
+    eoContinue<PlanningMOEO >& continuator2 = do_make_continue_daemoeo(parser, state, eval_yahsp_moeo,arch);
+
+    eoCheckPoint<PlanningMOEO >& checkpoint2 = do_make_checkpoint_daemoeo(parser, state, eval_yahsp_moeo, continuator2, pop, arch);
+
     // Selection
     eoDetTournamentSelect< PlanningMOEO > select;
+    PlanningSampleLookEval<PlanningMOEO > psle(eval_yahsp_moeo);
 
     /// algorithm
     moeoIBEA<PlanningMOEO > &  ibea = do_make_ibea_moeo(parser, state, psle, checkpoint, variator);
-    //moeoNSGAII<PlanningMOEO > nsgaII (checkpoint, eval_yahsp_moeo, variator);
+
     /*eoGeneralBreeder< PlanningMOEO > breed(select, variator , 2);
 
     eoMergeReduce< PlanningMOEO > replace;
@@ -146,11 +149,10 @@ int main (int argc, char *argv[])
     eoEasyEA< PlanningMOEO > (checkpoint, eval_yahsp_moeo, breed, replace);*/
 
     // run the algo
-    //apply(eval_yahsp_moeo, pop);
-    //nsgaII(pop);
-    std::cout << "Start IBEA" << std::endl;
-    ibea(pop);
-    /*while(continuator(pop)) {
+    apply(eval_yahsp_moeo, pop);
+    //ibea(pop);
+    eoTimeContinue<PlanningMOEO > azert(600);
+    while(azert(pop)) {
         //pop = do_make_pop(parser, state, init);
         for(int i = 0; i < pop.size(); i++)
         {
@@ -158,16 +160,18 @@ int main (int argc, char *argv[])
                 pop[i].invalidate();
         }
         apply(eval_yahsp_moeo, pop);
-
-    }*/
-    //eo();
+        arch(pop);
+    }
+    std::cout << "IBEA PART" << std::endl;
+    std::system("mv ./Res Res_Before -r && mkdir Res");
+    ibea(pop);
     // extract first front of the final population using an moeoArchive (this is the output of nsgaII)
-    //arch(pop);
+    arch(pop);
 
     /// printing of the final archive
-    //cout << "Final Archive\n";
-    //arch.sortedPrintOn(cout);
-    //cout << endl;
+    cout << "Final Archive\n";
+    arch.sortedPrintOn(cout);
+    cout << endl;
 
     for(int i = 0; i < arch.size(); i++)
     {
