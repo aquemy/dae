@@ -69,8 +69,7 @@ void do_make_eval_param(eoParser &parser)
  	 	
     parser.createParam((double)1,"makespan_add_weigth-min",
          "Weighting for the optimizing  makespan_add during the search (min-bound)", 'V', "Evaluation" );
-	      
-	 
+	      	 
     parser.createParam((double)1,"astar_weigth",
          "Weighting for the optimizing  A* heuristic during the search", 'O', "Evaluation" );
 	 

@@ -104,7 +104,7 @@ public:
         return current;
     }
     
-     void update(double indicator)
+    void update(double indicator)
     {
         /*std::cerr << "Update strategy n°" << nbAppel << std::endl;
         std::cerr << "- Update information : " << std::endl;

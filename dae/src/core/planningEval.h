@@ -8,6 +8,7 @@
 #include <typeinfo>
 #include <evaluation/yahsp.h>
 #include "planning.h"
+#include "planningObjectiveVector.h"
 
 namespace daex {
 
@@ -133,7 +134,6 @@ public:
         double eval = deltaPlus(decompo); // TODO : pouvoir changer l'indicateur
         if(level == "Pop")
         {
-            std::cerr << "Appel au niveau de la pop : " << this << std::endl;
             std::cerr << eval << std::endl;
             strat.update(eval);
         }
